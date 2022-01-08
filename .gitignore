@@ -1,0 +1,6 @@
+*.db
+*.exe
+.idea/
+config.json
+*.bat
+test.txt

@@ -1,0 +1,11 @@
+{
+  "ScrapeInterval" : 5,
+  "DbName" : "gok",
+  "DbHost" : "localhost",
+  "DbPort" : 5432,
+  "DbUser" : "user",
+  "DbPassword" : "password",
+  "DbSSLMode" : "disable",
+  "EntryCollectorDelay" : 20,
+  "EntryCollectorRandomDelay" : 100
+}
