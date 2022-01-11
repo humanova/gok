@@ -77,8 +77,8 @@ func ScrapeAll() {
 		log.Printf("[Scraper:main] could not insert failed requests : %s\n", err)
 	}
 
-	log.Printf("[Scraper:main] Scraped %d entries, %d topics, %d pTopics from eksisozluk.\n" +
+	log.Printf("[Scraper:main] Scraped %d entries, %d topics, %d links from eksisozluk.\n" +
 		       "\t%d total requests (%d ok | %d failed).",
-		       len(entries), len(topics), len(popularTopics), len(requests), len(requests)-len(unsuccessfulRequests),
+		       len(entries), len(topics), len(entryAttachments), len(requests), len(requests)-len(unsuccessfulRequests),
 		       len(unsuccessfulRequests))
 }
