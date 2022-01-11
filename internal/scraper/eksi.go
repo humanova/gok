@@ -76,7 +76,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 								requestsChan chan map[string]uint16) {
 	const baseUrl = "https://eksisozluk.com"
 	const popularTopicsPath = "/basliklar/gundem"
-	topicPages := []string {"4", "5"}
+	topicPages := []string {"1", "2", "3", "4", "5"}
 	const timeLayout = "02.01.2006 15:04"
 
 	var topics popularTopics
