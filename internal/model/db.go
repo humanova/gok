@@ -46,7 +46,7 @@ func prepareDb() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	err = database.AutoMigrate(&Entry{},  &Topic{}, &PopularTopic{}, &Request{})
+	err = database.AutoMigrate(&Entry{},  &Topic{}, &PopularTopic{}, &EntryAttachment{}, &Request{})
 
 	if err != nil {
 		log.Println(fmt.Sprintf("[DB] couldn't create new table : %s\n", err))
@@ -241,8 +241,30 @@ func getPopularTopicsAfter(database *gorm.DB, timestamp int64) ([]PopularTopic, 
 	return topics, nil
 }
 
-// Request
+// -- EntryAttachment --
+func createEntryAttachment(database *gorm.DB, topic EntryAttachment) error {
+	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&topic)
 
+	if tx.Error != nil {
+		log.Println(fmt.Sprintf("[DB] couldn't insert new EntryAttachment : %s\n", tx.Error))
+		return tx.Error
+	}
+
+	return nil
+}
+
+func createEntryAttachments(database *gorm.DB, topics []EntryAttachment) error {
+	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&topics)
+
+	if tx.Error != nil {
+		log.Println(fmt.Sprintf("[DB] couldn't insert new EntryAttachment : %s\n", tx.Error))
+		return tx.Error
+	}
+
+	return nil
+}
+
+// Request
 func createRequest(database *gorm.DB, request Request) error {
 	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&request)
 

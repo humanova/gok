@@ -9,13 +9,15 @@ func ScrapeAll() {
 	var entries []model.Entry
 	var topics []model.Topic
 	var popularTopics []model.PopularTopic
+	var entryAttachments []model.EntryAttachment
 	var pTopics []model.PTopic // scraped
 	var requests map[string]uint16
 
 	topicsChan := make(chan []model.PTopic)
 	entriesChan := make(chan []model.Entry)
+	attachmentsChan := make(chan []model.EntryAttachment)
 	requestsChan := make(chan map[string]uint16)
-	go scrapeEksiTopicsAndEntries(entriesChan, topicsChan, requestsChan)
+	go scrapeEksiTopicsAndEntries(entriesChan, topicsChan, attachmentsChan, requestsChan)
 
 	pTopics = <- topicsChan
 
@@ -42,6 +44,7 @@ func ScrapeAll() {
 	}
 
 	entries = <- entriesChan
+	entryAttachments = <- attachmentsChan
 	requests = <- requestsChan
 
 	// insert entries in batches of 250
@@ -57,6 +60,11 @@ func ScrapeAll() {
 		}
 	}
 
+	err = model.AddEntryAttachments(entryAttachments)
+	if err != nil {
+		log.Printf("[Scraper:main] could not insert entry attachments : %s\n", err)
+	}
+
 	var unsuccessfulRequests []model.Request
 	for url, code := range requests {
 		if code != 200 {
@@ -65,6 +73,9 @@ func ScrapeAll() {
 	}
 
 	err = model.AddRequests(unsuccessfulRequests)
+	if err != nil {
+		log.Printf("[Scraper:main] could not insert failed requests : %s\n", err)
+	}
 
 	log.Printf("[Scraper:main] Scraped %d entries, %d topics, %d pTopics from eksisozluk.\n" +
 		       "\t%d total requests (%d ok | %d failed).",

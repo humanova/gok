@@ -72,18 +72,21 @@ func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
 
 func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 								topicsChan chan []model.PTopic,
+								attachmentsChan chan []model.EntryAttachment,
 								requestsChan chan map[string]uint16) {
 	const baseUrl = "https://eksisozluk.com"
 	const popularTopicsPath = "/basliklar/gundem"
-	topicPages := []string {"1", "2", "3", "4", "5"}
+	topicPages := []string {"4", "5"}
 	const timeLayout = "02.01.2006 15:04"
 
 	var topics popularTopics
 	var entries []model.Entry
+	var attachments []model.EntryAttachment
 	requests := make(map[string]uint16)
 	var scrapedIds []uint64
 
 	entriesMutex := &sync.Mutex{}
+	attachmentsMutex := &sync.Mutex{}
 	requestsMutex := &sync.RWMutex{}
 	scrapedIdsMutex := &sync.Mutex{}
 
@@ -164,7 +167,6 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 				entryId = 0
 			}
 
-
 			text := tEntry.ChildText("div .content")
 			tEntry.DOM.Find("div .content")
 			text = strings.TrimSuffix(strings.TrimPrefix(text, "\n    "), "\n")
@@ -187,6 +189,13 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 
 			entryTime, _ := time.Parse(timeLayout, dateStr)
 			entryTime = entryTime.Add(time.Duration(-3) * time.Hour)
+
+			// scrape entry links (attachments)
+			tEntry.ForEach("a[class='url']", func(_ int, tLink *colly.HTMLElement) {
+				attachmentsMutex.Lock()
+				attachments = append(attachments, model.EntryAttachment{EntryId: entryId, Url:tLink.Attr("href")})
+				attachmentsMutex.Unlock()
+			})
 
 			p := model.Entry{
 				EntryId:   entryId,
@@ -238,5 +247,6 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	}
 	entryCollector.Wait()
 	entriesChan <- entries
+	attachmentsChan <- attachments
 	requestsChan <- requests
 }
