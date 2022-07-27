@@ -76,7 +76,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 								requestsChan chan map[string]uint16) {
 	const baseUrl = "https://eksisozluk.com"
 	const popularTopicsPath = "/basliklar/gundem"
-	topicPages := []string {"1", "2", "3", "4", "5"}
+	topicPages := []string {"1"} // TODO FIX THISS "2", "3", "4", "5"
 	const timeLayout = "02.01.2006 15:04"
 
 	var topics popularTopics
@@ -129,7 +129,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 
 	// scrape popular topics
 	topicCollector.OnHTML("ul[class]", func(e *colly.HTMLElement) {
-		if e.Attr("class") != "topic-list"{
+		if e.Attr("class") != "topic-list partial"{
 			return
 		}
 		e.ForEach("a", topics.appendTopics)
@@ -209,6 +209,10 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 
 			entriesMutex.Lock()
 			entries = append(entries, p)
+			log.Println(len(entries))
+			if p.EntryId % 15 == 0 {
+				log.Println(p)
+			}
 			entriesMutex.Unlock()
 
 			scrapedIdsMutex.Lock()
@@ -234,6 +238,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	}
 	topicsChan <- topics
 
+	log.Println(len(topics))
 	for _, topic := range topics {
 		var url string
 		// use the last entry's id as a starting point, if scraped
