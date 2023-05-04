@@ -33,7 +33,7 @@ func containsUint64(s []uint64, e uint64) bool {
 
 func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
 	// get topic url
-	urlSlice := []string{"https://eksisozluk.com", strings.Split(element.Attr("href"), "?")[0]}
+	urlSlice := []string{"https://eksisozluk2023.com", strings.Split(element.Attr("href"), "?")[0]}
 	topicUrl := strings.Join(urlSlice, "")
 	// get topic_id by using '--' seperator. format : /<topic>--<topic_id>.
 	topicId, err := strconv.ParseUint(strings.Split(topicUrl, "--")[1], 10, 64)
