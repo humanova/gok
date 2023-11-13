@@ -3,12 +3,12 @@ package model
 import (
 	"context"
 	"fmt"
+	"gok/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 	"log"
-	"gok/internal/config"
 	"os"
 	"time"
 )
@@ -27,16 +27,16 @@ func prepareDb() (*gorm.DB, error) {
 	dbLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
-			SlowThreshold: time.Second,
-			LogLevel:      logger.Warn,
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Warn,
 			IgnoreRecordNotFoundError: true,
-			Colorful:      false,
+			Colorful:                  false,
 		},
 	)
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=UTC",
-		   config.Config.DbHost, config.Config.DbUser, config.Config.DbPassword, config.Config.DbName,
-		   config.Config.DbPort, config.Config.DbSSLMode)
+		config.Config.DbHost, config.Config.DbUser, config.Config.DbPassword, config.Config.DbName,
+		config.Config.DbPort, config.Config.DbSSLMode)
 
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: dbLogger,
@@ -46,7 +46,7 @@ func prepareDb() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	err = database.AutoMigrate(&Entry{},  &Topic{}, &PopularTopic{}, &EntryAttachment{}, &Request{})
+	err = database.AutoMigrate(&Entry{}, &Topic{}, &PopularTopic{}, &EntryAttachment{}, &Request{})
 
 	if err != nil {
 		log.Println(fmt.Sprintf("[DB] couldn't create new table : %s\n", err))
@@ -91,7 +91,7 @@ func updateEntryScore(database *gorm.DB, entry Entry, score int64) error {
 func getLastTopicEntry(database *gorm.DB, topicId uint64) (Entry, error) {
 	var entry Entry
 
-	tx := database.Order("entry_id desc").Where("topic_id = ?", topicId).First(&entry)
+	tx := database.Order("entry_id desc").Where("topic_id = ?", topicId).Limit(1).First(&entry)
 	if tx.Error != nil {
 		//log.Println(fmt.Sprintf("[DB] couldn't query any entry with given topic id(%d) : %s\n", topicId, tx.Error))
 		return entry, tx.Error

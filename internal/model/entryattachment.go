@@ -1,14 +1,12 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 )
 
 type EntryAttachment struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt sql.NullTime `gorm:"index"`
 	EntryId   uint64 `gorm:"primaryKey;autoIncrement:false"`
 	Url       string `gorm:"primaryKey;autoIncrement:false"`
 }

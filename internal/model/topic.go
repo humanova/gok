@@ -6,9 +6,9 @@ import (
 
 type Topic struct {
 	gorm.Model
-	TopicId   uint64  `gorm:"unique"`
-	Text      string
-	Url       string  `gorm:"unique"`
+	TopicId uint64 `gorm:"uniqueIndex:,sort:desc"`
+	Text    string
+	Url     string `gorm:"unique"`
 }
 
 type PopularTopic struct {
@@ -22,7 +22,7 @@ type PopularTopic struct {
 type PTopic struct {
 	TopicId    uint64
 	Url        string `gorm:"unique"`
-	Timestamp  int64 // unix time UTC
+	Timestamp  int64  // unix time UTC
 	Text       string
 	NewEntries uint64
 	PageNumber uint64
@@ -46,6 +46,7 @@ func AddTopics(newTopics []Topic) error {
 	}
 	return nil
 }
+
 // PopularTopic
 
 func AddPopularTopic(newTopic PopularTopic) error {
@@ -81,4 +82,3 @@ func GetPopularTopicsAfter(timestamp int64) ([]PopularTopic, error) {
 	}
 	return topics, nil
 }
-

@@ -7,7 +7,7 @@ import (
 type Entry struct {
 	gorm.Model
 	EntryId   uint64 `gorm:"unique"`
-	Timestamp int64 // unix time UTC
+	Timestamp int64  // unix time UTC
 	Author    string
 	Text      string
 	Url       string `gorm:"unique"`
@@ -66,7 +66,6 @@ func GetEntriesSince(timestamp int64) ([]Entry, error) {
 	}
 	return entries, nil
 }
-
 
 func GetEntriesFiltered(filters Filters) ([]Entry, error) {
 	var entries, err = getEntriesFiltered(database, filters)
