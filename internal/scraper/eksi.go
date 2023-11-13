@@ -33,7 +33,7 @@ func containsUint64(s []uint64, e uint64) bool {
 
 func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
 	// get topic url
-	urlSlice := []string{"https://eksisozluk2023.com", strings.Split(element.Attr("href"), "?")[0]}
+	urlSlice := []string{"https://eksisozluk1923.com", strings.Split(element.Attr("href"), "?")[0]}
 	topicUrl := strings.Join(urlSlice, "")
 	// get topic_id by using '--' seperator. format : /<topic>--<topic_id>.
 	topicId, err := strconv.ParseUint(strings.Split(topicUrl, "--")[1], 10, 64)
@@ -60,23 +60,23 @@ func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
 	}
 
 	// "topic (new entry count)" -> "topic"
-	topicText := element.DOM.Text()[0:len(element.DOM.Text())-len(newEntriesRaw)-1]
+	topicText := element.DOM.Text()[0 : len(element.DOM.Text())-len(newEntriesRaw)-1]
 
 	*topics = append(*topics, model.PTopic{Text: topicText,
-										   Url: topicUrl,
-										   NewEntries: newEntryCount,
-										   Timestamp: time.Now().Unix(),
-	                                       TopicId: topicId,
-	                                       PageNumber: pageNumber})
+		Url:        topicUrl,
+		NewEntries: newEntryCount,
+		Timestamp:  time.Now().Unix(),
+		TopicId:    topicId,
+		PageNumber: pageNumber})
 }
 
 func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
-								topicsChan chan []model.PTopic,
-								attachmentsChan chan []model.EntryAttachment,
-								requestsChan chan map[string]uint16) {
-	const baseUrl = "https://eksisozluk.com"
+	topicsChan chan []model.PTopic,
+	attachmentsChan chan []model.EntryAttachment,
+	requestsChan chan map[string]uint16) {
+	const baseUrl = "https://eksisozluk1923.com"
 	const popularTopicsPath = "/basliklar/gundem"
-	topicPages := []string {"1", "2", "3", "4", "5"}
+	topicPages := []string{"1", "2", "3", "4", "5"}
 	const timeLayout = "02.01.2006 15:04"
 
 	var topics popularTopics
@@ -90,14 +90,12 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	requestsMutex := &sync.RWMutex{}
 	scrapedIdsMutex := &sync.Mutex{}
 
-
 	topicCollector := colly.NewCollector(
-		colly.AllowedDomains("eksisozluk.com"),
+		colly.AllowedDomains("eksisozluk1923.com"),
 	)
 
-
 	entryCollector := colly.NewCollector(
-		colly.AllowedDomains("eksisozluk.com"),
+		colly.AllowedDomains("eksisozluk1923.com"),
 		colly.MaxDepth(1),
 		colly.Async(true),
 	)
@@ -105,11 +103,11 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	entryCollector.Limit(&colly.LimitRule{
 		DomainGlob:  "*",
 		Parallelism: 6,
-		Delay: time.Duration(config.Config.EntryCollectorDelay) * time.Millisecond,
+		Delay:       time.Duration(config.Config.EntryCollectorDelay) * time.Millisecond,
 		RandomDelay: time.Duration(config.Config.EntryCollectorRandomDelay) * time.Millisecond,
 	})
 
-	entryCollector.OnError(func (r *colly.Response, e error) {
+	entryCollector.OnError(func(r *colly.Response, e error) {
 		requestsMutex.Lock()
 		requests[r.Request.URL.String()] = uint16(r.StatusCode)
 		requestsMutex.Unlock()
@@ -129,7 +127,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 
 	// scrape popular topics
 	topicCollector.OnHTML("ul[class]", func(e *colly.HTMLElement) {
-		if e.Attr("class") != "topic-list partial"{
+		if e.Attr("class") != "topic-list partial" {
 			return
 		}
 		e.ForEach("a", topics.appendTopics)
@@ -193,7 +191,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 			// scrape entry links (attachments)
 			tEntry.ForEach("a[class='url']", func(_ int, tLink *colly.HTMLElement) {
 				attachmentsMutex.Lock()
-				attachments = append(attachments, model.EntryAttachment{EntryId: entryId, Url:tLink.Attr("href")})
+				attachments = append(attachments, model.EntryAttachment{EntryId: entryId, Url: tLink.Attr("href")})
 				attachmentsMutex.Unlock()
 			})
 
@@ -218,7 +216,6 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 			lastEntryId = entryId
 		})
 
-
 		slc := []string{baseUrl, topicUrl, "?focusto=", strconv.FormatUint(lastEntryId+1, 10)}
 		nextPageUrl := strings.Join(slc, "")
 		if _, exists := requests[nextPageUrl]; !exists && lastEntryId != 0 {
@@ -239,7 +236,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 		// use the last entry's id as a starting point, if scraped
 		entry, err := model.GetLastTopicEntry(topic.TopicId)
 		if err != nil {
-			url = strings.Join([]string{topic.Url, "?a=popular&p=1"},"")
+			url = strings.Join([]string{topic.Url, "?a=popular&p=1"}, "")
 		} else {
 			url = strings.Join([]string{topic.Url, "?focusto=", strconv.FormatUint(entry.EntryId+1, 10)}, "")
 		}
