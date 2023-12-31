@@ -95,7 +95,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	)
 
 	entryCollector := colly.NewCollector(
-		colly.AllowedDomains("ksisozluk111.com"),
+		colly.AllowedDomains("eksisozluk111.com"),
 		colly.MaxDepth(1),
 		colly.Async(true),
 	)
