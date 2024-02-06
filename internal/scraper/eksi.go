@@ -33,7 +33,7 @@ func containsUint64(s []uint64, e uint64) bool {
 
 func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
 	// get topic url
-	urlSlice := []string{"https://eksisozluk111.com", strings.Split(element.Attr("href"), "?")[0]}
+	urlSlice := []string{"https://eksisozluk.com", strings.Split(element.Attr("href"), "?")[0]}
 	topicUrl := strings.Join(urlSlice, "")
 	// get topic_id by using '--' seperator. format : /<topic>--<topic_id>.
 	topicId, err := strconv.ParseUint(strings.Split(topicUrl, "--")[1], 10, 64)
@@ -74,7 +74,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	topicsChan chan []model.PTopic,
 	attachmentsChan chan []model.EntryAttachment,
 	requestsChan chan map[string]uint16) {
-	const baseUrl = "https://eksisozluk111.com"
+	const baseUrl = "https://eksisozluk.com"
 	const popularTopicsPath = "/basliklar/gundem"
 	topicPages := []string{"1", "2", "3", "4", "5"}
 	const timeLayout = "02.01.2006 15:04"
@@ -91,11 +91,11 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	scrapedIdsMutex := &sync.Mutex{}
 
 	topicCollector := colly.NewCollector(
-		colly.AllowedDomains("eksisozluk111.com"),
+		colly.AllowedDomains("eksisozluk.com"),
 	)
 
 	entryCollector := colly.NewCollector(
-		colly.AllowedDomains("eksisozluk111.com"),
+		colly.AllowedDomains("eksisozluk.com"),
 		colly.MaxDepth(1),
 		colly.Async(true),
 	)
