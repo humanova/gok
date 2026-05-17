@@ -1,7 +1,8 @@
 package scraper
 
 import (
-	"log"
+	"log/slog"
+
 	"gok/internal/model"
 )
 
@@ -35,12 +36,12 @@ func ScrapeAll() {
 
 	err := model.AddTopics(topics)
 	if err != nil {
-		log.Printf("[Scraper:main] could not insert topics : %s\n", err)
+		slog.Error("could not insert topics", "error", err)
 	}
 
 	err = model.AddPopularTopics(popularTopics)
 	if err != nil {
-		log.Printf("[Scraper:main] could not insert pTopics : %s\n", err)
+		slog.Error("could not insert popular topics", "error", err)
 	}
 
 	entries = <- entriesChan
@@ -49,20 +50,17 @@ func ScrapeAll() {
 
 	// insert entries in batches of 250
 	batch := 250
-	for i:=0; i < len(entries); i+= batch {
-		j := i + batch
-		if j > len(entries) {
-			j = len(entries)
-		}
+	for i := 0; i < len(entries); i += batch {
+		j := min(i+batch, len(entries))
 		err := model.AddEntries(entries[i:j])
 		if err != nil {
-			log.Printf("[Scraper:main] could not insert entries to db : %s\n", err)
+			slog.Error("could not insert entries", "error", err)
 		}
 	}
 
 	err = model.AddEntryAttachments(entryAttachments)
 	if err != nil {
-		log.Printf("[Scraper:main] could not insert entry attachments : %s\n", err)
+		slog.Error("could not insert entry attachments", "error", err)
 	}
 
 	var unsuccessfulRequests []model.Request
@@ -74,11 +72,15 @@ func ScrapeAll() {
 
 	err = model.AddRequests(unsuccessfulRequests)
 	if err != nil {
-		log.Printf("[Scraper:main] could not insert failed requests : %s\n", err)
+		slog.Error("could not insert failed requests", "error", err)
 	}
 
-	log.Printf("[Scraper:main] Scraped %d entries, %d topics, %d links from eksisozluk.\n" +
-		       "\t%d total requests (%d ok | %d failed).",
-		       len(entries), len(topics), len(entryAttachments), len(requests), len(requests)-len(unsuccessfulRequests),
-		       len(unsuccessfulRequests))
+	slog.Info("scrape complete",
+		"entries", len(entries),
+		"topics", len(topics),
+		"links", len(entryAttachments),
+		"total_requests", len(requests),
+		"ok_requests", len(requests)-len(unsuccessfulRequests),
+		"failed_requests", len(unsuccessfulRequests),
+	)
 }

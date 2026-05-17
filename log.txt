@@ -1,0 +1,980 @@
+2026/05/17 12:45:47 Starting scraper cron job...
+2026/05/17 12:45:47 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 12:45:51 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2549.306ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8089819 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:45:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2460.046ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4580035 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:45:56 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2413.461ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102566 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:45:59 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2565.507ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102522 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:01 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2517.485ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102603 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:05 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3488.906ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8100836 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:09 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4247.689ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 3286026 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:12 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3000.040ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5305464 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:14 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2374.367ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102551 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:17 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2402.168ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7963854 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:19 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2377.602ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8066207 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:21 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2412.699ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102338 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:24 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3033.914ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6655016 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:27 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2547.080ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6748802 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:29 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2438.038ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7413177 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:32 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2555.493ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102333 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:34 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2414.123ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6518041 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:37 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2415.351ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4126247 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:39 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2420.184ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 33210 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:42 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2452.368ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102548 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:44 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2339.072ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1899629 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:46 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2306.520ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102454 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:49 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2780.086ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7445584 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4376.865ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102366 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:46:57 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3627.858ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6622428 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:00 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2515.081ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6870058 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:02 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2464.082ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 348851 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:05 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2487.533ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7727020 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:07 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2414.545ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102490 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:10 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2583.823ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4988783 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:12 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2415.114ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1686215 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:14 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2335.930ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 93103 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:17 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2490.404ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 151380 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:19 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2595.595ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102531 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:22 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2989.122ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5917003 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:25 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2566.318ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8088662 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:29 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4104.622ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7435046 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:33 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4305.304ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5800904 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:36 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2641.195ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1849715 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:38 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2382.282ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101663 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:41 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2699.923ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101952 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:44 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2420.555ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102206 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:46 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2382.358ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7937159 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:48 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2471.629ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7670733 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:51 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2696.212ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102314 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2403.631ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5191924 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:56 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2306.834ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7802622 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:47:58 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2393.293ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1921404 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:01 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2332.979ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7795120 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:03 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2571.973ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102169 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:06 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2418.070ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102474 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:08 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2383.811ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102467 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:11 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2784.093ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7311083 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:15 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4000.747ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 2508719 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:18 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3731.279ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4749220 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:21 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2665.426ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6734485 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:24 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2438.223ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6802257 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:26 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2511.528ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 223817 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:28 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2305.352ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102331 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:31 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2443.441ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101854 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:34 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3128.666ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6166390 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:36 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2418.636ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101874 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:39 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2399.043ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7299122 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:41 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2309.180ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 37894 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:43 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2303.661ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8013746 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:46 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2544.024ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 33409 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:49 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3505.908ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102082 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4744.528ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4996273 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:57 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2966.177ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102429 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:48:59 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2308.356ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102045 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:06 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[6344.671ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4091711 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:23 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[16971.662ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 2767193 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:25 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2585.009ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102200 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:28 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2293.947ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5086776 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:30 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2281.086ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102450 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:32 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2311.789ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6351641 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:35 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2637.128ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4611521 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:38 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3177.815ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7362531 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:42 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3508.737ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102287 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:45 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3773.473ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 91730 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:48 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2627.185ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7926455 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:50 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2353.346ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102091 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:49:53 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2356.264ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 2577439 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+2026/05/17 12:51:47 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 12:51:50 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2382.782ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8089819 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:51:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3086.858ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4580035 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:51:57 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3527.887ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102566 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:01 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3720.656ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102522 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:03 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2554.892ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102603 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:06 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2489.757ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 3286026 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:08 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2344.806ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8100836 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:11 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2399.051ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102551 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:13 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2568.179ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5305464 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:16 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2537.902ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7963854 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:18 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2392.317ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8066207 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:21 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2631.615ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6748802 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:23 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2462.866ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7413177 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:26 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2369.625ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102338 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:28 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2324.399ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102333 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:31 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3229.434ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6655016 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:35 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3876.299ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4126247 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:39 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3788.407ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1899629 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:42 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2781.064ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6518041 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:44 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2535.889ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 33210 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:47 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2464.600ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102548 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:49 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2350.164ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102454 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:51 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2572.654ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7445584 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2393.894ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102366 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:56 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2509.052ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6622428 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:52:59 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2511.506ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6870058 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:01 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2590.184ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 348851 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:04 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2415.476ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7727020 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:06 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2404.879ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102490 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:09 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2462.260ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4988783 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:11 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2528.413ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1686215 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:14 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2386.778ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 93103 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:16 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2418.981ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 151380 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:19 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2858.300ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102531 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:23 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3600.286ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5917003 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:27 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4816.937ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 33409 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:30 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2666.974ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8088662 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:33 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2516.959ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7435046 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:35 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2492.501ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5800904 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:38 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2527.335ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1849715 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:40 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2374.299ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101663 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:42 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2524.829ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101952 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:45 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2402.287ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102206 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:47 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2503.332ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7937159 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:50 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2487.313ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7670733 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:52 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2426.451ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102314 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:55 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2349.075ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5191924 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:53:57 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2801.048ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7802622 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:01 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3720.797ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1921404 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:06 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4535.983ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7795120 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:09 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2884.814ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102169 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:11 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2250.950ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102474 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:13 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2531.403ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102467 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:16 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2411.787ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7311083 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:18 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2563.272ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 2508719 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:21 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2452.629ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4749220 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:23 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2497.973ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6734485 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:26 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2465.573ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6802257 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:28 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2486.782ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 223817 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:31 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2517.553ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102331 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:33 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2486.040ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101854 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:36 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2881.379ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6166390 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:40 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3825.249ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101874 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:44 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4016.572ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7299122 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:46 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2411.400ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 37894 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:49 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2558.054ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8013746 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:51 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2428.839ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102082 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2286.658ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4996273 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:56 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2307.562ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102429 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:54:59 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2570.308ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102045 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:01 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2710.961ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4091711 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:04 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2609.314ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 2767193 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:06 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2486.703ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5086776 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:09 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2625.891ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102200 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:11 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2469.999ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102450 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:14 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2748.613ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6351641 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:17 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2383.519ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4611521 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:19 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2460.261ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7362531 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:22 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2715.335ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102287 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:25 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3425.570ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 91730 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:29 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4120.298ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7926455 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:32 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2945.275ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102091 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:55:35 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2540.386ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 2577439 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+2026/05/17 12:57:47 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 12:57:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[5394.110ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8089819 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:57:57 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2912.085ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102566 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:57:59 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2502.118ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4580035 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:02 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2578.144ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102522 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:04 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2426.045ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102603 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:07 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2565.772ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8100836 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:09 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2420.134ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 3286026 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:12 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2507.081ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102551 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:14 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2477.952ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5305464 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:17 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2599.901ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102595 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:19 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2711.721ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7963854 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:22 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2505.925ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8066207 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:24 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2560.391ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6748802 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:27 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2332.539ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102333 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:29 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2415.879ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7413177 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:32 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2452.924ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102338 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:34 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2540.832ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6655016 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:37 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2792.305ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4126247 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:40 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3480.627ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1899629 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:45 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4123.225ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6518041 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:47 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2906.076ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 33210 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:50 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2684.967ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102366 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:53 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2381.901ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102548 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:55 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2491.358ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102454 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:58:57 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2448.534ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7445584 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:00 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2477.608ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6622428 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:03 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2599.710ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6870058 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:05 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2494.804ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5917003 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:07 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2405.780ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 348851 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:10 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2474.540ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7727020 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:12 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2441.399ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102490 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:15 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2502.992ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7937159 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:17 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2475.456ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4988783 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:20 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2993.781ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1686215 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:24 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3931.436ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 93103 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:28 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4105.301ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102467 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:31 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2669.270ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 151380 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:34 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2501.170ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102531 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:36 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2867.977ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 33409 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:40 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3120.174ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8088662 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:43 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3421.829ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7435046 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+2026/05/17 12:59:43 [Scraper:main] Scraped 27739 entries, 83 topics, 2171 links from eksisozluk.
+	2862 total requests (2843 ok | 19 failed).
+
+2026/05/17 12:59:46 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2692.521ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5800904 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:48 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2600.100ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1849715 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:51 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2664.151ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101663 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:53 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2517.523ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101952 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:56 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2494.248ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102206 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 12:59:59 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2600.264ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7670733 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:01 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2812.050ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102314 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:04 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3098.657ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5191924 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:08 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4030.421ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7802622 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:13 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4086.995ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1921404 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:16 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2984.135ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7795120 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:18 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2411.550ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102169 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:20 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2490.135ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102474 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:23 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2523.042ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7311083 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:26 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2546.093ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 2508719 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:28 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2645.096ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4749220 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:31 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2672.046ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6734485 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:33 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2402.213ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6802257 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:36 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2519.680ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 223817 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:38 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2497.852ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102331 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:41 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2590.025ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101854 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:44 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2682.062ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6166390 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:46 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2597.706ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101874 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:49 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2602.274ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7299122 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:52 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2821.038ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 37894 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2590.946ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8013746 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:00:57 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2691.452ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102082 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:00 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2784.957ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4996273 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:03 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3708.334ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102429 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:08 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4912.991ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102045 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:12 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3595.934ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4091711 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:14 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2541.353ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 2767193 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:17 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2841.727ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5086776 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:20 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2529.242ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102200 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:22 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2512.004ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102450 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:25 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2656.819ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6351641 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:28 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2723.626ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7362531 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:30 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2528.200ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4611521 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:33 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2670.418ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102287 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:36 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2710.746ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7926455 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:38 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2710.314ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 91730 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:41 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2613.589ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102091 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:01:43 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2563.042ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 2577439 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+2026/05/17 13:03:47 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 13:03:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[5565.200ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 3286026 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:03:56 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2304.495ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8089819 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:03:58 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2304.322ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102566 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:01 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2379.077ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4580035 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:03 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2494.460ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102522 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:06 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2514.404ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102551 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:08 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2322.731ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5305464 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:10 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2375.267ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102338 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:13 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2513.580ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8066207 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:15 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2495.061ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6748802 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:18 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2478.756ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102548 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:20 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2331.615ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8100836 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:23 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2600.204ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7963854 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:25 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2397.805ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102603 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:28 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2471.727ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7727020 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:30 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2399.564ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7445584 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:33 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2579.746ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102333 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:35 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2539.702ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4988783 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:38 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2994.702ms] [rows:0] SELECT * FROM "entries" WHERE topic_id = 8102595 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:42 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3779.211ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6518041 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:46 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4300.010ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7413177 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:49 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2684.778ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6655016 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:52 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2604.163ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4126247 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:54 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2593.090ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 348851 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:57 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2320.123ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101663 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:04:59 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2519.153ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1849715 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:05:02 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2764.920ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102454 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:05:04 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2526.968ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 33210 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:05:07 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2767.297ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102490 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:05:10 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2604.992ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102366 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:05:12 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2604.639ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6622428 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:05:15 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2441.371ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 7937159 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:05:17 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2588.900ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 1686215 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:05:20 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2764.235ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102206 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:05:23 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2827.504ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8101952 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+2026/05/17 13:07:08 Starting scraper cron job...
+2026/05/17 13:07:08 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 13:07:14 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4917.794ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102566 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:17 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3061.056ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8089819 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:19 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2431.692ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 3286026 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:22 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2568.017ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102603 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:25 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2546.481ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4580035 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:27 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2604.434ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102551 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:30 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2480.108ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5305464 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:32 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2474.382ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8100836 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:35 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2603.840ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102338 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:37 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2600.273ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6748802 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:07:40 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2591.344ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102522 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+2026/05/17 13:07:55 Starting scraper cron job...
+2026/05/17 13:07:55 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 13:07:59 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2687.760ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102566 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:01 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2536.320ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8089819 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:04 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2416.625ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 3286026 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:06 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2589.334ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102603 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:09 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2546.400ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 4580035 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:11 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2447.492ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102551 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:14 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2576.599ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 5305464 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:17 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3510.165ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8100836 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:23 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[5698.086ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102338 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:26 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[3284.996ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 6748802 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+
+2026/05/17 13:08:29 C:/Users/msi/go/src/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2719.632ms] [rows:1] SELECT * FROM "entries" WHERE topic_id = 8102522 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc,"entries"."id" LIMIT 1
+2026/05/17 13:31:06 Starting scraper cron job...
+2026/05/17 13:31:06 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 13:31:43 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[35403.704ms] [rows:0] SELECT "entry_id" FROM "entries" WHERE topic_id = 8102595 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+
+2026/05/17 13:32:13 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[30370.276ms] [rows:0] SELECT "entry_id" FROM "entries" WHERE topic_id = 8075885 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+
+2026/05/17 13:32:15 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[2073.808ms] [rows:1] SELECT "entry_id" FROM "entries" WHERE topic_id = 7435046 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+2026/05/17 13:37:06 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 13:38:34 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[86866.151ms] [rows:0] SELECT "entry_id" FROM "entries" WHERE topic_id = 8102595 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+
+2026/05/17 13:40:06 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[91961.737ms] [rows:0] SELECT "entry_id" FROM "entries" WHERE topic_id = 8075885 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+
+2026/05/17 13:40:07 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[1012.087ms] [rows:1] SELECT "entry_id" FROM "entries" WHERE topic_id = 93103 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+
+2026/05/17 13:40:12 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[4849.437ms] [rows:1] SELECT "entry_id" FROM "entries" WHERE topic_id = 7435046 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+2026/05/17 13:43:06 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 13:44:05 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[57748.450ms] [rows:0] SELECT "entry_id" FROM "entries" WHERE topic_id = 8102595 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+
+2026/05/17 13:44:23 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[17517.071ms] [rows:0] SELECT "entry_id" FROM "entries" WHERE topic_id = 8075885 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+
+2026/05/17 13:44:24 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[1100.107ms] [rows:1] SELECT "entry_id" FROM "entries" WHERE topic_id = 7435046 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+2026/05/17 13:44:54 [Scraper:main] Scraped 26324 entries, 81 topics, 9138 links from eksisozluk.
+	2718 total requests (2707 ok | 11 failed).
+2026/05/17 13:49:06 [Scraper:eksi] Scraping popular topics from eksisozluk...
+2026/05/17 13:49:13 [Scraper:main] Scraped 18519 entries, 82 topics, 7528 links from eksisozluk.
+	1935 total requests (1919 ok | 16 failed).
+
+2026/05/17 13:49:27 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[19898.263ms] [rows:1] SELECT "entry_id" FROM "entries" WHERE topic_id = 7435046 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+
+2026/05/17 13:49:28 /home/humanova/projects/gok/internal/model/db.go:94 SLOW SQL >= 1s
+[1009.350ms] [rows:1] SELECT "entry_id" FROM "entries" WHERE topic_id = 37894 AND "entries"."deleted_at" IS NULL ORDER BY entry_id desc LIMIT 1
+2026/05/17 13:52:25 [Scraper:main] Scraped 16013 entries, 81 topics, 953 links from eksisozluk.
+	1686 total requests (1672 ok | 14 failed).
+2026/05/17 13:55:06 [Scraper:eksi] Scraping popular topics from eksisozluk...

@@ -1,35 +1,18 @@
 package scraper
 
 import (
-	"github.com/gocolly/colly"
-	"gok/internal/config"
-	model "gok/internal/model"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/gocolly/colly"
+	"gok/internal/config"
+	model "gok/internal/model"
 )
 
 type popularTopics []model.PTopic
-
-func containsString(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
-func containsUint64(s []uint64, e uint64) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
 
 func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
 	// get topic url
@@ -39,14 +22,14 @@ func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
 	topicId, err := strconv.ParseUint(strings.Split(topicUrl, "--")[1], 10, 64)
 	if err != nil {
 		topicId = 0
-		log.Println("[Scraper:eksi] Couldn't scrape topic id (topic scraper)")
+		slog.Warn("couldn't scrape topic id")
 	}
 
 	urlQuery := element.Request.URL.RawQuery
 	pageNumber, err := strconv.ParseUint(urlQuery[len(urlQuery)-1:], 10, 64) // last character of rawQuery
 	if err != nil {
 		pageNumber = 0
-		log.Println("[Scraper:eksi] Couldn't scrape page number (topic scraper)")
+		slog.Warn("couldn't scrape page number")
 	}
 
 	newEntriesRaw := element.DOM.Find("small").Text()
@@ -55,7 +38,7 @@ func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
 
 	newEntryCount, err := strconv.ParseUint(newEntriesString, 10, 64)
 	if err != nil {
-		log.Println("[Scraper:eksi] Couldn't scrape new entry count")
+		slog.Warn("couldn't scrape new entry count")
 		newEntryCount = 0
 	}
 
@@ -83,7 +66,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	var entries []model.Entry
 	var attachments []model.EntryAttachment
 	requests := make(map[string]uint16)
-	var scrapedIds []uint64
+	scrapedIds := make(map[uint64]struct{})
 
 	entriesMutex := &sync.Mutex{}
 	attachmentsMutex := &sync.Mutex{}
@@ -133,7 +116,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 		e.ForEach("a", topics.appendTopics)
 
 		if len(topics) == 0 {
-			log.Println("[Scraper:eksi] Couldn't scrape any topics")
+			slog.Warn("couldn't scrape any topics")
 			return
 		}
 	})
@@ -148,20 +131,23 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 		topicId, err := strconv.ParseUint(e.ChildAttr("h1[data-title]", "data-id"), 10, 64)
 		if err != nil {
 			topicId = 0
-			log.Println("[Scraper:eksi] Couldn't parse topic id (entry scraper)")
+			slog.Warn("couldn't parse topic id")
 		}
 		var lastEntryId uint64 = 0
 
 		e.ForEach("li[data-id]", func(_ int, tEntry *colly.HTMLElement) {
 			entryId, err := strconv.ParseUint(tEntry.Attr("data-id"), 10, 64)
 			// check if it's not already scraped
-			if containsUint64(scrapedIds, entryId) {
+			scrapedIdsMutex.Lock()
+			_, alreadyScraped := scrapedIds[entryId]
+			scrapedIdsMutex.Unlock()
+			if alreadyScraped {
 				return
 			}
 
 			author := tEntry.Attr("data-author")
 			if err != nil {
-				log.Println("[Scraper:eksi] Couldn't scrape entry id")
+				slog.Warn("couldn't scrape entry id")
 				entryId = 0
 			}
 
@@ -173,7 +159,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 
 			score, err := strconv.ParseInt(favString, 10, 64)
 			if err != nil {
-				log.Println("[Scraper:eksi] Couldn't parse entry score")
+				slog.Warn("couldn't parse entry score")
 				score = 0
 			}
 
@@ -210,7 +196,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 			entriesMutex.Unlock()
 
 			scrapedIdsMutex.Lock()
-			scrapedIds = append(scrapedIds, entryId)
+			scrapedIds[entryId] = struct{}{}
 			scrapedIdsMutex.Unlock()
 
 			lastEntryId = entryId
@@ -224,7 +210,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	})
 
 	// -----------------
-	log.Println("[Scraper:eksi] Scraping popular topics from eksisozluk...")
+	slog.Info("scraping popular topics from eksisozluk")
 	for _, pageNum := range topicPages {
 		url := strings.Join([]string{baseUrl, popularTopicsPath, "?p=", pageNum}, "")
 		topicCollector.Visit(url)
