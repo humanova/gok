@@ -6,13 +6,13 @@ import (
 
 type Entry struct {
 	gorm.Model
-	EntryId   uint64 `gorm:"unique"`
-	Timestamp int64  // unix time UTC
+	EntryId   uint64 `gorm:"unique;index:idx_entries_topic_entry,priority:2,sort:desc"`
+	Timestamp int64  `gorm:"index:idx_entries_timestamp"` // unix time UTC
 	Author    string
 	Text      string
 	Url       string `gorm:"unique"`
 	Score     int64
-	TopicId   uint64
+	TopicId   uint64 `gorm:"index:idx_entries_topic_entry,priority:1"`
 }
 
 func InitDb() error {

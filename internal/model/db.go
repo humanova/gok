@@ -91,7 +91,7 @@ func updateEntryScore(database *gorm.DB, entry Entry, score int64) error {
 func getLastTopicEntry(database *gorm.DB, topicId uint64) (Entry, error) {
 	var entry Entry
 
-	tx := database.Order("entry_id desc").Where("topic_id = ?", topicId).Limit(1).First(&entry)
+	tx := database.Select("entry_id").Order("entry_id desc").Where("topic_id = ?", topicId).Limit(1).Find(&entry)
 	if tx.Error != nil {
 		//log.Println(fmt.Sprintf("[DB] couldn't query any entry with given topic id(%d) : %s\n", topicId, tx.Error))
 		return entry, tx.Error
@@ -141,7 +141,7 @@ func getEntriesFiltered(database *gorm.DB, filters Filters) ([]Entry, error) {
 
 	tx := database.Where("")
 	if filters.CreatedAfter != "" {
-		tx.Where("timestamp > ?", filters.CreatedAfter)
+		tx = tx.Where("timestamp > ?", filters.CreatedAfter)
 	}
 	if filters.CreatedBefore != "" {
 		tx = tx.Where("timestamp < ?", filters.CreatedBefore)

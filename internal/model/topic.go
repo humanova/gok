@@ -14,7 +14,7 @@ type Topic struct {
 type PopularTopic struct {
 	gorm.Model
 	TopicId    uint64
-	Timestamp  int64 // unix time UTC
+	Timestamp  int64  `gorm:"index:idx_popular_topics_timestamp"` // unix time UTC
 	NewEntries uint64
 	PageNumber uint64
 }
