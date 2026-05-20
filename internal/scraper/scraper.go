@@ -20,16 +20,16 @@ func ScrapeAll() {
 	requestsChan := make(chan map[string]uint16)
 	go scrapeEksiTopicsAndEntries(entriesChan, topicsChan, attachmentsChan, requestsChan)
 
-	pTopics = <- topicsChan
+	pTopics = <-topicsChan
 
 	for _, pTopic := range pTopics {
 		t := model.Topic{TopicId: pTopic.TopicId,
-							 Text: pTopic.Text,
-							 Url: pTopic.Url}
+			Text: pTopic.Text,
+			Url:  pTopic.Url}
 		pT := model.PopularTopic{TopicId: pTopic.TopicId,
-										   NewEntries: pTopic.NewEntries,
-										   Timestamp: pTopic.Timestamp,
-										   PageNumber: pTopic.PageNumber}
+			NewEntries: pTopic.NewEntries,
+			Timestamp:  pTopic.Timestamp,
+			PageNumber: pTopic.PageNumber}
 		popularTopics = append(popularTopics, pT)
 		topics = append(topics, t)
 	}
@@ -44,9 +44,9 @@ func ScrapeAll() {
 		slog.Error("could not insert popular topics", "error", err)
 	}
 
-	entries = <- entriesChan
-	entryAttachments = <- attachmentsChan
-	requests = <- requestsChan
+	entries = <-entriesChan
+	entryAttachments = <-attachmentsChan
+	requests = <-requestsChan
 
 	// insert entries in batches of 250
 	batch := 250

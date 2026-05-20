@@ -3,4 +3,6 @@
 .idea/
 config.json
 *.bat
-test.txt
+log.txt
+.github/
+gok
