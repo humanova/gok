@@ -1,8 +1,11 @@
 package scraper
 
 import (
+	"context"
 	"log/slog"
 
+	"gok/internal/config"
+	"gok/internal/embedder"
 	"gok/internal/model"
 )
 
@@ -58,6 +61,9 @@ func ScrapeAll() {
 		}
 	}
 
+	// embed entries asynchronously so scrape latency is unaffected
+	go embedEntries(entries)
+
 	err = model.AddEntryAttachments(entryAttachments)
 	if err != nil {
 		slog.Error("could not insert entry attachments", "error", err)
@@ -83,4 +89,42 @@ func ScrapeAll() {
 		"ok_requests", len(requests)-len(unsuccessfulRequests),
 		"failed_requests", len(unsuccessfulRequests),
 	)
+}
+
+// embedEntries calls the embedder sidecar and persists embeddings for a batch of entries.
+// Runs asynchronously — errors are logged but do not fail the scrape.
+func embedEntries(entries []model.Entry) {
+	if config.Config.EmbedderUrl == "" {
+		return
+	}
+	client := embedder.NewClient(config.Config.EmbedderUrl)
+	ctx := context.Background()
+
+	if !client.Healthy(ctx) {
+		slog.Warn("embedder sidecar not reachable, skipping embedding")
+		return
+	}
+
+	batchSize := 64
+	for i := 0; i < len(entries); i += batchSize {
+		j := min(i+batchSize, len(entries))
+		batch := entries[i:j]
+
+		texts := make([]string, len(batch))
+		for k, e := range batch {
+			texts[k] = e.Text
+		}
+
+		vecs, err := client.EmbedPassages(ctx, texts)
+		if err != nil {
+			slog.Error("embedding batch failed", "error", err, "offset", i)
+			continue
+		}
+
+		if err := model.UpdateEntryEmbeddings(batch, vecs); err != nil {
+			slog.Error("persisting embeddings failed", "error", err, "offset", i)
+		}
+	}
+
+	slog.Info("embedding complete", "entries", len(entries))
 }

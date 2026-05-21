@@ -21,11 +21,15 @@ configs/config.json      → runtime config (DB creds, scrape interval, colly de
 5. Failed HTTP requests are stored via `model.AddRequests` for diagnostics.
 
 ## Model Conventions
-- All GORM models embed `gorm.Model` (adds `ID`, `CreatedAt`, `UpdatedAt`, `DeletedAt`).
+- Most GORM models embed `gorm.Model` (adds `ID`, `CreatedAt`, `UpdatedAt`, `DeletedAt`). Exceptions:
+  - `EntryAttachment` uses a composite primary key (`EntryId` + `Url`) with manual `CreatedAt`/`UpdatedAt` fields — no soft-delete.
+  - `Request` has a plain `ID uint` primary key and `CreatedAt time.Time` — no `gorm.Model` embedding.
 - `PTopic` is a transient scrape-time struct; `Topic` + `PopularTopic` are the persisted DB models.
 - DB functions are **private** in `db.go`; each model file (e.g., `entry.go`, `topic.go`) exposes **public** wrapper functions.
-- Composite index on `entries`: `(TopicId ASC, EntryId DESC)` – `idx_entries_topic_entry`.
-- `Entry.Url` and `Topic.Url` are `unique` constraints; upserts use `clause.OnConflict{DoNothing: true}`.
+- `db.go` also defines the `Filters` struct (`CreatedAfter`, `CreatedBefore`, `QueryText`, `Author`) used by `getEntriesFiltered`; defaults to entries from the last 12 hours when no filters are provided.
+- Composite index on `entries`: `(TopicId ASC, EntryId DESC)` – `idx_entries_topic_entry`; additional index `idx_entries_timestamp` on `Timestamp`.
+- `Entry.Url` and `Topic.Url` are `unique` constraints; `Topic.TopicId` has a `uniqueIndex`; all upserts use `clause.OnConflict{DoNothing: true}`.
+- Structured logging uses the standard `log/slog` package throughout.
 
 ## Scraper Conventions
 - Two colly collectors: `topicCollector` (topic list pages) and `entryCollector` (per-topic entry pages).
@@ -43,7 +47,7 @@ Loaded from `configs/config.json` at `init()`. Key fields:
 Copy `configs/templates/config_template.json` to `configs/config.json` and fill in values before running.
 
 ## Environment Setup
-Requirements: **Go** (1.15+) and **PostgreSQL**.
+Requirements: **Go** (1.26+) and **PostgreSQL**.
 
 ```bash
 # Create DB and user (example)

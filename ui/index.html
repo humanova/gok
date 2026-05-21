@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EkşiPulse — Bugün ne oluyor?</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2e3147;
+      --accent: #7c6af7;
+      --accent-dim: #4d42b0;
+      --text: #e4e4f0;
+      --muted: #888;
+      --user-bubble: #2a2d3e;
+      --bot-bubble: #1e2132;
+      --radius: 12px;
+      --font: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      max-width: 780px;
+      padding: 1.2rem 1.5rem 0.8rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+
+    header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+    header h1 span { color: var(--accent); }
+    header .subtitle { font-size: 0.8rem; color: var(--muted); }
+
+    #digest-bar {
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto 0.5rem;
+      padding: 0 1rem;
+    }
+
+    #digest-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.9rem;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    #digest-btn:hover { background: var(--accent-dim); color: #fff; }
+
+    #chat-window {
+      flex: 1;
+      width: 100%;
+      max-width: 780px;
+      overflow-y: auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    .msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 88%;
+    }
+    .msg.user { align-self: flex-end; align-items: flex-end; }
+    .msg.bot  { align-self: flex-start; align-items: flex-start; }
+
+    .bubble {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      line-height: 1.6;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .msg.user .bubble { background: var(--user-bubble); border-bottom-right-radius: 3px; }
+    .msg.bot  .bubble { background: var(--bot-bubble);  border-bottom-left-radius: 3px; }
+
+    .label { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.25rem; }
+
+    .cursor { display: inline-block; width: 0.55em; height: 1em;
+              background: var(--accent); animation: blink 0.8s steps(1) infinite;
+              vertical-align: text-bottom; border-radius: 2px; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    form {
+      width: 100%;
+      max-width: 780px;
+      padding: 0.8rem 1.5rem 1.2rem;
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    #query {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 0.7rem 1rem;
+      font-size: 0.95rem;
+      font-family: var(--font);
+      resize: none;
+      outline: none;
+      transition: border-color 0.15s;
+      min-height: 44px;
+      max-height: 140px;
+    }
+    #query:focus { border-color: var(--accent); }
+
+    button[type=submit] {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0 1.2rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      align-self: flex-end;
+      height: 44px;
+    }
+    button[type=submit]:hover { background: var(--accent-dim); }
+    button[type=submit]:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0 1.5rem 0.5rem;
+      max-width: 780px;
+      width: 100%;
+    }
+    .suggestion-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 99px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .suggestion-chip:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ekşi<span>Pulse</span></h1>
+    <span class="subtitle">Ekşi Sözlük'ten anlık gündem özeti</span>
+  </header>
+
+  <div id="digest-bar">
+    <button id="digest-btn">⚡ Günlük özeti getir</button>
+  </div>
+
+  <div id="chat-window"></div>
+
+  <div class="suggestions">
+    <button class="suggestion-chip">Bugün ne oluyor?</button>
+    <button class="suggestion-chip">Siyasi atmosfer nasıl?</button>
+    <button class="suggestion-chip">Ekonomik endişeler neler?</button>
+    <button class="suggestion-chip">Sporda gündem ne?</button>
+  </div>
+
+  <form id="chat-form">
+    <textarea id="query" placeholder="Bir şeyler sor… (örn: bugün ne oluyor?)" rows="1"></textarea>
+    <button type="submit" id="send-btn">↑</button>
+  </form>
+
+  <script>
+    const API_BASE = '';  // same origin
+
+    const chatWindow = document.getElementById('chat-window');
+    const form = document.getElementById('chat-form');
+    const queryInput = document.getElementById('query');
+    const sendBtn = document.getElementById('send-btn');
+
+    function addMessage(role, text = '') {
+      const wrap = document.createElement('div');
+      wrap.className = `msg ${role}`;
+
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = role === 'user' ? 'Sen' : 'EkşiPulse';
+      wrap.appendChild(label);
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      wrap.appendChild(bubble);
+
+      chatWindow.appendChild(wrap);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+      return bubble;
+    }
+
+    async function sendQuery(query) {
+      if (!query.trim()) return;
+
+      addMessage('user', query);
+      const botBubble = addMessage('bot');
+
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      botBubble.appendChild(cursor);
+
+      sendBtn.disabled = true;
+      let fullText = '';
+
+      try {
+        const resp = await fetch(`${API_BASE}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query }),
+        });
+
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();  // keep incomplete line
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const token = JSON.parse(line.slice(6));
+                fullText += token;
+                botBubble.textContent = fullText;
+                botBubble.appendChild(cursor);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+              } catch {}
+            } else if (line.startsWith('event: done')) {
+              botBubble.textContent = fullText;
+            } else if (line.startsWith('event: error')) {
+              botBubble.textContent = fullText + '\n\n[Hata oluştu]';
+            }
+          }
+        }
+      } catch (err) {
+        botBubble.textContent = `Bağlantı hatası: ${err.message}`;
+      } finally {
+        cursor.remove();
+        sendBtn.disabled = false;
+        queryInput.focus();
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const query = queryInput.value.trim();
+      queryInput.value = '';
+      queryInput.style.height = 'auto';
+      await sendQuery(query);
+    });
+
+    queryInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        form.dispatchEvent(new Event('submit'));
+      }
+    });
+
+    queryInput.addEventListener('input', () => {
+      queryInput.style.height = 'auto';
+      queryInput.style.height = queryInput.scrollHeight + 'px';
+    });
+
+    document.querySelectorAll('.suggestion-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        queryInput.value = chip.textContent;
+        form.dispatchEvent(new Event('submit'));
+      });
+    });
+
+    document.getElementById('digest-btn').addEventListener('click', async () => {
+      const botBubble = addMessage('bot');
+      botBubble.textContent = 'Günlük özet yükleniyor…';
+      try {
+        const resp = await fetch(`${API_BASE}/digest/latest`);
+        const data = await resp.json();
+        let out = `📋 ${data.summary}\n\n`;
+        out += `🌡️ Genel his: ${data.dominant_sentiment}\n\n`;
+        if (data.trending_topics?.length) {
+          out += `🔥 Gündemde: ${data.trending_topics.join(', ')}\n\n`;
+        }
+        if (data.key_viewpoints?.length) {
+          out += '💬 Öne çıkan görüşler:\n';
+          for (const vp of data.key_viewpoints) {
+            out += `• ${vp.stance}: "${vp.representative_quote}" — @${vp.author}\n`;
+          }
+        }
+        botBubble.textContent = out;
+      } catch (err) {
+        botBubble.textContent = `Özet alınamadı: ${err.message}`;
+      }
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    });
+  </script>
+</body>
+</html>

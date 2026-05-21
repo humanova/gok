@@ -978,3 +978,1803 @@
 2026/05/17 13:52:25 [Scraper:main] Scraped 16013 entries, 81 topics, 953 links from eksisozluk.
 	1686 total requests (1672 ok | 14 failed).
 2026/05/17 13:55:06 [Scraper:eksi] Scraping popular topics from eksisozluk...
+
+2026/05/17 15:28:00 /home/humanova/go/pkg/mod/gorm.io/driver/postgres@v1.2.3/migrator.go:140 SLOW SQL >= 1s
+[44855.634ms] [rows:0] CREATE INDEX "idx_entries_deleted_at" ON "entries" ("deleted_at")
+2026/05/17 15:28:00 Starting scraper cron job...
+2026/05/17 15:28:00 [Scraper:eksi] Scraping popular topics from eksisozluk...
+2026/05/17 15:34:00 [Scraper:eksi] Scraping popular topics from eksisozluk...
+2026/05/17 15:40:00 [Scraper:eksi] Scraping popular topics from eksisozluk...
+2026/05/17 15:40:22 [Scraper:main] Scraped 22388 entries, 81 topics, 1009 links from eksisozluk.
+	2329 total requests (2317 ok | 12 failed).
+2026/05/17 15:44:12 [Scraper:main] Scraped 8242 entries, 80 topics, 1844 links from eksisozluk.
+	916 total requests (899 ok | 17 failed).
+2026/05/17 15:46:00 [Scraper:eksi] Scraping popular topics from eksisozluk...
+2026/05/17 15:46:22 [Scraper:main] Scraped 316 entries, 79 topics, 28 links from eksisozluk.
+	97 total requests (82 ok | 15 failed).
+2026/05/17 15:49:01 [Scraper:main] Scraped 25220 entries, 82 topics, 2124 links from eksisozluk.
+	2615 total requests (2604 ok | 11 failed).
+2026/05/17 18:28:10 Starting scraper cron job...
+2026/05/17 18:28:10 [Scraper:eksi] Scraping popular topics from eksisozluk...
+2026/05/17 18:34:10 [Scraper:eksi] Scraping popular topics from eksisozluk...
+2026/05/17 18:38:20 [Scraper:main] Scraped 17927 entries, 84 topics, 986 links from eksisozluk.
+	1901 total requests (1888 ok | 13 failed).
+2026/05/17 18:39:27 INFO starting scraper cron job
+2026/05/17 18:39:27 INFO scraping popular topics from eksisozluk
+2026/05/17 18:42:56 INFO scrape complete entries=5659 topics=85 links=524 total_requests=635 ok_requests=628 failed_requests=7
+2026/05/17 18:45:27 INFO scraping popular topics from eksisozluk
+2026/05/17 18:45:52 INFO scrape complete entries=392 topics=85 links=43 total_requests=105 ok_requests=99 failed_requests=6
+2026/05/17 18:51:27 INFO scraping popular topics from eksisozluk
+2026/05/17 18:51:53 INFO scrape complete entries=362 topics=84 links=40 total_requests=98 ok_requests=89 failed_requests=9
+2026/05/17 18:57:27 INFO scraping popular topics from eksisozluk
+2026/05/17 18:57:57 INFO scrape complete entries=368 topics=84 links=43 total_requests=109 ok_requests=95 failed_requests=14
+2026/05/17 19:03:27 INFO scraping popular topics from eksisozluk
+2026/05/17 19:03:56 INFO scrape complete entries=350 topics=85 links=35 total_requests=109 ok_requests=99 failed_requests=10
+2026/05/17 19:09:27 INFO scraping popular topics from eksisozluk
+2026/05/17 19:09:55 INFO scrape complete entries=357 topics=85 links=29 total_requests=106 ok_requests=97 failed_requests=9
+2026/05/17 19:15:27 INFO scraping popular topics from eksisozluk
+2026/05/17 19:15:56 INFO scrape complete entries=377 topics=85 links=31 total_requests=110 ok_requests=103 failed_requests=7
+2026/05/17 19:21:28 INFO scraping popular topics from eksisozluk
+2026/05/17 19:21:56 INFO scrape complete entries=366 topics=84 links=29 total_requests=105 ok_requests=96 failed_requests=9
+2026/05/17 19:27:28 INFO scraping popular topics from eksisozluk
+2026/05/17 19:27:50 INFO scrape complete entries=388 topics=83 links=33 total_requests=104 ok_requests=97 failed_requests=7
+2026/05/17 19:33:28 INFO scraping popular topics from eksisozluk
+2026/05/17 19:33:54 INFO scrape complete entries=417 topics=83 links=33 total_requests=115 ok_requests=109 failed_requests=6
+2026/05/17 19:39:28 INFO scraping popular topics from eksisozluk
+2026/05/17 19:39:57 INFO scrape complete entries=419 topics=82 links=32 total_requests=113 ok_requests=108 failed_requests=5
+2026/05/17 19:45:28 INFO scraping popular topics from eksisozluk
+2026/05/17 19:45:57 INFO scrape complete entries=418 topics=82 links=37 total_requests=104 ok_requests=97 failed_requests=7
+2026/05/17 19:51:28 INFO scraping popular topics from eksisozluk
+2026/05/17 19:51:57 INFO scrape complete entries=406 topics=81 links=39 total_requests=107 ok_requests=103 failed_requests=4
+2026/05/17 19:57:28 INFO scraping popular topics from eksisozluk
+2026/05/17 19:57:50 INFO scrape complete entries=436 topics=82 links=41 total_requests=102 ok_requests=98 failed_requests=4
+2026/05/17 20:03:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:04:37 INFO scrape complete entries=1659 topics=82 links=53 total_requests=232 ok_requests=225 failed_requests=7
+2026/05/17 20:09:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:09:58 INFO scrape complete entries=423 topics=83 links=33 total_requests=112 ok_requests=106 failed_requests=6
+2026/05/17 20:15:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:15:51 INFO scrape complete entries=437 topics=83 links=35 total_requests=103 ok_requests=97 failed_requests=6
+2026/05/17 20:21:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:21:59 INFO scrape complete entries=448 topics=84 links=37 total_requests=110 ok_requests=104 failed_requests=6
+2026/05/17 20:27:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:28:01 INFO scrape complete entries=591 topics=86 links=52 total_requests=125 ok_requests=116 failed_requests=9
+2026/05/17 20:33:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:33:54 INFO scrape complete entries=444 topics=86 links=32 total_requests=116 ok_requests=112 failed_requests=4
+2026/05/17 20:39:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:39:57 INFO scrape complete entries=378 topics=85 links=31 total_requests=105 ok_requests=97 failed_requests=8
+2026/05/17 20:45:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:45:59 INFO scrape complete entries=434 topics=85 links=32 total_requests=114 ok_requests=110 failed_requests=4
+2026/05/17 20:51:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:53:09 INFO scrape complete entries=2681 topics=86 links=102 total_requests=343 ok_requests=336 failed_requests=7
+2026/05/17 20:57:28 INFO scraping popular topics from eksisozluk
+2026/05/17 20:57:59 INFO scrape complete entries=463 topics=86 links=31 total_requests=122 ok_requests=115 failed_requests=7
+2026/05/17 21:03:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:03:58 INFO scrape complete entries=479 topics=86 links=34 total_requests=118 ok_requests=110 failed_requests=8
+2026/05/17 21:09:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:09:58 INFO scrape complete entries=546 topics=87 links=34 total_requests=125 ok_requests=117 failed_requests=8
+2026/05/17 21:15:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:16:00 INFO scrape complete entries=474 topics=87 links=37 total_requests=124 ok_requests=116 failed_requests=8
+2026/05/17 21:21:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:22:01 INFO scrape complete entries=455 topics=87 links=37 total_requests=125 ok_requests=119 failed_requests=6
+2026/05/17 21:27:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:29:01 INFO scrape complete entries=2142 topics=87 links=215 total_requests=283 ok_requests=275 failed_requests=8
+2026/05/17 21:33:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:38:15 INFO scrape complete entries=7507 topics=88 links=985 total_requests=827 ok_requests=819 failed_requests=8
+2026/05/17 21:39:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:40:00 INFO scrape complete entries=478 topics=88 links=30 total_requests=112 ok_requests=103 failed_requests=9
+2026/05/17 21:45:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:46:01 INFO scrape complete entries=448 topics=87 links=42 total_requests=117 ok_requests=109 failed_requests=8
+2026/05/17 21:51:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:52:01 INFO scrape complete entries=443 topics=87 links=45 total_requests=112 ok_requests=103 failed_requests=9
+2026/05/17 21:57:28 INFO scraping popular topics from eksisozluk
+2026/05/17 21:57:58 INFO scrape complete entries=549 topics=88 links=48 total_requests=128 ok_requests=116 failed_requests=12
+2026/05/17 22:03:28 INFO scraping popular topics from eksisozluk
+2026/05/17 22:03:55 INFO scrape complete entries=393 topics=87 links=48 total_requests=111 ok_requests=99 failed_requests=12
+2026/05/17 22:09:28 INFO scraping popular topics from eksisozluk
+2026/05/17 22:10:00 INFO scrape complete entries=418 topics=87 links=53 total_requests=111 ok_requests=103 failed_requests=8
+2026/05/17 22:15:28 INFO scraping popular topics from eksisozluk
+2026/05/17 22:16:03 INFO scrape complete entries=422 topics=87 links=51 total_requests=108 ok_requests=99 failed_requests=9
+2026/05/17 22:21:28 INFO scraping popular topics from eksisozluk
+2026/05/17 22:22:01 INFO scrape complete entries=441 topics=87 links=56 total_requests=115 ok_requests=105 failed_requests=10
+2026/05/17 22:27:28 INFO scraping popular topics from eksisozluk
+2026/05/17 22:27:59 INFO scrape complete entries=445 topics=87 links=34 total_requests=115 ok_requests=106 failed_requests=9
+2026/05/17 22:33:28 INFO scraping popular topics from eksisozluk
+2026/05/17 22:33:55 INFO scrape complete entries=411 topics=87 links=35 total_requests=106 ok_requests=97 failed_requests=9
+2026/05/17 22:39:28 INFO scraping popular topics from eksisozluk
+2026/05/17 22:40:03 INFO scrape complete entries=618 topics=88 links=47 total_requests=130 ok_requests=121 failed_requests=9
+2026/05/17 22:45:28 INFO scraping popular topics from eksisozluk
+2026/05/17 22:46:00 INFO scrape complete entries=420 topics=88 links=31 total_requests=107 ok_requests=91 failed_requests=16
+2026/05/17 22:51:28 INFO scraping popular topics from eksisozluk
+2026/05/17 22:51:56 INFO scrape complete entries=501 topics=88 links=34 total_requests=123 ok_requests=113 failed_requests=10
+2026/05/17 22:57:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:03:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:03:33 INFO scrape complete entries=9222 topics=89 links=1278 total_requests=991 ok_requests=984 failed_requests=7
+2026/05/17 23:09:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:09:43 INFO scrape complete entries=9364 topics=89 links=1281 total_requests=1014 ok_requests=1006 failed_requests=8
+2026/05/17 23:10:28 INFO scrape complete entries=1336 topics=90 links=53 total_requests=213 ok_requests=206 failed_requests=7
+2026/05/17 23:15:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:15:56 INFO scrape complete entries=449 topics=90 links=39 total_requests=114 ok_requests=107 failed_requests=7
+2026/05/17 23:21:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:25:25 INFO scrape complete entries=6359 topics=91 links=5424 total_requests=709 ok_requests=697 failed_requests=12
+2026/05/17 23:27:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:27:53 INFO scrape complete entries=444 topics=92 links=48 total_requests=115 ok_requests=108 failed_requests=7
+2026/05/17 23:33:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:33:54 INFO scrape complete entries=436 topics=91 links=34 total_requests=113 ok_requests=103 failed_requests=10
+2026/05/17 23:39:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:39:53 INFO scrape complete entries=443 topics=88 links=35 total_requests=111 ok_requests=104 failed_requests=7
+2026/05/17 23:45:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:45:55 INFO scrape complete entries=436 topics=88 links=40 total_requests=112 ok_requests=107 failed_requests=5
+2026/05/17 23:51:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:51:56 INFO scrape complete entries=441 topics=88 links=42 total_requests=108 ok_requests=102 failed_requests=6
+2026/05/17 23:57:28 INFO scraping popular topics from eksisozluk
+2026/05/17 23:57:59 INFO scrape complete entries=451 topics=88 links=44 total_requests=111 ok_requests=102 failed_requests=9
+2026/05/18 00:03:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:03:57 INFO scrape complete entries=442 topics=88 links=36 total_requests=115 ok_requests=108 failed_requests=7
+2026/05/18 00:09:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:15:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:16:25 INFO scrape complete entries=12021 topics=89 links=458 total_requests=1272 ok_requests=1263 failed_requests=9
+2026/05/18 00:21:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:22:00 INFO scrape complete entries=405 topics=89 links=36 total_requests=120 ok_requests=107 failed_requests=13
+2026/05/18 00:22:17 INFO scrape complete entries=12021 topics=89 links=461 total_requests=1280 ok_requests=1270 failed_requests=10
+2026/05/18 00:27:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:27:58 INFO scrape complete entries=425 topics=89 links=32 total_requests=114 ok_requests=102 failed_requests=12
+2026/05/18 00:33:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:33:53 INFO scrape complete entries=404 topics=89 links=29 total_requests=103 ok_requests=94 failed_requests=9
+2026/05/18 00:39:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:40:11 INFO scrape complete entries=850 topics=90 links=47 total_requests=147 ok_requests=138 failed_requests=9
+2026/05/18 00:45:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:45:49 INFO scrape complete entries=426 topics=90 links=28 total_requests=104 ok_requests=95 failed_requests=9
+2026/05/18 00:51:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:51:50 INFO scrape complete entries=429 topics=90 links=23 total_requests=106 ok_requests=96 failed_requests=10
+2026/05/18 00:57:28 INFO scraping popular topics from eksisozluk
+2026/05/18 00:57:55 INFO scrape complete entries=415 topics=90 links=31 total_requests=106 ok_requests=96 failed_requests=10
+2026/05/18 01:03:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:03:58 INFO scrape complete entries=413 topics=90 links=26 total_requests=102 ok_requests=92 failed_requests=10
+2026/05/18 01:09:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:09:51 INFO scrape complete entries=444 topics=90 links=32 total_requests=102 ok_requests=96 failed_requests=6
+2026/05/18 01:15:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:15:52 INFO scrape complete entries=484 topics=91 links=35 total_requests=106 ok_requests=101 failed_requests=5
+2026/05/18 01:21:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:21:55 INFO scrape complete entries=448 topics=91 links=34 total_requests=105 ok_requests=99 failed_requests=6
+2026/05/18 01:27:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:27:49 INFO scrape complete entries=448 topics=91 links=37 total_requests=99 ok_requests=90 failed_requests=9
+2026/05/18 01:33:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:33:52 INFO scrape complete entries=427 topics=90 links=34 total_requests=103 ok_requests=94 failed_requests=9
+2026/05/18 01:39:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:39:51 INFO scrape complete entries=418 topics=89 links=35 total_requests=101 ok_requests=92 failed_requests=9
+2026/05/18 01:45:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:45:54 INFO scrape complete entries=436 topics=89 links=35 total_requests=98 ok_requests=89 failed_requests=9
+2026/05/18 01:51:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:51:54 INFO scrape complete entries=449 topics=88 links=36 total_requests=98 ok_requests=89 failed_requests=9
+2026/05/18 01:57:28 INFO scraping popular topics from eksisozluk
+2026/05/18 01:57:52 INFO scrape complete entries=436 topics=88 links=36 total_requests=96 ok_requests=87 failed_requests=9
+2026/05/18 02:03:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:03:51 INFO scrape complete entries=428 topics=88 links=34 total_requests=99 ok_requests=91 failed_requests=8
+2026/05/18 02:09:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:09:56 INFO scrape complete entries=427 topics=88 links=35 total_requests=96 ok_requests=81 failed_requests=15
+2026/05/18 02:15:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:15:52 INFO scrape complete entries=415 topics=88 links=36 total_requests=95 ok_requests=84 failed_requests=11
+2026/05/18 02:21:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:21:53 INFO scrape complete entries=418 topics=88 links=36 total_requests=95 ok_requests=86 failed_requests=9
+2026/05/18 02:27:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:28:02 INFO scrape complete entries=657 topics=89 links=38 total_requests=119 ok_requests=111 failed_requests=8
+2026/05/18 02:33:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:33:52 INFO scrape complete entries=423 topics=89 links=34 total_requests=95 ok_requests=85 failed_requests=10
+2026/05/18 02:39:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:39:54 INFO scrape complete entries=436 topics=89 links=35 total_requests=94 ok_requests=87 failed_requests=7
+2026/05/18 02:45:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:45:53 INFO scrape complete entries=431 topics=89 links=34 total_requests=95 ok_requests=86 failed_requests=9
+2026/05/18 02:51:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:51:52 INFO scrape complete entries=428 topics=89 links=34 total_requests=96 ok_requests=87 failed_requests=9
+2026/05/18 02:57:28 INFO scraping popular topics from eksisozluk
+2026/05/18 02:57:52 INFO scrape complete entries=436 topics=89 links=34 total_requests=101 ok_requests=94 failed_requests=7
+2026/05/18 03:03:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:03:51 INFO scrape complete entries=439 topics=89 links=34 total_requests=96 ok_requests=91 failed_requests=5
+2026/05/18 03:09:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:09:55 INFO scrape complete entries=435 topics=89 links=35 total_requests=100 ok_requests=93 failed_requests=7
+2026/05/18 03:15:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:15:56 INFO scrape complete entries=444 topics=89 links=35 total_requests=98 ok_requests=91 failed_requests=7
+2026/05/18 03:21:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:21:53 INFO scrape complete entries=441 topics=89 links=35 total_requests=96 ok_requests=90 failed_requests=6
+2026/05/18 03:27:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:27:54 INFO scrape complete entries=445 topics=88 links=35 total_requests=96 ok_requests=89 failed_requests=7
+2026/05/18 03:33:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:33:50 INFO scrape complete entries=448 topics=88 links=35 total_requests=93 ok_requests=87 failed_requests=6
+2026/05/18 03:39:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:39:51 INFO scrape complete entries=452 topics=87 links=35 total_requests=92 ok_requests=87 failed_requests=5
+2026/05/18 03:45:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:45:52 INFO scrape complete entries=456 topics=87 links=34 total_requests=95 ok_requests=89 failed_requests=6
+2026/05/18 03:51:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:51:53 INFO scrape complete entries=454 topics=87 links=35 total_requests=93 ok_requests=87 failed_requests=6
+2026/05/18 03:57:28 INFO scraping popular topics from eksisozluk
+2026/05/18 03:57:56 INFO scrape complete entries=427 topics=87 links=30 total_requests=91 ok_requests=83 failed_requests=8
+2026/05/18 04:03:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:03:52 INFO scrape complete entries=446 topics=87 links=38 total_requests=96 ok_requests=88 failed_requests=8
+2026/05/18 04:09:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:09:51 INFO scrape complete entries=442 topics=87 links=36 total_requests=95 ok_requests=86 failed_requests=9
+2026/05/18 04:15:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:15:53 INFO scrape complete entries=427 topics=87 links=36 total_requests=92 ok_requests=83 failed_requests=9
+2026/05/18 04:21:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:21:53 INFO scrape complete entries=430 topics=87 links=38 total_requests=92 ok_requests=84 failed_requests=8
+2026/05/18 04:27:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:27:49 INFO scrape complete entries=431 topics=87 links=38 total_requests=90 ok_requests=82 failed_requests=8
+2026/05/18 04:33:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:33:51 INFO scrape complete entries=425 topics=87 links=38 total_requests=90 ok_requests=81 failed_requests=9
+2026/05/18 04:39:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:39:51 INFO scrape complete entries=434 topics=87 links=38 total_requests=92 ok_requests=85 failed_requests=7
+2026/05/18 04:45:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:45:50 INFO scrape complete entries=429 topics=87 links=38 total_requests=92 ok_requests=84 failed_requests=8
+2026/05/18 04:51:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:51:48 INFO scrape complete entries=439 topics=87 links=38 total_requests=93 ok_requests=84 failed_requests=9
+2026/05/18 04:57:28 INFO scraping popular topics from eksisozluk
+2026/05/18 04:57:55 INFO scrape complete entries=419 topics=87 links=33 total_requests=96 ok_requests=84 failed_requests=12
+2026/05/18 05:03:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:03:48 INFO scrape complete entries=430 topics=86 links=35 total_requests=90 ok_requests=82 failed_requests=8
+2026/05/18 05:09:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:09:51 INFO scrape complete entries=421 topics=85 links=31 total_requests=92 ok_requests=82 failed_requests=10
+2026/05/18 05:15:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:15:50 INFO scrape complete entries=432 topics=86 links=35 total_requests=92 ok_requests=83 failed_requests=9
+2026/05/18 05:21:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:21:51 INFO scrape complete entries=413 topics=86 links=33 total_requests=95 ok_requests=85 failed_requests=10
+2026/05/18 05:27:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:27:51 INFO scrape complete entries=401 topics=86 links=29 total_requests=90 ok_requests=77 failed_requests=13
+2026/05/18 05:33:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:33:52 INFO scrape complete entries=386 topics=85 links=31 total_requests=92 ok_requests=78 failed_requests=14
+2026/05/18 05:39:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:39:52 INFO scrape complete entries=378 topics=85 links=28 total_requests=91 ok_requests=77 failed_requests=14
+2026/05/18 05:45:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:45:52 INFO scrape complete entries=386 topics=85 links=29 total_requests=91 ok_requests=79 failed_requests=12
+2026/05/18 05:51:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:51:51 INFO scrape complete entries=379 topics=85 links=27 total_requests=94 ok_requests=82 failed_requests=12
+2026/05/18 05:57:28 INFO scraping popular topics from eksisozluk
+2026/05/18 05:57:52 INFO scrape complete entries=391 topics=85 links=29 total_requests=91 ok_requests=81 failed_requests=10
+2026/05/18 06:03:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:03:51 INFO scrape complete entries=402 topics=85 links=29 total_requests=98 ok_requests=89 failed_requests=9
+2026/05/18 06:09:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:09:52 INFO scrape complete entries=394 topics=84 links=28 total_requests=95 ok_requests=85 failed_requests=10
+2026/05/18 06:15:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:15:53 INFO scrape complete entries=372 topics=84 links=25 total_requests=91 ok_requests=79 failed_requests=12
+2026/05/18 06:21:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:21:51 INFO scrape complete entries=376 topics=84 links=25 total_requests=92 ok_requests=79 failed_requests=13
+2026/05/18 06:27:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:27:52 INFO scrape complete entries=374 topics=84 links=24 total_requests=93 ok_requests=83 failed_requests=10
+2026/05/18 06:33:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:33:53 INFO scrape complete entries=358 topics=84 links=22 total_requests=93 ok_requests=79 failed_requests=14
+2026/05/18 06:39:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:39:50 INFO scrape complete entries=379 topics=84 links=25 total_requests=95 ok_requests=86 failed_requests=9
+2026/05/18 06:45:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:45:53 INFO scrape complete entries=397 topics=85 links=25 total_requests=100 ok_requests=87 failed_requests=13
+2026/05/18 06:51:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:51:52 INFO scrape complete entries=376 topics=85 links=24 total_requests=94 ok_requests=84 failed_requests=10
+2026/05/18 06:57:28 INFO scraping popular topics from eksisozluk
+2026/05/18 06:57:53 INFO scrape complete entries=381 topics=85 links=24 total_requests=99 ok_requests=88 failed_requests=11
+2026/05/18 07:03:28 INFO scraping popular topics from eksisozluk
+2026/05/18 07:03:53 INFO scrape complete entries=396 topics=85 links=24 total_requests=102 ok_requests=92 failed_requests=10
+2026/05/18 07:09:28 INFO scraping popular topics from eksisozluk
+2026/05/18 07:09:56 INFO scrape complete entries=376 topics=85 links=22 total_requests=96 ok_requests=82 failed_requests=14
+2026/05/18 07:15:28 INFO scraping popular topics from eksisozluk
+2026/05/18 07:15:52 INFO scrape complete entries=383 topics=85 links=25 total_requests=101 ok_requests=87 failed_requests=14
+2026/05/18 07:21:28 INFO scraping popular topics from eksisozluk
+2026/05/18 07:21:53 INFO scrape complete entries=367 topics=85 links=26 total_requests=95 ok_requests=81 failed_requests=14
+2026/05/18 07:27:28 INFO scraping popular topics from eksisozluk
+2026/05/18 07:27:55 INFO scrape complete entries=347 topics=84 links=20 total_requests=96 ok_requests=82 failed_requests=14
+2026/05/18 07:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 07:33:50 INFO scrape complete entries=355 topics=84 links=25 total_requests=94 ok_requests=84 failed_requests=10
+2026/05/18 07:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 07:39:52 INFO scrape complete entries=387 topics=85 links=25 total_requests=99 ok_requests=89 failed_requests=10
+2026/05/18 07:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 07:45:49 INFO scrape complete entries=380 topics=83 links=27 total_requests=95 ok_requests=85 failed_requests=10
+2026/05/18 07:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 07:51:50 INFO scrape complete entries=366 topics=83 links=27 total_requests=95 ok_requests=84 failed_requests=11
+2026/05/18 07:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 07:57:55 INFO scrape complete entries=370 topics=83 links=21 total_requests=101 ok_requests=90 failed_requests=11
+2026/05/18 08:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:03:56 INFO scrape complete entries=370 topics=83 links=27 total_requests=97 ok_requests=86 failed_requests=11
+2026/05/18 08:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:09:56 INFO scrape complete entries=379 topics=84 links=25 total_requests=105 ok_requests=96 failed_requests=9
+2026/05/18 08:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:15:59 INFO scrape complete entries=359 topics=84 links=22 total_requests=103 ok_requests=90 failed_requests=13
+2026/05/18 08:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:22:07 INFO scrape complete entries=524 topics=84 links=22 total_requests=123 ok_requests=115 failed_requests=8
+2026/05/18 08:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:27:56 INFO scrape complete entries=391 topics=85 links=22 total_requests=106 ok_requests=96 failed_requests=10
+2026/05/18 08:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:33:52 INFO scrape complete entries=378 topics=85 links=23 total_requests=100 ok_requests=89 failed_requests=11
+2026/05/18 08:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:39:53 INFO scrape complete entries=372 topics=85 links=23 total_requests=104 ok_requests=95 failed_requests=9
+2026/05/18 08:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:45:59 INFO scrape complete entries=376 topics=85 links=22 total_requests=103 ok_requests=92 failed_requests=11
+2026/05/18 08:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:51:57 INFO scrape complete entries=412 topics=86 links=25 total_requests=111 ok_requests=100 failed_requests=11
+2026/05/18 08:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 08:57:53 INFO scrape complete entries=344 topics=86 links=23 total_requests=100 ok_requests=78 failed_requests=22
+2026/05/18 09:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:03:51 INFO scrape complete entries=376 topics=86 links=27 total_requests=108 ok_requests=86 failed_requests=22
+2026/05/18 09:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:09:49 INFO scrape complete entries=331 topics=86 links=25 total_requests=104 ok_requests=82 failed_requests=22
+2026/05/18 09:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:16:06 INFO scrape complete entries=631 topics=87 links=54 total_requests=135 ok_requests=108 failed_requests=27
+2026/05/18 09:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:21:59 INFO scrape complete entries=472 topics=87 links=29 total_requests=119 ok_requests=102 failed_requests=17
+2026/05/18 09:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:30:10 INFO scrape complete entries=4194 topics=88 links=3195 total_requests=490 ok_requests=477 failed_requests=13
+2026/05/18 09:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:33:54 INFO scrape complete entries=395 topics=88 links=31 total_requests=102 ok_requests=92 failed_requests=10
+2026/05/18 09:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:39:50 INFO scrape complete entries=369 topics=87 links=30 total_requests=99 ok_requests=89 failed_requests=10
+2026/05/18 09:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:46:03 INFO scrape complete entries=388 topics=88 links=32 total_requests=109 ok_requests=99 failed_requests=10
+2026/05/18 09:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:51:57 INFO scrape complete entries=406 topics=88 links=31 total_requests=104 ok_requests=92 failed_requests=12
+2026/05/18 09:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 09:58:00 INFO scrape complete entries=429 topics=88 links=32 total_requests=108 ok_requests=96 failed_requests=12
+2026/05/18 10:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:03:50 INFO scrape complete entries=401 topics=88 links=33 total_requests=103 ok_requests=94 failed_requests=9
+2026/05/18 10:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:09:56 INFO scrape complete entries=413 topics=89 links=31 total_requests=110 ok_requests=96 failed_requests=14
+2026/05/18 10:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:15:59 INFO scrape complete entries=383 topics=90 links=34 total_requests=109 ok_requests=98 failed_requests=11
+2026/05/18 10:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:22:02 INFO scrape complete entries=380 topics=89 links=29 total_requests=105 ok_requests=92 failed_requests=13
+2026/05/18 10:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:28:00 INFO scrape complete entries=401 topics=90 links=33 total_requests=111 ok_requests=99 failed_requests=12
+2026/05/18 10:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:34:48 INFO scrape complete entries=1756 topics=91 links=143 total_requests=250 ok_requests=242 failed_requests=8
+2026/05/18 10:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:39:59 INFO scrape complete entries=433 topics=91 links=38 total_requests=114 ok_requests=108 failed_requests=6
+2026/05/18 10:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:45:53 INFO scrape complete entries=428 topics=90 links=37 total_requests=114 ok_requests=108 failed_requests=6
+2026/05/18 10:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:51:57 INFO scrape complete entries=419 topics=90 links=35 total_requests=112 ok_requests=104 failed_requests=8
+2026/05/18 10:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 10:57:59 INFO scrape complete entries=427 topics=90 links=36 total_requests=113 ok_requests=104 failed_requests=9
+2026/05/18 11:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:03:55 INFO scrape complete entries=434 topics=92 links=46 total_requests=112 ok_requests=103 failed_requests=9
+2026/05/18 11:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:10:01 INFO scrape complete entries=407 topics=93 links=44 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/18 11:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:15:57 INFO scrape complete entries=422 topics=93 links=49 total_requests=110 ok_requests=103 failed_requests=7
+2026/05/18 11:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:21:58 INFO scrape complete entries=428 topics=94 links=48 total_requests=113 ok_requests=105 failed_requests=8
+2026/05/18 11:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:27:56 INFO scrape complete entries=447 topics=95 links=41 total_requests=111 ok_requests=103 failed_requests=8
+2026/05/18 11:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:33:58 INFO scrape complete entries=439 topics=95 links=37 total_requests=115 ok_requests=105 failed_requests=10
+2026/05/18 11:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:39:55 INFO scrape complete entries=433 topics=94 links=40 total_requests=112 ok_requests=103 failed_requests=9
+2026/05/18 11:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:45:59 INFO scrape complete entries=433 topics=94 links=39 total_requests=116 ok_requests=107 failed_requests=9
+2026/05/18 11:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:52:02 INFO scrape complete entries=430 topics=94 links=38 total_requests=118 ok_requests=111 failed_requests=7
+2026/05/18 11:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 11:58:00 INFO scrape complete entries=438 topics=94 links=40 total_requests=116 ok_requests=107 failed_requests=9
+2026/05/18 12:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:03:56 INFO scrape complete entries=445 topics=92 links=40 total_requests=118 ok_requests=109 failed_requests=9
+2026/05/18 12:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:10:01 INFO scrape complete entries=569 topics=93 links=108 total_requests=133 ok_requests=123 failed_requests=10
+2026/05/18 12:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:16:00 INFO scrape complete entries=415 topics=93 links=44 total_requests=118 ok_requests=107 failed_requests=11
+2026/05/18 12:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:21:58 INFO scrape complete entries=443 topics=93 links=47 total_requests=113 ok_requests=102 failed_requests=11
+2026/05/18 12:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:27:57 INFO scrape complete entries=432 topics=94 links=52 total_requests=118 ok_requests=106 failed_requests=12
+2026/05/18 12:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:33:58 INFO scrape complete entries=415 topics=94 links=43 total_requests=114 ok_requests=102 failed_requests=12
+2026/05/18 12:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:39:57 INFO scrape complete entries=407 topics=92 links=45 total_requests=107 ok_requests=97 failed_requests=10
+2026/05/18 12:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:45:58 INFO scrape complete entries=429 topics=92 links=48 total_requests=117 ok_requests=107 failed_requests=10
+2026/05/18 12:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:51:57 INFO scrape complete entries=440 topics=92 links=47 total_requests=117 ok_requests=106 failed_requests=11
+2026/05/18 12:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 12:57:54 INFO scrape complete entries=394 topics=92 links=60 total_requests=110 ok_requests=101 failed_requests=9
+2026/05/18 13:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:03:58 INFO scrape complete entries=393 topics=92 links=54 total_requests=112 ok_requests=98 failed_requests=14
+2026/05/18 13:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:10:26 INFO scrape complete entries=1190 topics=92 links=76 total_requests=189 ok_requests=174 failed_requests=15
+2026/05/18 13:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:15:55 INFO scrape complete entries=413 topics=92 links=48 total_requests=116 ok_requests=105 failed_requests=11
+2026/05/18 13:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:21:56 INFO scrape complete entries=402 topics=93 links=48 total_requests=112 ok_requests=100 failed_requests=12
+2026/05/18 13:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:27:57 INFO scrape complete entries=442 topics=93 links=46 total_requests=115 ok_requests=103 failed_requests=12
+2026/05/18 13:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:33:57 INFO scrape complete entries=417 topics=90 links=48 total_requests=109 ok_requests=95 failed_requests=14
+2026/05/18 13:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:40:00 INFO scrape complete entries=375 topics=88 links=46 total_requests=106 ok_requests=88 failed_requests=18
+2026/05/18 13:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:45:55 INFO scrape complete entries=400 topics=88 links=49 total_requests=112 ok_requests=99 failed_requests=13
+2026/05/18 13:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:51:55 INFO scrape complete entries=395 topics=88 links=45 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/18 13:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 13:57:56 INFO scrape complete entries=370 topics=88 links=37 total_requests=106 ok_requests=93 failed_requests=13
+2026/05/18 14:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:03:59 INFO scrape complete entries=402 topics=87 links=22 total_requests=109 ok_requests=94 failed_requests=15
+2026/05/18 14:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:09:57 INFO scrape complete entries=404 topics=87 links=23 total_requests=107 ok_requests=90 failed_requests=17
+2026/05/18 14:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:15:58 INFO scrape complete entries=399 topics=87 links=24 total_requests=109 ok_requests=96 failed_requests=13
+2026/05/18 14:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:21:56 INFO scrape complete entries=405 topics=89 links=25 total_requests=109 ok_requests=94 failed_requests=15
+2026/05/18 14:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:27:56 INFO scrape complete entries=442 topics=89 links=40 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/18 14:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:34:00 INFO scrape complete entries=442 topics=89 links=36 total_requests=112 ok_requests=97 failed_requests=15
+2026/05/18 14:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:39:57 INFO scrape complete entries=445 topics=90 links=47 total_requests=119 ok_requests=107 failed_requests=12
+2026/05/18 14:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:46:00 INFO scrape complete entries=408 topics=90 links=25 total_requests=111 ok_requests=98 failed_requests=13
+2026/05/18 14:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:51:56 INFO scrape complete entries=422 topics=90 links=42 total_requests=104 ok_requests=95 failed_requests=9
+2026/05/18 14:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 14:59:00 INFO scrape complete entries=1933 topics=91 links=422 total_requests=263 ok_requests=253 failed_requests=10
+2026/05/18 15:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:03:57 INFO scrape complete entries=466 topics=91 links=43 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/18 15:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:09:56 INFO scrape complete entries=475 topics=91 links=45 total_requests=121 ok_requests=113 failed_requests=8
+2026/05/18 15:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:16:13 INFO scrape complete entries=921 topics=91 links=56 total_requests=160 ok_requests=153 failed_requests=7
+2026/05/18 15:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:21:56 INFO scrape complete entries=469 topics=90 links=45 total_requests=112 ok_requests=107 failed_requests=5
+2026/05/18 15:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:28:00 INFO scrape complete entries=468 topics=90 links=49 total_requests=122 ok_requests=112 failed_requests=10
+2026/05/18 15:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:34:03 INFO scrape complete entries=460 topics=91 links=42 total_requests=111 ok_requests=101 failed_requests=10
+2026/05/18 15:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:40:01 INFO scrape complete entries=494 topics=92 links=46 total_requests=120 ok_requests=114 failed_requests=6
+2026/05/18 15:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:46:00 INFO scrape complete entries=472 topics=91 links=44 total_requests=117 ok_requests=113 failed_requests=4
+2026/05/18 15:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:52:03 INFO scrape complete entries=509 topics=92 links=44 total_requests=123 ok_requests=116 failed_requests=7
+2026/05/18 15:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 15:57:56 INFO scrape complete entries=470 topics=91 links=28 total_requests=120 ok_requests=111 failed_requests=9
+2026/05/18 16:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:03:54 INFO scrape complete entries=487 topics=91 links=27 total_requests=116 ok_requests=107 failed_requests=9
+2026/05/18 16:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:10:01 INFO scrape complete entries=497 topics=90 links=26 total_requests=117 ok_requests=106 failed_requests=11
+2026/05/18 16:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:15:56 INFO scrape complete entries=453 topics=90 links=25 total_requests=111 ok_requests=101 failed_requests=10
+2026/05/18 16:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:23:02 INFO scrape complete entries=2258 topics=90 links=239 total_requests=296 ok_requests=286 failed_requests=10
+2026/05/18 16:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:27:57 INFO scrape complete entries=470 topics=90 links=25 total_requests=110 ok_requests=101 failed_requests=9
+2026/05/18 16:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:34:05 INFO scrape complete entries=450 topics=90 links=25 total_requests=117 ok_requests=106 failed_requests=11
+2026/05/18 16:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:39:55 INFO scrape complete entries=463 topics=90 links=24 total_requests=111 ok_requests=100 failed_requests=11
+2026/05/18 16:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:45:55 INFO scrape complete entries=459 topics=90 links=25 total_requests=114 ok_requests=98 failed_requests=16
+2026/05/18 16:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:51:56 INFO scrape complete entries=462 topics=90 links=25 total_requests=114 ok_requests=103 failed_requests=11
+2026/05/18 16:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 16:57:53 INFO scrape complete entries=462 topics=91 links=26 total_requests=116 ok_requests=107 failed_requests=9
+2026/05/18 17:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:03:59 INFO scrape complete entries=444 topics=90 links=24 total_requests=111 ok_requests=100 failed_requests=11
+2026/05/18 17:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:09:58 INFO scrape complete entries=413 topics=90 links=24 total_requests=107 ok_requests=95 failed_requests=12
+2026/05/18 17:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:15:55 INFO scrape complete entries=452 topics=90 links=28 total_requests=116 ok_requests=110 failed_requests=6
+2026/05/18 17:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:21:58 INFO scrape complete entries=408 topics=89 links=29 total_requests=107 ok_requests=97 failed_requests=10
+2026/05/18 17:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:28:02 INFO scrape complete entries=446 topics=90 links=34 total_requests=119 ok_requests=108 failed_requests=11
+2026/05/18 17:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:34:00 INFO scrape complete entries=465 topics=91 links=34 total_requests=115 ok_requests=103 failed_requests=12
+2026/05/18 17:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:39:56 INFO scrape complete entries=472 topics=91 links=37 total_requests=108 ok_requests=100 failed_requests=8
+2026/05/18 17:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:45:59 INFO scrape complete entries=464 topics=91 links=38 total_requests=110 ok_requests=100 failed_requests=10
+2026/05/18 17:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:52:51 INFO scrape complete entries=2016 topics=93 links=166 total_requests=267 ok_requests=259 failed_requests=8
+2026/05/18 17:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 17:58:03 INFO scrape complete entries=511 topics=93 links=40 total_requests=123 ok_requests=111 failed_requests=12
+2026/05/18 18:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:04:01 INFO scrape complete entries=457 topics=93 links=49 total_requests=119 ok_requests=104 failed_requests=15
+2026/05/18 18:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:10:03 INFO scrape complete entries=512 topics=95 links=66 total_requests=125 ok_requests=111 failed_requests=14
+2026/05/18 18:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:15:58 INFO scrape complete entries=429 topics=94 links=54 total_requests=117 ok_requests=108 failed_requests=9
+2026/05/18 18:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:22:00 INFO scrape complete entries=433 topics=94 links=45 total_requests=117 ok_requests=108 failed_requests=9
+2026/05/18 18:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:28:01 INFO scrape complete entries=438 topics=93 links=45 total_requests=118 ok_requests=109 failed_requests=9
+2026/05/18 18:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:34:00 INFO scrape complete entries=466 topics=93 links=46 total_requests=117 ok_requests=110 failed_requests=7
+2026/05/18 18:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:40:33 INFO scrape complete entries=1809 topics=93 links=111 total_requests=246 ok_requests=240 failed_requests=6
+2026/05/18 18:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:45:58 INFO scrape complete entries=470 topics=92 links=49 total_requests=112 ok_requests=98 failed_requests=14
+2026/05/18 18:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:51:55 INFO scrape complete entries=468 topics=92 links=38 total_requests=108 ok_requests=98 failed_requests=10
+2026/05/18 18:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 18:58:01 INFO scrape complete entries=462 topics=92 links=35 total_requests=118 ok_requests=105 failed_requests=13
+2026/05/18 19:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:04:00 INFO scrape complete entries=468 topics=92 links=47 total_requests=115 ok_requests=105 failed_requests=10
+2026/05/18 19:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:09:55 INFO scrape complete entries=480 topics=92 links=50 total_requests=113 ok_requests=105 failed_requests=8
+2026/05/18 19:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:16:15 INFO scrape complete entries=904 topics=93 links=63 total_requests=164 ok_requests=154 failed_requests=10
+2026/05/18 19:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:21:58 INFO scrape complete entries=466 topics=92 links=55 total_requests=120 ok_requests=111 failed_requests=9
+2026/05/18 19:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:28:02 INFO scrape complete entries=461 topics=92 links=45 total_requests=116 ok_requests=105 failed_requests=11
+2026/05/18 19:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:33:58 INFO scrape complete entries=484 topics=92 links=47 total_requests=117 ok_requests=107 failed_requests=10
+2026/05/18 19:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:40:03 INFO scrape complete entries=436 topics=92 links=41 total_requests=116 ok_requests=107 failed_requests=9
+2026/05/18 19:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:46:01 INFO scrape complete entries=455 topics=92 links=45 total_requests=117 ok_requests=107 failed_requests=10
+2026/05/18 19:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:51:58 INFO scrape complete entries=453 topics=92 links=45 total_requests=112 ok_requests=106 failed_requests=6
+2026/05/18 19:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 19:58:12 INFO scrape complete entries=445 topics=91 links=34 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/18 20:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:04:26 INFO scrape complete entries=1043 topics=93 links=82 total_requests=179 ok_requests=171 failed_requests=8
+2026/05/18 20:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:10:03 INFO scrape complete entries=466 topics=93 links=29 total_requests=121 ok_requests=113 failed_requests=8
+2026/05/18 20:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:16:22 INFO scrape complete entries=968 topics=92 links=85 total_requests=172 ok_requests=157 failed_requests=15
+2026/05/18 20:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:21:59 INFO scrape complete entries=483 topics=95 links=51 total_requests=128 ok_requests=120 failed_requests=8
+2026/05/18 20:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:28:01 INFO scrape complete entries=450 topics=95 links=36 total_requests=119 ok_requests=108 failed_requests=11
+2026/05/18 20:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:38:03 INFO scrape complete entries=6471 topics=95 links=512 total_requests=723 ok_requests=713 failed_requests=10
+2026/05/18 20:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:40:03 INFO scrape complete entries=455 topics=96 links=42 total_requests=120 ok_requests=114 failed_requests=6
+2026/05/18 20:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:46:06 INFO scrape complete entries=443 topics=96 links=41 total_requests=124 ok_requests=115 failed_requests=9
+2026/05/18 20:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:52:03 INFO scrape complete entries=431 topics=95 links=35 total_requests=118 ok_requests=110 failed_requests=8
+2026/05/18 20:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 20:57:59 INFO scrape complete entries=445 topics=95 links=29 total_requests=121 ok_requests=116 failed_requests=5
+2026/05/18 21:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:04:04 INFO scrape complete entries=456 topics=95 links=30 total_requests=122 ok_requests=117 failed_requests=5
+2026/05/18 21:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:09:57 INFO scrape complete entries=450 topics=95 links=31 total_requests=118 ok_requests=113 failed_requests=5
+2026/05/18 21:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:15:55 INFO scrape complete entries=440 topics=94 links=26 total_requests=124 ok_requests=119 failed_requests=5
+2026/05/18 21:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:22:02 INFO scrape complete entries=421 topics=95 links=20 total_requests=118 ok_requests=110 failed_requests=8
+2026/05/18 21:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:28:00 INFO scrape complete entries=426 topics=94 links=22 total_requests=118 ok_requests=109 failed_requests=9
+2026/05/18 21:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:34:00 INFO scrape complete entries=449 topics=94 links=25 total_requests=120 ok_requests=113 failed_requests=7
+2026/05/18 21:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:39:59 INFO scrape complete entries=436 topics=93 links=25 total_requests=122 ok_requests=114 failed_requests=8
+2026/05/18 21:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:45:56 INFO scrape complete entries=474 topics=93 links=27 total_requests=120 ok_requests=113 failed_requests=7
+2026/05/18 21:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:52:03 INFO scrape complete entries=484 topics=93 links=27 total_requests=122 ok_requests=114 failed_requests=8
+2026/05/18 21:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 21:57:57 INFO scrape complete entries=433 topics=93 links=27 total_requests=121 ok_requests=110 failed_requests=11
+2026/05/18 22:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:04:02 INFO scrape complete entries=424 topics=91 links=31 total_requests=114 ok_requests=102 failed_requests=12
+2026/05/18 22:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:09:57 INFO scrape complete entries=379 topics=90 links=24 total_requests=108 ok_requests=99 failed_requests=9
+2026/05/18 22:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:16:03 INFO scrape complete entries=409 topics=90 links=21 total_requests=117 ok_requests=107 failed_requests=10
+2026/05/18 22:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:23:23 INFO scrape complete entries=2974 topics=91 links=128 total_requests=373 ok_requests=361 failed_requests=12
+2026/05/18 22:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:27:54 INFO scrape complete entries=406 topics=92 links=36 total_requests=120 ok_requests=111 failed_requests=9
+2026/05/18 22:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:34:03 INFO scrape complete entries=454 topics=91 links=38 total_requests=122 ok_requests=108 failed_requests=14
+2026/05/18 22:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:40:07 INFO scrape complete entries=450 topics=91 links=30 total_requests=122 ok_requests=107 failed_requests=15
+2026/05/18 22:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:45:57 INFO scrape complete entries=423 topics=91 links=42 total_requests=119 ok_requests=108 failed_requests=11
+2026/05/18 22:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:51:57 INFO scrape complete entries=426 topics=91 links=34 total_requests=113 ok_requests=102 failed_requests=11
+2026/05/18 22:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 22:57:58 INFO scrape complete entries=405 topics=92 links=32 total_requests=114 ok_requests=103 failed_requests=11
+2026/05/18 23:03:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:03:55 INFO scrape complete entries=435 topics=91 links=32 total_requests=114 ok_requests=100 failed_requests=14
+2026/05/18 23:09:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:10:13 INFO scrape complete entries=702 topics=92 links=79 total_requests=152 ok_requests=140 failed_requests=12
+2026/05/18 23:15:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:18:00 INFO scrape complete entries=2919 topics=92 links=105 total_requests=362 ok_requests=355 failed_requests=7
+2026/05/18 23:21:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:21:55 INFO scrape complete entries=415 topics=92 links=40 total_requests=111 ok_requests=104 failed_requests=7
+2026/05/18 23:27:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:27:57 INFO scrape complete entries=435 topics=92 links=32 total_requests=113 ok_requests=106 failed_requests=7
+2026/05/18 23:33:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:33:57 INFO scrape complete entries=459 topics=92 links=36 total_requests=114 ok_requests=105 failed_requests=9
+2026/05/18 23:39:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:40:00 INFO scrape complete entries=417 topics=91 links=35 total_requests=113 ok_requests=106 failed_requests=7
+2026/05/18 23:45:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:45:54 INFO scrape complete entries=440 topics=91 links=35 total_requests=110 ok_requests=101 failed_requests=9
+2026/05/18 23:51:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:51:56 INFO scrape complete entries=475 topics=91 links=45 total_requests=119 ok_requests=112 failed_requests=7
+2026/05/18 23:57:29 INFO scraping popular topics from eksisozluk
+2026/05/18 23:57:56 INFO scrape complete entries=455 topics=91 links=40 total_requests=114 ok_requests=107 failed_requests=7
+2026/05/19 00:03:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:04:17 INFO scrape complete entries=1147 topics=92 links=106 total_requests=184 ok_requests=175 failed_requests=9
+2026/05/19 00:09:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:09:59 INFO scrape complete entries=467 topics=92 links=53 total_requests=119 ok_requests=108 failed_requests=11
+2026/05/19 00:15:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:15:54 INFO scrape complete entries=444 topics=91 links=42 total_requests=121 ok_requests=112 failed_requests=9
+2026/05/19 00:21:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:22:12 INFO scrape complete entries=899 topics=92 links=47 total_requests=167 ok_requests=156 failed_requests=11
+2026/05/19 00:27:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:27:53 INFO scrape complete entries=430 topics=92 links=47 total_requests=112 ok_requests=104 failed_requests=8
+2026/05/19 00:33:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:33:56 INFO scrape complete entries=436 topics=91 links=43 total_requests=109 ok_requests=99 failed_requests=10
+2026/05/19 00:39:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:39:56 INFO scrape complete entries=434 topics=91 links=45 total_requests=110 ok_requests=96 failed_requests=14
+2026/05/19 00:45:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:45:54 INFO scrape complete entries=424 topics=91 links=42 total_requests=108 ok_requests=95 failed_requests=13
+2026/05/19 00:51:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:51:54 INFO scrape complete entries=409 topics=91 links=39 total_requests=108 ok_requests=96 failed_requests=12
+2026/05/19 00:57:29 INFO scraping popular topics from eksisozluk
+2026/05/19 00:57:55 INFO scrape complete entries=427 topics=90 links=42 total_requests=109 ok_requests=96 failed_requests=13
+2026/05/19 01:03:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:03:54 INFO scrape complete entries=396 topics=90 links=37 total_requests=106 ok_requests=93 failed_requests=13
+2026/05/19 01:09:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:09:51 INFO scrape complete entries=421 topics=90 links=39 total_requests=107 ok_requests=96 failed_requests=11
+2026/05/19 01:15:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:15:48 INFO scrape complete entries=417 topics=90 links=39 total_requests=103 ok_requests=89 failed_requests=14
+2026/05/19 01:21:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:21:55 INFO scrape complete entries=388 topics=90 links=29 total_requests=107 ok_requests=91 failed_requests=16
+2026/05/19 01:27:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:27:52 INFO scrape complete entries=386 topics=90 links=30 total_requests=100 ok_requests=86 failed_requests=14
+2026/05/19 01:33:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:33:52 INFO scrape complete entries=377 topics=90 links=31 total_requests=101 ok_requests=89 failed_requests=12
+2026/05/19 01:39:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:39:50 INFO scrape complete entries=377 topics=90 links=30 total_requests=96 ok_requests=82 failed_requests=14
+2026/05/19 01:45:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:45:52 INFO scrape complete entries=393 topics=90 links=31 total_requests=105 ok_requests=92 failed_requests=13
+2026/05/19 01:51:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:51:51 INFO scrape complete entries=408 topics=90 links=32 total_requests=108 ok_requests=98 failed_requests=10
+2026/05/19 01:57:29 INFO scraping popular topics from eksisozluk
+2026/05/19 01:57:50 INFO scrape complete entries=422 topics=90 links=32 total_requests=109 ok_requests=99 failed_requests=10
+2026/05/19 02:03:29 INFO scraping popular topics from eksisozluk
+2026/05/19 02:03:59 INFO scrape complete entries=412 topics=89 links=29 total_requests=109 ok_requests=100 failed_requests=9
+2026/05/19 02:09:29 INFO scraping popular topics from eksisozluk
+2026/05/19 02:09:54 INFO scrape complete entries=413 topics=89 links=25 total_requests=104 ok_requests=95 failed_requests=9
+2026/05/19 02:15:29 INFO scraping popular topics from eksisozluk
+2026/05/19 02:15:49 INFO scrape complete entries=421 topics=89 links=25 total_requests=105 ok_requests=96 failed_requests=9
+2026/05/19 02:21:29 INFO scraping popular topics from eksisozluk
+2026/05/19 02:22:13 INFO scrape complete entries=980 topics=90 links=71 total_requests=159 ok_requests=150 failed_requests=9
+2026/05/19 02:27:29 INFO scraping popular topics from eksisozluk
+2026/05/19 02:27:51 INFO scrape complete entries=425 topics=91 links=26 total_requests=105 ok_requests=95 failed_requests=10
+2026/05/19 02:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 02:33:51 INFO scrape complete entries=413 topics=90 links=25 total_requests=104 ok_requests=94 failed_requests=10
+2026/05/19 02:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 02:39:53 INFO scrape complete entries=397 topics=90 links=25 total_requests=104 ok_requests=91 failed_requests=13
+2026/05/19 02:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 02:46:16 INFO scrape complete entries=341 topics=90 links=25 total_requests=100 ok_requests=79 failed_requests=21
+2026/05/19 02:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 02:52:14 INFO scrape complete entries=188 topics=50 links=13 total_requests=60 ok_requests=45 failed_requests=15
+2026/05/19 02:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 02:57:56 INFO scrape complete entries=420 topics=91 links=29 total_requests=111 ok_requests=98 failed_requests=13
+2026/05/19 03:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:03:50 INFO scrape complete entries=392 topics=91 links=29 total_requests=107 ok_requests=96 failed_requests=11
+2026/05/19 03:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:09:50 INFO scrape complete entries=409 topics=91 links=30 total_requests=104 ok_requests=96 failed_requests=8
+2026/05/19 03:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:15:53 INFO scrape complete entries=396 topics=91 links=33 total_requests=103 ok_requests=90 failed_requests=13
+2026/05/19 03:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:21:54 INFO scrape complete entries=399 topics=91 links=31 total_requests=107 ok_requests=96 failed_requests=11
+2026/05/19 03:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:27:55 INFO scrape complete entries=395 topics=91 links=31 total_requests=101 ok_requests=91 failed_requests=10
+2026/05/19 03:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:33:53 INFO scrape complete entries=401 topics=91 links=31 total_requests=104 ok_requests=93 failed_requests=11
+2026/05/19 03:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:39:55 INFO scrape complete entries=410 topics=91 links=31 total_requests=101 ok_requests=89 failed_requests=12
+2026/05/19 03:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:45:55 INFO scrape complete entries=405 topics=92 links=30 total_requests=104 ok_requests=92 failed_requests=12
+2026/05/19 03:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:51:57 INFO scrape complete entries=395 topics=92 links=30 total_requests=105 ok_requests=91 failed_requests=14
+2026/05/19 03:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 03:58:00 INFO scrape complete entries=405 topics=91 links=30 total_requests=101 ok_requests=87 failed_requests=14
+2026/05/19 04:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:03:55 INFO scrape complete entries=397 topics=91 links=31 total_requests=106 ok_requests=93 failed_requests=13
+2026/05/19 04:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:09:53 INFO scrape complete entries=394 topics=91 links=32 total_requests=103 ok_requests=92 failed_requests=11
+2026/05/19 04:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:15:55 INFO scrape complete entries=400 topics=91 links=33 total_requests=104 ok_requests=94 failed_requests=10
+2026/05/19 04:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:21:55 INFO scrape complete entries=399 topics=91 links=32 total_requests=100 ok_requests=91 failed_requests=9
+2026/05/19 04:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:27:56 INFO scrape complete entries=392 topics=91 links=32 total_requests=105 ok_requests=94 failed_requests=11
+2026/05/19 04:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:33:54 INFO scrape complete entries=395 topics=91 links=32 total_requests=103 ok_requests=92 failed_requests=11
+2026/05/19 04:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:39:56 INFO scrape complete entries=407 topics=91 links=32 total_requests=107 ok_requests=97 failed_requests=10
+2026/05/19 04:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:45:54 INFO scrape complete entries=411 topics=91 links=33 total_requests=105 ok_requests=96 failed_requests=9
+2026/05/19 04:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:51:55 INFO scrape complete entries=416 topics=91 links=33 total_requests=104 ok_requests=95 failed_requests=9
+2026/05/19 04:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 04:57:55 INFO scrape complete entries=418 topics=91 links=34 total_requests=101 ok_requests=91 failed_requests=10
+2026/05/19 05:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:03:58 INFO scrape complete entries=423 topics=91 links=27 total_requests=104 ok_requests=95 failed_requests=9
+2026/05/19 05:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:09:53 INFO scrape complete entries=409 topics=91 links=27 total_requests=97 ok_requests=86 failed_requests=11
+2026/05/19 05:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:15:56 INFO scrape complete entries=429 topics=92 links=26 total_requests=101 ok_requests=92 failed_requests=9
+2026/05/19 05:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:21:52 INFO scrape complete entries=442 topics=92 links=26 total_requests=104 ok_requests=96 failed_requests=8
+2026/05/19 05:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:27:54 INFO scrape complete entries=461 topics=92 links=26 total_requests=107 ok_requests=97 failed_requests=10
+2026/05/19 05:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:34:01 INFO scrape complete entries=427 topics=93 links=29 total_requests=104 ok_requests=91 failed_requests=13
+2026/05/19 05:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:39:58 INFO scrape complete entries=435 topics=93 links=29 total_requests=103 ok_requests=94 failed_requests=9
+2026/05/19 05:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:45:56 INFO scrape complete entries=437 topics=93 links=30 total_requests=105 ok_requests=95 failed_requests=10
+2026/05/19 05:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:51:55 INFO scrape complete entries=440 topics=93 links=30 total_requests=104 ok_requests=91 failed_requests=13
+2026/05/19 05:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 05:57:53 INFO scrape complete entries=440 topics=93 links=32 total_requests=108 ok_requests=97 failed_requests=11
+2026/05/19 06:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:03:58 INFO scrape complete entries=439 topics=92 links=31 total_requests=104 ok_requests=94 failed_requests=10
+2026/05/19 06:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:09:56 INFO scrape complete entries=439 topics=92 links=27 total_requests=103 ok_requests=92 failed_requests=11
+2026/05/19 06:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:15:54 INFO scrape complete entries=439 topics=92 links=28 total_requests=108 ok_requests=96 failed_requests=12
+2026/05/19 06:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:21:56 INFO scrape complete entries=446 topics=92 links=28 total_requests=107 ok_requests=95 failed_requests=12
+2026/05/19 06:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:27:57 INFO scrape complete entries=423 topics=92 links=26 total_requests=103 ok_requests=87 failed_requests=16
+2026/05/19 06:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:33:54 INFO scrape complete entries=425 topics=92 links=29 total_requests=103 ok_requests=89 failed_requests=14
+2026/05/19 06:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:39:59 INFO scrape complete entries=422 topics=92 links=28 total_requests=109 ok_requests=94 failed_requests=15
+2026/05/19 06:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:45:57 INFO scrape complete entries=425 topics=91 links=30 total_requests=107 ok_requests=95 failed_requests=12
+2026/05/19 06:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:51:52 INFO scrape complete entries=428 topics=91 links=30 total_requests=105 ok_requests=89 failed_requests=16
+2026/05/19 06:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 06:57:53 INFO scrape complete entries=408 topics=91 links=30 total_requests=104 ok_requests=89 failed_requests=15
+2026/05/19 07:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:03:57 INFO scrape complete entries=406 topics=90 links=32 total_requests=106 ok_requests=88 failed_requests=18
+2026/05/19 07:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:09:53 INFO scrape complete entries=376 topics=90 links=27 total_requests=98 ok_requests=82 failed_requests=16
+2026/05/19 07:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:15:51 INFO scrape complete entries=375 topics=89 links=30 total_requests=101 ok_requests=86 failed_requests=15
+2026/05/19 07:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:22:01 INFO scrape complete entries=621 topics=90 links=82 total_requests=122 ok_requests=104 failed_requests=18
+2026/05/19 07:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:27:53 INFO scrape complete entries=395 topics=89 links=30 total_requests=101 ok_requests=85 failed_requests=16
+2026/05/19 07:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:33:52 INFO scrape complete entries=392 topics=89 links=28 total_requests=105 ok_requests=88 failed_requests=17
+2026/05/19 07:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:39:53 INFO scrape complete entries=385 topics=89 links=28 total_requests=102 ok_requests=86 failed_requests=16
+2026/05/19 07:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:45:56 INFO scrape complete entries=382 topics=89 links=28 total_requests=105 ok_requests=88 failed_requests=17
+2026/05/19 07:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:51:57 INFO scrape complete entries=382 topics=89 links=29 total_requests=107 ok_requests=88 failed_requests=19
+2026/05/19 07:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 07:57:55 INFO scrape complete entries=382 topics=89 links=30 total_requests=104 ok_requests=86 failed_requests=18
+2026/05/19 08:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:04:01 INFO scrape complete entries=361 topics=89 links=30 total_requests=105 ok_requests=85 failed_requests=20
+2026/05/19 08:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:09:57 INFO scrape complete entries=365 topics=89 links=30 total_requests=102 ok_requests=84 failed_requests=18
+2026/05/19 08:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:15:55 INFO scrape complete entries=380 topics=89 links=39 total_requests=107 ok_requests=88 failed_requests=19
+2026/05/19 08:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:21:56 INFO scrape complete entries=377 topics=89 links=43 total_requests=105 ok_requests=89 failed_requests=16
+2026/05/19 08:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:27:56 INFO scrape complete entries=355 topics=88 links=38 total_requests=105 ok_requests=89 failed_requests=16
+2026/05/19 08:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:34:05 INFO scrape complete entries=462 topics=89 links=40 total_requests=118 ok_requests=97 failed_requests=21
+2026/05/19 08:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:39:55 INFO scrape complete entries=387 topics=88 links=42 total_requests=108 ok_requests=93 failed_requests=15
+2026/05/19 08:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:45:59 INFO scrape complete entries=361 topics=88 links=40 total_requests=107 ok_requests=90 failed_requests=17
+2026/05/19 08:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:51:55 INFO scrape complete entries=377 topics=89 links=38 total_requests=108 ok_requests=94 failed_requests=14
+2026/05/19 08:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 08:58:20 INFO scrape complete entries=994 topics=89 links=98 total_requests=170 ok_requests=153 failed_requests=17
+2026/05/19 09:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:03:59 INFO scrape complete entries=533 topics=90 links=40 total_requests=130 ok_requests=119 failed_requests=11
+2026/05/19 09:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:09:56 INFO scrape complete entries=383 topics=90 links=36 total_requests=110 ok_requests=99 failed_requests=11
+2026/05/19 09:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:16:01 INFO scrape complete entries=441 topics=91 links=35 total_requests=121 ok_requests=105 failed_requests=16
+2026/05/19 09:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:21:59 INFO scrape complete entries=418 topics=91 links=44 total_requests=120 ok_requests=110 failed_requests=10
+2026/05/19 09:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:27:59 INFO scrape complete entries=394 topics=91 links=42 total_requests=105 ok_requests=88 failed_requests=17
+2026/05/19 09:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:34:01 INFO scrape complete entries=399 topics=90 links=39 total_requests=113 ok_requests=99 failed_requests=14
+2026/05/19 09:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:39:56 INFO scrape complete entries=418 topics=90 links=41 total_requests=110 ok_requests=100 failed_requests=10
+2026/05/19 09:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:45:52 INFO scrape complete entries=422 topics=90 links=37 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/19 09:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:51:57 INFO scrape complete entries=424 topics=90 links=37 total_requests=111 ok_requests=99 failed_requests=12
+2026/05/19 09:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 09:57:57 INFO scrape complete entries=406 topics=90 links=38 total_requests=106 ok_requests=96 failed_requests=10
+2026/05/19 10:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:04:00 INFO scrape complete entries=430 topics=90 links=38 total_requests=111 ok_requests=100 failed_requests=11
+2026/05/19 10:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:09:58 INFO scrape complete entries=441 topics=90 links=33 total_requests=110 ok_requests=98 failed_requests=12
+2026/05/19 10:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:16:09 INFO scrape complete entries=783 topics=90 links=42 total_requests=150 ok_requests=135 failed_requests=15
+2026/05/19 10:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:21:58 INFO scrape complete entries=400 topics=90 links=28 total_requests=112 ok_requests=101 failed_requests=11
+2026/05/19 10:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:27:55 INFO scrape complete entries=423 topics=90 links=31 total_requests=113 ok_requests=102 failed_requests=11
+2026/05/19 10:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:34:00 INFO scrape complete entries=408 topics=90 links=30 total_requests=114 ok_requests=105 failed_requests=9
+2026/05/19 10:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:42:17 INFO scrape complete entries=4504 topics=91 links=702 total_requests=520 ok_requests=510 failed_requests=10
+2026/05/19 10:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:45:59 INFO scrape complete entries=442 topics=91 links=31 total_requests=111 ok_requests=99 failed_requests=12
+2026/05/19 10:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:51:55 INFO scrape complete entries=457 topics=89 links=34 total_requests=111 ok_requests=99 failed_requests=12
+2026/05/19 10:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 10:57:54 INFO scrape complete entries=414 topics=88 links=31 total_requests=108 ok_requests=93 failed_requests=15
+2026/05/19 11:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:04:13 INFO scrape complete entries=402 topics=88 links=31 total_requests=112 ok_requests=96 failed_requests=16
+2026/05/19 11:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:09:51 INFO scrape complete entries=154 topics=37 links=20 total_requests=40 ok_requests=35 failed_requests=5
+2026/05/19 11:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:16:01 INFO scrape complete entries=429 topics=87 links=37 total_requests=120 ok_requests=107 failed_requests=13
+2026/05/19 11:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:22:01 INFO scrape complete entries=405 topics=89 links=31 total_requests=114 ok_requests=100 failed_requests=14
+2026/05/19 11:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:27:59 INFO scrape complete entries=401 topics=88 links=29 total_requests=113 ok_requests=98 failed_requests=15
+2026/05/19 11:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:33:58 INFO scrape complete entries=419 topics=88 links=32 total_requests=114 ok_requests=104 failed_requests=10
+2026/05/19 11:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:39:57 INFO scrape complete entries=406 topics=88 links=33 total_requests=106 ok_requests=93 failed_requests=13
+2026/05/19 11:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:45:59 INFO scrape complete entries=388 topics=87 links=34 total_requests=108 ok_requests=97 failed_requests=11
+2026/05/19 11:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:52:01 INFO scrape complete entries=410 topics=87 links=31 total_requests=107 ok_requests=100 failed_requests=7
+2026/05/19 11:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 11:57:59 INFO scrape complete entries=413 topics=87 links=33 total_requests=109 ok_requests=99 failed_requests=10
+2026/05/19 12:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:03:57 INFO scrape complete entries=417 topics=87 links=31 total_requests=111 ok_requests=101 failed_requests=10
+2026/05/19 12:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:10:00 INFO scrape complete entries=394 topics=86 links=32 total_requests=109 ok_requests=98 failed_requests=11
+2026/05/19 12:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:15:57 INFO scrape complete entries=412 topics=86 links=29 total_requests=105 ok_requests=100 failed_requests=5
+2026/05/19 12:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:21:57 INFO scrape complete entries=411 topics=84 links=27 total_requests=103 ok_requests=95 failed_requests=8
+2026/05/19 12:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:28:03 INFO scrape complete entries=436 topics=85 links=27 total_requests=109 ok_requests=97 failed_requests=12
+2026/05/19 12:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:33:55 INFO scrape complete entries=412 topics=82 links=24 total_requests=108 ok_requests=92 failed_requests=16
+2026/05/19 12:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:39:59 INFO scrape complete entries=378 topics=82 links=24 total_requests=107 ok_requests=94 failed_requests=13
+2026/05/19 12:45:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:45:56 INFO scrape complete entries=383 topics=82 links=24 total_requests=99 ok_requests=86 failed_requests=13
+2026/05/19 12:51:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:51:59 INFO scrape complete entries=425 topics=83 links=26 total_requests=109 ok_requests=96 failed_requests=13
+2026/05/19 12:57:30 INFO scraping popular topics from eksisozluk
+2026/05/19 12:57:53 INFO scrape complete entries=420 topics=82 links=25 total_requests=102 ok_requests=93 failed_requests=9
+2026/05/19 13:03:30 INFO scraping popular topics from eksisozluk
+2026/05/19 13:03:55 INFO scrape complete entries=438 topics=82 links=35 total_requests=102 ok_requests=94 failed_requests=8
+2026/05/19 13:09:30 INFO scraping popular topics from eksisozluk
+2026/05/19 13:09:55 INFO scrape complete entries=452 topics=82 links=36 total_requests=98 ok_requests=87 failed_requests=11
+2026/05/19 13:15:30 INFO scraping popular topics from eksisozluk
+2026/05/19 13:15:54 INFO scrape complete entries=462 topics=81 links=38 total_requests=108 ok_requests=100 failed_requests=8
+2026/05/19 13:21:30 INFO scraping popular topics from eksisozluk
+2026/05/19 13:21:53 INFO scrape complete entries=418 topics=81 links=33 total_requests=96 ok_requests=85 failed_requests=11
+2026/05/19 13:27:30 INFO scraping popular topics from eksisozluk
+2026/05/19 13:27:57 INFO scrape complete entries=416 topics=80 links=31 total_requests=105 ok_requests=95 failed_requests=10
+2026/05/19 13:33:30 INFO scraping popular topics from eksisozluk
+2026/05/19 13:33:52 INFO scrape complete entries=421 topics=80 links=31 total_requests=102 ok_requests=93 failed_requests=9
+2026/05/19 13:39:30 INFO scraping popular topics from eksisozluk
+2026/05/19 13:39:54 INFO scrape complete entries=380 topics=80 links=29 total_requests=98 ok_requests=87 failed_requests=11
+2026/05/19 13:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 13:45:58 INFO scrape complete entries=393 topics=80 links=29 total_requests=104 ok_requests=91 failed_requests=13
+2026/05/19 13:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 13:51:53 INFO scrape complete entries=351 topics=80 links=24 total_requests=98 ok_requests=89 failed_requests=9
+2026/05/19 13:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 13:57:53 INFO scrape complete entries=359 topics=80 links=27 total_requests=96 ok_requests=86 failed_requests=10
+2026/05/19 14:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:03:52 INFO scrape complete entries=374 topics=80 links=30 total_requests=98 ok_requests=89 failed_requests=9
+2026/05/19 14:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:09:59 INFO scrape complete entries=370 topics=80 links=27 total_requests=99 ok_requests=89 failed_requests=10
+2026/05/19 14:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:15:55 INFO scrape complete entries=347 topics=79 links=26 total_requests=96 ok_requests=86 failed_requests=10
+2026/05/19 14:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:21:51 INFO scrape complete entries=364 topics=79 links=27 total_requests=92 ok_requests=82 failed_requests=10
+2026/05/19 14:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:27:52 INFO scrape complete entries=390 topics=79 links=31 total_requests=97 ok_requests=89 failed_requests=8
+2026/05/19 14:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:33:58 INFO scrape complete entries=432 topics=80 links=35 total_requests=104 ok_requests=96 failed_requests=8
+2026/05/19 14:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:39:58 INFO scrape complete entries=400 topics=79 links=37 total_requests=99 ok_requests=91 failed_requests=8
+2026/05/19 14:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:45:55 INFO scrape complete entries=382 topics=79 links=38 total_requests=94 ok_requests=84 failed_requests=10
+2026/05/19 14:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:51:57 INFO scrape complete entries=412 topics=80 links=40 total_requests=102 ok_requests=88 failed_requests=14
+2026/05/19 14:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 14:57:57 INFO scrape complete entries=392 topics=80 links=41 total_requests=98 ok_requests=86 failed_requests=12
+2026/05/19 15:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:03:57 INFO scrape complete entries=403 topics=81 links=37 total_requests=100 ok_requests=89 failed_requests=11
+2026/05/19 15:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:13:48 INFO scrape complete entries=6529 topics=81 links=934 total_requests=716 ok_requests=702 failed_requests=14
+2026/05/19 15:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:16:00 INFO scrape complete entries=357 topics=81 links=35 total_requests=99 ok_requests=83 failed_requests=16
+2026/05/19 15:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:21:53 INFO scrape complete entries=382 topics=81 links=35 total_requests=105 ok_requests=89 failed_requests=16
+2026/05/19 15:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:28:18 INFO scrape complete entries=880 topics=82 links=42 total_requests=157 ok_requests=141 failed_requests=16
+2026/05/19 15:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:34:00 INFO scrape complete entries=363 topics=82 links=28 total_requests=100 ok_requests=85 failed_requests=15
+2026/05/19 15:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:39:52 INFO scrape complete entries=382 topics=82 links=31 total_requests=107 ok_requests=93 failed_requests=14
+2026/05/19 15:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:45:56 INFO scrape complete entries=372 topics=82 links=32 total_requests=100 ok_requests=88 failed_requests=12
+2026/05/19 15:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:51:58 INFO scrape complete entries=375 topics=82 links=32 total_requests=98 ok_requests=84 failed_requests=14
+2026/05/19 15:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 15:57:59 INFO scrape complete entries=405 topics=82 links=32 total_requests=106 ok_requests=94 failed_requests=12
+2026/05/19 16:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:03:59 INFO scrape complete entries=400 topics=80 links=34 total_requests=103 ok_requests=94 failed_requests=9
+2026/05/19 16:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:09:54 INFO scrape complete entries=443 topics=81 links=39 total_requests=102 ok_requests=91 failed_requests=11
+2026/05/19 16:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:15:58 INFO scrape complete entries=407 topics=81 links=33 total_requests=104 ok_requests=90 failed_requests=14
+2026/05/19 16:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:21:55 INFO scrape complete entries=373 topics=81 links=32 total_requests=101 ok_requests=87 failed_requests=14
+2026/05/19 16:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:28:01 INFO scrape complete entries=366 topics=83 links=36 total_requests=112 ok_requests=100 failed_requests=12
+2026/05/19 16:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:33:54 INFO scrape complete entries=342 topics=83 links=30 total_requests=99 ok_requests=90 failed_requests=9
+2026/05/19 16:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:39:53 INFO scrape complete entries=386 topics=83 links=35 total_requests=97 ok_requests=89 failed_requests=8
+2026/05/19 16:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:46:00 INFO scrape complete entries=522 topics=84 links=38 total_requests=117 ok_requests=110 failed_requests=7
+2026/05/19 16:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:51:58 INFO scrape complete entries=436 topics=84 links=37 total_requests=115 ok_requests=106 failed_requests=9
+2026/05/19 16:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 16:57:58 INFO scrape complete entries=436 topics=84 links=32 total_requests=107 ok_requests=92 failed_requests=15
+2026/05/19 17:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:03:59 INFO scrape complete entries=414 topics=85 links=39 total_requests=111 ok_requests=97 failed_requests=14
+2026/05/19 17:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:09:57 INFO scrape complete entries=395 topics=85 links=40 total_requests=108 ok_requests=94 failed_requests=14
+2026/05/19 17:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:15:55 INFO scrape complete entries=381 topics=85 links=39 total_requests=105 ok_requests=94 failed_requests=11
+2026/05/19 17:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:21:57 INFO scrape complete entries=374 topics=85 links=40 total_requests=102 ok_requests=88 failed_requests=14
+2026/05/19 17:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:27:53 INFO scrape complete entries=353 topics=84 links=35 total_requests=101 ok_requests=92 failed_requests=9
+2026/05/19 17:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:33:56 INFO scrape complete entries=380 topics=83 links=34 total_requests=106 ok_requests=94 failed_requests=12
+2026/05/19 17:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:39:55 INFO scrape complete entries=361 topics=83 links=34 total_requests=100 ok_requests=87 failed_requests=13
+2026/05/19 17:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:45:56 INFO scrape complete entries=346 topics=83 links=33 total_requests=98 ok_requests=86 failed_requests=12
+2026/05/19 17:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:51:57 INFO scrape complete entries=333 topics=83 links=27 total_requests=100 ok_requests=83 failed_requests=17
+2026/05/19 17:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 17:58:23 INFO scrape complete entries=1197 topics=84 links=40 total_requests=187 ok_requests=175 failed_requests=12
+2026/05/19 18:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:03:58 INFO scrape complete entries=342 topics=84 links=25 total_requests=102 ok_requests=88 failed_requests=14
+2026/05/19 18:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:10:00 INFO scrape complete entries=372 topics=84 links=26 total_requests=108 ok_requests=95 failed_requests=13
+2026/05/19 18:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:16:01 INFO scrape complete entries=396 topics=85 links=35 total_requests=116 ok_requests=104 failed_requests=12
+2026/05/19 18:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:21:57 INFO scrape complete entries=336 topics=83 links=28 total_requests=106 ok_requests=94 failed_requests=12
+2026/05/19 18:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:27:59 INFO scrape complete entries=351 topics=83 links=26 total_requests=108 ok_requests=98 failed_requests=10
+2026/05/19 18:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:33:59 INFO scrape complete entries=370 topics=82 links=26 total_requests=104 ok_requests=97 failed_requests=7
+2026/05/19 18:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:40:01 INFO scrape complete entries=370 topics=82 links=24 total_requests=106 ok_requests=100 failed_requests=6
+2026/05/19 18:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:45:53 INFO scrape complete entries=377 topics=82 links=23 total_requests=103 ok_requests=94 failed_requests=9
+2026/05/19 18:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:51:59 INFO scrape complete entries=348 topics=82 links=22 total_requests=109 ok_requests=100 failed_requests=9
+2026/05/19 18:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 18:57:55 INFO scrape complete entries=418 topics=83 links=22 total_requests=112 ok_requests=103 failed_requests=9
+2026/05/19 19:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:03:57 INFO scrape complete entries=370 topics=83 links=22 total_requests=106 ok_requests=95 failed_requests=11
+2026/05/19 19:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:09:56 INFO scrape complete entries=415 topics=84 links=27 total_requests=110 ok_requests=100 failed_requests=10
+2026/05/19 19:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:16:01 INFO scrape complete entries=411 topics=85 links=32 total_requests=113 ok_requests=100 failed_requests=13
+2026/05/19 19:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:21:58 INFO scrape complete entries=401 topics=85 links=38 total_requests=108 ok_requests=95 failed_requests=13
+2026/05/19 19:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:28:01 INFO scrape complete entries=368 topics=85 links=33 total_requests=105 ok_requests=90 failed_requests=15
+2026/05/19 19:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:34:01 INFO scrape complete entries=372 topics=84 links=38 total_requests=104 ok_requests=90 failed_requests=14
+2026/05/19 19:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:40:26 INFO scrape complete entries=343 topics=84 links=36 total_requests=101 ok_requests=84 failed_requests=17
+2026/05/19 19:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:45:59 INFO scrape complete entries=377 topics=84 links=37 total_requests=106 ok_requests=96 failed_requests=10
+2026/05/19 19:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:51:57 INFO scrape complete entries=371 topics=84 links=26 total_requests=103 ok_requests=94 failed_requests=9
+2026/05/19 19:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 19:57:52 INFO scrape complete entries=349 topics=84 links=26 total_requests=100 ok_requests=90 failed_requests=10
+2026/05/19 20:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:03:59 INFO scrape complete entries=370 topics=83 links=31 total_requests=106 ok_requests=95 failed_requests=11
+2026/05/19 20:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:09:59 INFO scrape complete entries=388 topics=85 links=32 total_requests=111 ok_requests=104 failed_requests=7
+2026/05/19 20:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:16:05 INFO scrape complete entries=341 topics=84 links=29 total_requests=101 ok_requests=90 failed_requests=11
+2026/05/19 20:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:22:04 INFO scrape complete entries=353 topics=83 links=32 total_requests=111 ok_requests=101 failed_requests=10
+2026/05/19 20:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:27:55 INFO scrape complete entries=375 topics=82 links=34 total_requests=99 ok_requests=93 failed_requests=6
+2026/05/19 20:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:33:56 INFO scrape complete entries=387 topics=82 links=33 total_requests=103 ok_requests=96 failed_requests=7
+2026/05/19 20:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:39:57 INFO scrape complete entries=385 topics=82 links=35 total_requests=105 ok_requests=96 failed_requests=9
+2026/05/19 20:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:46:11 INFO scrape complete entries=736 topics=83 links=58 total_requests=138 ok_requests=129 failed_requests=9
+2026/05/19 20:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:51:59 INFO scrape complete entries=402 topics=84 links=30 total_requests=108 ok_requests=100 failed_requests=8
+2026/05/19 20:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 20:58:09 INFO scrape complete entries=525 topics=85 links=38 total_requests=128 ok_requests=113 failed_requests=15
+2026/05/19 21:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:03:58 INFO scrape complete entries=372 topics=85 links=26 total_requests=106 ok_requests=94 failed_requests=12
+2026/05/19 21:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:09:55 INFO scrape complete entries=390 topics=85 links=26 total_requests=105 ok_requests=96 failed_requests=9
+2026/05/19 21:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:15:59 INFO scrape complete entries=382 topics=85 links=26 total_requests=107 ok_requests=96 failed_requests=11
+2026/05/19 21:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:21:57 INFO scrape complete entries=384 topics=86 links=28 total_requests=107 ok_requests=98 failed_requests=9
+2026/05/19 21:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:28:00 INFO scrape complete entries=424 topics=87 links=38 total_requests=116 ok_requests=106 failed_requests=10
+2026/05/19 21:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:34:36 INFO scrape complete entries=1118 topics=87 links=82 total_requests=178 ok_requests=163 failed_requests=15
+2026/05/19 21:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:40:11 INFO scrape complete entries=361 topics=87 links=29 total_requests=105 ok_requests=89 failed_requests=16
+2026/05/19 21:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:46:01 INFO scrape complete entries=363 topics=86 links=23 total_requests=105 ok_requests=92 failed_requests=13
+2026/05/19 21:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:51:57 INFO scrape complete entries=399 topics=85 links=22 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/19 21:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 21:58:24 INFO scrape complete entries=896 topics=84 links=34 total_requests=162 ok_requests=152 failed_requests=10
+2026/05/19 22:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:04:27 INFO scrape complete entries=1240 topics=87 links=68 total_requests=198 ok_requests=188 failed_requests=10
+2026/05/19 22:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:09:59 INFO scrape complete entries=389 topics=85 links=22 total_requests=115 ok_requests=103 failed_requests=12
+2026/05/19 22:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:15:58 INFO scrape complete entries=427 topics=86 links=25 total_requests=117 ok_requests=110 failed_requests=7
+2026/05/19 22:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:22:00 INFO scrape complete entries=421 topics=87 links=24 total_requests=115 ok_requests=107 failed_requests=8
+2026/05/19 22:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:28:01 INFO scrape complete entries=406 topics=86 links=25 total_requests=118 ok_requests=107 failed_requests=11
+2026/05/19 22:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:33:58 INFO scrape complete entries=417 topics=87 links=26 total_requests=112 ok_requests=103 failed_requests=9
+2026/05/19 22:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:39:56 INFO scrape complete entries=399 topics=87 links=27 total_requests=109 ok_requests=100 failed_requests=9
+2026/05/19 22:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:46:44 INFO scrape complete entries=1595 topics=88 links=395 total_requests=233 ok_requests=221 failed_requests=12
+2026/05/19 22:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:52:01 INFO scrape complete entries=434 topics=88 links=32 total_requests=122 ok_requests=110 failed_requests=12
+2026/05/19 22:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 22:58:07 INFO scrape complete entries=396 topics=88 links=35 total_requests=116 ok_requests=108 failed_requests=8
+2026/05/19 23:03:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:04:05 INFO scrape complete entries=392 topics=87 links=31 total_requests=114 ok_requests=99 failed_requests=15
+2026/05/19 23:09:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:09:59 INFO scrape complete entries=408 topics=86 links=27 total_requests=119 ok_requests=113 failed_requests=6
+2026/05/19 23:15:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:16:05 INFO scrape complete entries=404 topics=86 links=27 total_requests=111 ok_requests=98 failed_requests=13
+2026/05/19 23:21:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:22:47 INFO scrape complete entries=2008 topics=87 links=427 total_requests=279 ok_requests=269 failed_requests=10
+2026/05/19 23:27:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:28:12 INFO scrape complete entries=819 topics=89 links=111 total_requests=152 ok_requests=142 failed_requests=10
+2026/05/19 23:33:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:33:57 INFO scrape complete entries=399 topics=89 links=30 total_requests=107 ok_requests=96 failed_requests=11
+2026/05/19 23:39:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:40:53 INFO scrape complete entries=1942 topics=90 links=85 total_requests=268 ok_requests=259 failed_requests=9
+2026/05/19 23:45:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:45:59 INFO scrape complete entries=551 topics=92 links=38 total_requests=129 ok_requests=120 failed_requests=9
+2026/05/19 23:51:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:52:03 INFO scrape complete entries=386 topics=92 links=32 total_requests=115 ok_requests=102 failed_requests=13
+2026/05/19 23:57:31 INFO scraping popular topics from eksisozluk
+2026/05/19 23:57:56 INFO scrape complete entries=373 topics=92 links=30 total_requests=112 ok_requests=106 failed_requests=6
+2026/05/20 00:03:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:04:02 INFO scrape complete entries=388 topics=92 links=29 total_requests=120 ok_requests=108 failed_requests=12
+2026/05/20 00:09:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:09:56 INFO scrape complete entries=380 topics=92 links=29 total_requests=112 ok_requests=103 failed_requests=9
+2026/05/20 00:15:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:15:56 INFO scrape complete entries=388 topics=92 links=35 total_requests=106 ok_requests=98 failed_requests=8
+2026/05/20 00:21:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:21:54 INFO scrape complete entries=372 topics=92 links=32 total_requests=106 ok_requests=97 failed_requests=9
+2026/05/20 00:27:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:27:58 INFO scrape complete entries=388 topics=90 links=34 total_requests=111 ok_requests=103 failed_requests=8
+2026/05/20 00:33:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:34:00 INFO scrape complete entries=382 topics=90 links=34 total_requests=102 ok_requests=93 failed_requests=9
+2026/05/20 00:39:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:39:56 INFO scrape complete entries=371 topics=90 links=32 total_requests=106 ok_requests=96 failed_requests=10
+2026/05/20 00:45:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:45:59 INFO scrape complete entries=386 topics=90 links=32 total_requests=107 ok_requests=98 failed_requests=9
+2026/05/20 00:51:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:52:21 INFO scrape complete entries=962 topics=91 links=46 total_requests=162 ok_requests=151 failed_requests=11
+2026/05/20 00:57:31 INFO scraping popular topics from eksisozluk
+2026/05/20 00:58:01 INFO scrape complete entries=417 topics=92 links=38 total_requests=105 ok_requests=91 failed_requests=14
+2026/05/20 01:03:31 INFO scraping popular topics from eksisozluk
+2026/05/20 01:03:58 INFO scrape complete entries=402 topics=91 links=33 total_requests=106 ok_requests=94 failed_requests=12
+2026/05/20 01:09:31 INFO scraping popular topics from eksisozluk
+2026/05/20 01:09:56 INFO scrape complete entries=387 topics=91 links=33 total_requests=102 ok_requests=88 failed_requests=14
+2026/05/20 01:15:31 INFO scraping popular topics from eksisozluk
+2026/05/20 01:15:58 INFO scrape complete entries=385 topics=91 links=33 total_requests=106 ok_requests=92 failed_requests=14
+2026/05/20 01:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 01:21:54 INFO scrape complete entries=373 topics=91 links=33 total_requests=101 ok_requests=88 failed_requests=13
+2026/05/20 01:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 01:27:58 INFO scrape complete entries=389 topics=90 links=33 total_requests=102 ok_requests=90 failed_requests=12
+2026/05/20 01:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 01:33:54 INFO scrape complete entries=389 topics=90 links=33 total_requests=103 ok_requests=92 failed_requests=11
+2026/05/20 01:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 01:39:54 INFO scrape complete entries=396 topics=90 links=33 total_requests=102 ok_requests=89 failed_requests=13
+2026/05/20 01:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 01:45:52 INFO scrape complete entries=400 topics=90 links=33 total_requests=105 ok_requests=92 failed_requests=13
+2026/05/20 01:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 01:51:55 INFO scrape complete entries=410 topics=90 links=38 total_requests=105 ok_requests=92 failed_requests=13
+2026/05/20 01:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 01:57:53 INFO scrape complete entries=397 topics=90 links=31 total_requests=104 ok_requests=91 failed_requests=13
+2026/05/20 02:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:03:51 INFO scrape complete entries=401 topics=90 links=31 total_requests=101 ok_requests=90 failed_requests=11
+2026/05/20 02:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:09:54 INFO scrape complete entries=395 topics=90 links=31 total_requests=98 ok_requests=83 failed_requests=15
+2026/05/20 02:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:15:54 INFO scrape complete entries=410 topics=89 links=29 total_requests=101 ok_requests=91 failed_requests=10
+2026/05/20 02:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:21:57 INFO scrape complete entries=404 topics=89 links=28 total_requests=98 ok_requests=87 failed_requests=11
+2026/05/20 02:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:27:56 INFO scrape complete entries=381 topics=89 links=20 total_requests=96 ok_requests=84 failed_requests=12
+2026/05/20 02:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:33:57 INFO scrape complete entries=370 topics=89 links=21 total_requests=95 ok_requests=82 failed_requests=13
+2026/05/20 02:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:39:56 INFO scrape complete entries=387 topics=89 links=22 total_requests=95 ok_requests=84 failed_requests=11
+2026/05/20 02:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:45:54 INFO scrape complete entries=387 topics=89 links=22 total_requests=98 ok_requests=88 failed_requests=10
+2026/05/20 02:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:51:57 INFO scrape complete entries=393 topics=88 links=22 total_requests=98 ok_requests=89 failed_requests=9
+2026/05/20 02:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 02:57:56 INFO scrape complete entries=400 topics=88 links=21 total_requests=99 ok_requests=88 failed_requests=11
+2026/05/20 03:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:03:58 INFO scrape complete entries=390 topics=88 links=25 total_requests=97 ok_requests=85 failed_requests=12
+2026/05/20 03:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:09:59 INFO scrape complete entries=362 topics=88 links=24 total_requests=95 ok_requests=81 failed_requests=14
+2026/05/20 03:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:15:57 INFO scrape complete entries=368 topics=88 links=24 total_requests=95 ok_requests=83 failed_requests=12
+2026/05/20 03:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:21:57 INFO scrape complete entries=377 topics=88 links=24 total_requests=96 ok_requests=82 failed_requests=14
+2026/05/20 03:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:27:55 INFO scrape complete entries=378 topics=88 links=23 total_requests=97 ok_requests=84 failed_requests=13
+2026/05/20 03:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:33:55 INFO scrape complete entries=352 topics=88 links=23 total_requests=95 ok_requests=82 failed_requests=13
+2026/05/20 03:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:39:56 INFO scrape complete entries=366 topics=88 links=23 total_requests=95 ok_requests=85 failed_requests=10
+2026/05/20 03:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:45:55 INFO scrape complete entries=368 topics=87 links=23 total_requests=93 ok_requests=82 failed_requests=11
+2026/05/20 03:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:51:57 INFO scrape complete entries=350 topics=87 links=23 total_requests=91 ok_requests=78 failed_requests=13
+2026/05/20 03:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 03:57:52 INFO scrape complete entries=359 topics=87 links=23 total_requests=91 ok_requests=78 failed_requests=13
+2026/05/20 04:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:03:58 INFO scrape complete entries=360 topics=87 links=23 total_requests=94 ok_requests=80 failed_requests=14
+2026/05/20 04:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:09:58 INFO scrape complete entries=342 topics=86 links=22 total_requests=95 ok_requests=82 failed_requests=13
+2026/05/20 04:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:15:55 INFO scrape complete entries=352 topics=86 links=23 total_requests=93 ok_requests=81 failed_requests=12
+2026/05/20 04:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:21:53 INFO scrape complete entries=355 topics=86 links=23 total_requests=92 ok_requests=79 failed_requests=13
+2026/05/20 04:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:27:56 INFO scrape complete entries=340 topics=86 links=23 total_requests=90 ok_requests=76 failed_requests=14
+2026/05/20 04:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:33:51 INFO scrape complete entries=349 topics=86 links=24 total_requests=93 ok_requests=81 failed_requests=12
+2026/05/20 04:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:39:52 INFO scrape complete entries=392 topics=87 links=26 total_requests=98 ok_requests=85 failed_requests=13
+2026/05/20 04:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:45:52 INFO scrape complete entries=353 topics=86 links=24 total_requests=93 ok_requests=81 failed_requests=12
+2026/05/20 04:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:51:51 INFO scrape complete entries=364 topics=86 links=24 total_requests=91 ok_requests=80 failed_requests=11
+2026/05/20 04:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 04:57:53 INFO scrape complete entries=365 topics=86 links=24 total_requests=90 ok_requests=79 failed_requests=11
+2026/05/20 05:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:03:56 INFO scrape complete entries=357 topics=86 links=22 total_requests=92 ok_requests=78 failed_requests=14
+2026/05/20 05:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:09:54 INFO scrape complete entries=363 topics=86 links=28 total_requests=92 ok_requests=79 failed_requests=13
+2026/05/20 05:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:15:54 INFO scrape complete entries=361 topics=86 links=28 total_requests=89 ok_requests=74 failed_requests=15
+2026/05/20 05:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:21:52 INFO scrape complete entries=364 topics=86 links=31 total_requests=88 ok_requests=75 failed_requests=13
+2026/05/20 05:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:27:57 INFO scrape complete entries=369 topics=86 links=31 total_requests=92 ok_requests=78 failed_requests=14
+2026/05/20 05:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:33:55 INFO scrape complete entries=358 topics=86 links=31 total_requests=88 ok_requests=72 failed_requests=16
+2026/05/20 05:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:39:54 INFO scrape complete entries=370 topics=86 links=40 total_requests=91 ok_requests=76 failed_requests=15
+2026/05/20 05:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:45:56 INFO scrape complete entries=355 topics=86 links=40 total_requests=92 ok_requests=73 failed_requests=19
+2026/05/20 05:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:51:56 INFO scrape complete entries=337 topics=86 links=40 total_requests=92 ok_requests=74 failed_requests=18
+2026/05/20 05:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 05:57:51 INFO scrape complete entries=344 topics=86 links=41 total_requests=92 ok_requests=77 failed_requests=15
+2026/05/20 06:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:03:57 INFO scrape complete entries=348 topics=86 links=41 total_requests=92 ok_requests=77 failed_requests=15
+2026/05/20 06:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:09:53 INFO scrape complete entries=353 topics=86 links=42 total_requests=94 ok_requests=81 failed_requests=13
+2026/05/20 06:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:15:56 INFO scrape complete entries=358 topics=86 links=35 total_requests=95 ok_requests=80 failed_requests=15
+2026/05/20 06:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:21:58 INFO scrape complete entries=369 topics=86 links=43 total_requests=97 ok_requests=85 failed_requests=12
+2026/05/20 06:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:29:25 INFO scrape complete entries=2659 topics=87 links=152 total_requests=324 ok_requests=311 failed_requests=13
+2026/05/20 06:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:33:57 INFO scrape complete entries=389 topics=87 links=44 total_requests=95 ok_requests=82 failed_requests=13
+2026/05/20 06:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:39:57 INFO scrape complete entries=385 topics=87 links=46 total_requests=100 ok_requests=84 failed_requests=16
+2026/05/20 06:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:45:58 INFO scrape complete entries=434 topics=87 links=48 total_requests=102 ok_requests=91 failed_requests=11
+2026/05/20 06:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:51:54 INFO scrape complete entries=407 topics=87 links=45 total_requests=93 ok_requests=83 failed_requests=10
+2026/05/20 06:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 06:58:01 INFO scrape complete entries=418 topics=88 links=47 total_requests=102 ok_requests=88 failed_requests=14
+2026/05/20 07:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:04:00 INFO scrape complete entries=392 topics=88 links=48 total_requests=97 ok_requests=83 failed_requests=14
+2026/05/20 07:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:09:57 INFO scrape complete entries=401 topics=88 links=47 total_requests=97 ok_requests=88 failed_requests=9
+2026/05/20 07:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:15:56 INFO scrape complete entries=417 topics=88 links=47 total_requests=102 ok_requests=94 failed_requests=8
+2026/05/20 07:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:21:59 INFO scrape complete entries=372 topics=88 links=38 total_requests=100 ok_requests=87 failed_requests=13
+2026/05/20 07:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:27:57 INFO scrape complete entries=367 topics=88 links=43 total_requests=98 ok_requests=88 failed_requests=10
+2026/05/20 07:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:33:52 INFO scrape complete entries=373 topics=88 links=39 total_requests=99 ok_requests=92 failed_requests=7
+2026/05/20 07:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:39:55 INFO scrape complete entries=385 topics=88 links=38 total_requests=101 ok_requests=94 failed_requests=7
+2026/05/20 07:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:45:58 INFO scrape complete entries=391 topics=88 links=39 total_requests=100 ok_requests=92 failed_requests=8
+2026/05/20 07:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:51:52 INFO scrape complete entries=390 topics=88 links=37 total_requests=100 ok_requests=94 failed_requests=6
+2026/05/20 07:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 07:58:00 INFO scrape complete entries=422 topics=89 links=45 total_requests=105 ok_requests=97 failed_requests=8
+2026/05/20 08:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:03:57 INFO scrape complete entries=412 topics=88 links=42 total_requests=100 ok_requests=93 failed_requests=7
+2026/05/20 08:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:10:00 INFO scrape complete entries=449 topics=89 links=43 total_requests=106 ok_requests=99 failed_requests=7
+2026/05/20 08:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:16:01 INFO scrape complete entries=410 topics=88 links=45 total_requests=101 ok_requests=90 failed_requests=11
+2026/05/20 08:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:21:59 INFO scrape complete entries=407 topics=88 links=45 total_requests=100 ok_requests=91 failed_requests=9
+2026/05/20 08:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:29:52 INFO scrape complete entries=3521 topics=86 links=128 total_requests=414 ok_requests=406 failed_requests=8
+2026/05/20 08:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:34:02 INFO scrape complete entries=467 topics=87 links=43 total_requests=115 ok_requests=108 failed_requests=7
+2026/05/20 08:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:39:58 INFO scrape complete entries=414 topics=87 links=41 total_requests=106 ok_requests=104 failed_requests=2
+2026/05/20 08:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:45:57 INFO scrape complete entries=453 topics=87 links=36 total_requests=114 ok_requests=110 failed_requests=4
+2026/05/20 08:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:51:58 INFO scrape complete entries=433 topics=88 links=35 total_requests=112 ok_requests=105 failed_requests=7
+2026/05/20 08:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 08:58:12 INFO scrape complete entries=760 topics=90 links=42 total_requests=143 ok_requests=140 failed_requests=3
+2026/05/20 09:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:03:57 INFO scrape complete entries=446 topics=90 links=35 total_requests=114 ok_requests=112 failed_requests=2
+2026/05/20 09:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:09:59 INFO scrape complete entries=439 topics=90 links=30 total_requests=111 ok_requests=105 failed_requests=6
+2026/05/20 09:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:15:58 INFO scrape complete entries=452 topics=90 links=34 total_requests=108 ok_requests=104 failed_requests=4
+2026/05/20 09:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:21:57 INFO scrape complete entries=461 topics=90 links=35 total_requests=104 ok_requests=103 failed_requests=1
+2026/05/20 09:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:27:56 INFO scrape complete entries=468 topics=90 links=31 total_requests=104 ok_requests=103 failed_requests=1
+2026/05/20 09:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:33:59 INFO scrape complete entries=489 topics=90 links=31 total_requests=110 ok_requests=107 failed_requests=3
+2026/05/20 09:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:40:28 INFO scrape complete entries=1186 topics=91 links=84 total_requests=183 ok_requests=176 failed_requests=7
+2026/05/20 09:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:45:53 INFO scrape complete entries=491 topics=91 links=29 total_requests=107 ok_requests=101 failed_requests=6
+2026/05/20 09:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:52:04 INFO scrape complete entries=471 topics=92 links=29 total_requests=109 ok_requests=101 failed_requests=8
+2026/05/20 09:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 09:57:59 INFO scrape complete entries=463 topics=92 links=28 total_requests=112 ok_requests=107 failed_requests=5
+2026/05/20 10:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:04:00 INFO scrape complete entries=446 topics=92 links=30 total_requests=115 ok_requests=104 failed_requests=11
+2026/05/20 10:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:10:01 INFO scrape complete entries=453 topics=92 links=29 total_requests=108 ok_requests=101 failed_requests=7
+2026/05/20 10:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:16:02 INFO scrape complete entries=437 topics=92 links=28 total_requests=116 ok_requests=108 failed_requests=8
+2026/05/20 10:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:22:04 INFO scrape complete entries=555 topics=92 links=33 total_requests=119 ok_requests=113 failed_requests=6
+2026/05/20 10:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:27:57 INFO scrape complete entries=477 topics=92 links=31 total_requests=114 ok_requests=106 failed_requests=8
+2026/05/20 10:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:33:59 INFO scrape complete entries=456 topics=92 links=32 total_requests=109 ok_requests=100 failed_requests=9
+2026/05/20 10:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:39:58 INFO scrape complete entries=475 topics=92 links=33 total_requests=106 ok_requests=98 failed_requests=8
+2026/05/20 10:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:46:19 INFO scrape complete entries=965 topics=94 links=66 total_requests=166 ok_requests=158 failed_requests=8
+2026/05/20 10:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:52:04 INFO scrape complete entries=457 topics=94 links=20 total_requests=114 ok_requests=102 failed_requests=12
+2026/05/20 10:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 10:57:57 INFO scrape complete entries=471 topics=94 links=30 total_requests=113 ok_requests=100 failed_requests=13
+2026/05/20 11:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:04:02 INFO scrape complete entries=457 topics=94 links=30 total_requests=115 ok_requests=98 failed_requests=17
+2026/05/20 11:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:10:06 INFO scrape complete entries=445 topics=94 links=31 total_requests=121 ok_requests=111 failed_requests=10
+2026/05/20 11:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:16:03 INFO scrape complete entries=463 topics=95 links=31 total_requests=118 ok_requests=108 failed_requests=10
+2026/05/20 11:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:22:05 INFO scrape complete entries=468 topics=94 links=29 total_requests=119 ok_requests=108 failed_requests=11
+2026/05/20 11:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:27:54 INFO scrape complete entries=426 topics=94 links=28 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/20 11:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:34:21 INFO scrape complete entries=857 topics=95 links=38 total_requests=155 ok_requests=138 failed_requests=17
+2026/05/20 11:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:40:04 INFO scrape complete entries=429 topics=95 links=29 total_requests=112 ok_requests=100 failed_requests=12
+2026/05/20 11:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:46:08 INFO scrape complete entries=442 topics=96 links=22 total_requests=110 ok_requests=96 failed_requests=14
+2026/05/20 11:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:52:10 INFO scrape complete entries=437 topics=97 links=24 total_requests=115 ok_requests=103 failed_requests=12
+2026/05/20 11:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 11:58:04 INFO scrape complete entries=452 topics=96 links=29 total_requests=118 ok_requests=107 failed_requests=11
+2026/05/20 12:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:04:11 INFO scrape complete entries=617 topics=96 links=31 total_requests=134 ok_requests=123 failed_requests=11
+2026/05/20 12:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:10:01 INFO scrape complete entries=457 topics=95 links=25 total_requests=116 ok_requests=108 failed_requests=8
+2026/05/20 12:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:16:02 INFO scrape complete entries=428 topics=95 links=30 total_requests=113 ok_requests=107 failed_requests=6
+2026/05/20 12:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:22:02 INFO scrape complete entries=494 topics=97 links=31 total_requests=116 ok_requests=108 failed_requests=8
+2026/05/20 12:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:27:58 INFO scrape complete entries=475 topics=96 links=33 total_requests=118 ok_requests=109 failed_requests=9
+2026/05/20 12:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:34:02 INFO scrape complete entries=455 topics=96 links=34 total_requests=114 ok_requests=107 failed_requests=7
+2026/05/20 12:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:40:03 INFO scrape complete entries=532 topics=97 links=39 total_requests=121 ok_requests=111 failed_requests=10
+2026/05/20 12:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:46:00 INFO scrape complete entries=461 topics=98 links=43 total_requests=120 ok_requests=114 failed_requests=6
+2026/05/20 12:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:52:23 INFO scrape complete entries=1020 topics=98 links=209 total_requests=174 ok_requests=166 failed_requests=8
+2026/05/20 12:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 12:58:05 INFO scrape complete entries=444 topics=96 links=42 total_requests=117 ok_requests=106 failed_requests=11
+2026/05/20 13:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:04:04 INFO scrape complete entries=465 topics=95 links=49 total_requests=116 ok_requests=111 failed_requests=5
+2026/05/20 13:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:10:02 INFO scrape complete entries=459 topics=95 links=43 total_requests=114 ok_requests=105 failed_requests=9
+2026/05/20 13:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:16:01 INFO scrape complete entries=474 topics=95 links=44 total_requests=114 ok_requests=108 failed_requests=6
+2026/05/20 13:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:22:00 INFO scrape complete entries=470 topics=95 links=35 total_requests=112 ok_requests=106 failed_requests=6
+2026/05/20 13:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:27:59 INFO scrape complete entries=465 topics=95 links=44 total_requests=111 ok_requests=104 failed_requests=7
+2026/05/20 13:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:34:02 INFO scrape complete entries=475 topics=95 links=40 total_requests=112 ok_requests=101 failed_requests=11
+2026/05/20 13:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:39:56 INFO scrape complete entries=470 topics=95 links=41 total_requests=116 ok_requests=108 failed_requests=8
+2026/05/20 13:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:46:00 INFO scrape complete entries=469 topics=94 links=44 total_requests=110 ok_requests=101 failed_requests=9
+2026/05/20 13:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:52:02 INFO scrape complete entries=483 topics=94 links=43 total_requests=112 ok_requests=105 failed_requests=7
+2026/05/20 13:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 13:57:58 INFO scrape complete entries=468 topics=93 links=40 total_requests=108 ok_requests=97 failed_requests=11
+2026/05/20 14:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:11:58 INFO scrape complete entries=13940 topics=94 links=1293 total_requests=1462 ok_requests=1448 failed_requests=14
+2026/05/20 14:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:21:24 INFO scrape complete entries=9337 topics=96 links=689 total_requests=1008 ok_requests=996 failed_requests=12
+2026/05/20 14:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:21:35 INFO scrape complete entries=22792 topics=95 links=1937 total_requests=2356 ok_requests=2343 failed_requests=13
+2026/05/20 14:22:03 INFO scrape complete entries=634 topics=97 links=52 total_requests=130 ok_requests=117 failed_requests=13
+2026/05/20 14:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:28:04 INFO scrape complete entries=467 topics=98 links=57 total_requests=121 ok_requests=108 failed_requests=13
+2026/05/20 14:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:34:02 INFO scrape complete entries=471 topics=98 links=49 total_requests=121 ok_requests=109 failed_requests=12
+2026/05/20 14:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:40:13 INFO scrape complete entries=441 topics=97 links=45 total_requests=119 ok_requests=106 failed_requests=13
+2026/05/20 14:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:46:13 INFO scrape complete entries=454 topics=97 links=46 total_requests=119 ok_requests=107 failed_requests=12
+2026/05/20 14:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:52:03 INFO scrape complete entries=436 topics=97 links=51 total_requests=112 ok_requests=100 failed_requests=12
+2026/05/20 14:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 14:58:10 INFO scrape complete entries=699 topics=98 links=63 total_requests=139 ok_requests=130 failed_requests=9
+2026/05/20 15:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:04:04 INFO scrape complete entries=499 topics=99 links=42 total_requests=118 ok_requests=109 failed_requests=9
+2026/05/20 15:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:10:06 INFO scrape complete entries=581 topics=99 links=322 total_requests=129 ok_requests=122 failed_requests=7
+2026/05/20 15:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:16:00 INFO scrape complete entries=503 topics=98 links=42 total_requests=113 ok_requests=107 failed_requests=6
+2026/05/20 15:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:22:04 INFO scrape complete entries=514 topics=99 links=41 total_requests=122 ok_requests=113 failed_requests=9
+2026/05/20 15:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:28:03 INFO scrape complete entries=491 topics=99 links=40 total_requests=122 ok_requests=113 failed_requests=9
+2026/05/20 15:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:34:03 INFO scrape complete entries=528 topics=100 links=35 total_requests=121 ok_requests=114 failed_requests=7
+2026/05/20 15:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:40:04 INFO scrape complete entries=484 topics=100 links=31 total_requests=121 ok_requests=112 failed_requests=9
+2026/05/20 15:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:46:22 INFO scrape complete entries=1002 topics=101 links=59 total_requests=174 ok_requests=168 failed_requests=6
+2026/05/20 15:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:52:14 INFO scrape complete entries=714 topics=103 links=43 total_requests=148 ok_requests=140 failed_requests=8
+2026/05/20 15:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 15:57:58 INFO scrape complete entries=515 topics=103 links=39 total_requests=123 ok_requests=116 failed_requests=7
+2026/05/20 16:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:04:02 INFO scrape complete entries=476 topics=103 links=32 total_requests=125 ok_requests=113 failed_requests=12
+2026/05/20 16:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:10:05 INFO scrape complete entries=491 topics=103 links=39 total_requests=124 ok_requests=112 failed_requests=12
+2026/05/20 16:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:16:03 INFO scrape complete entries=459 topics=103 links=34 total_requests=126 ok_requests=117 failed_requests=9
+2026/05/20 16:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:22:01 INFO scrape complete entries=460 topics=103 links=34 total_requests=122 ok_requests=112 failed_requests=10
+2026/05/20 16:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:28:04 INFO scrape complete entries=434 topics=103 links=33 total_requests=123 ok_requests=113 failed_requests=10
+2026/05/20 16:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:34:02 INFO scrape complete entries=432 topics=102 links=33 total_requests=119 ok_requests=110 failed_requests=9
+2026/05/20 16:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:40:03 INFO scrape complete entries=446 topics=101 links=37 total_requests=124 ok_requests=118 failed_requests=6
+2026/05/20 16:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:45:58 INFO scrape complete entries=492 topics=102 links=51 total_requests=124 ok_requests=120 failed_requests=4
+2026/05/20 16:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:52:03 INFO scrape complete entries=493 topics=103 links=42 total_requests=123 ok_requests=114 failed_requests=9
+2026/05/20 16:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 16:58:09 INFO scrape complete entries=490 topics=103 links=43 total_requests=127 ok_requests=116 failed_requests=11
+2026/05/20 17:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:04:15 INFO scrape complete entries=720 topics=103 links=93 total_requests=151 ok_requests=139 failed_requests=12
+2026/05/20 17:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:10:18 INFO scrape complete entries=825 topics=104 links=82 total_requests=157 ok_requests=147 failed_requests=10
+2026/05/20 17:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:16:03 INFO scrape complete entries=490 topics=104 links=42 total_requests=130 ok_requests=121 failed_requests=9
+2026/05/20 17:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:22:30 INFO scrape complete entries=468 topics=104 links=41 total_requests=126 ok_requests=106 failed_requests=20
+2026/05/20 17:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:28:47 INFO scrape complete entries=393 topics=103 links=29 total_requests=120 ok_requests=92 failed_requests=28
+2026/05/20 17:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:34:36 INFO scrape complete entries=447 topics=103 links=36 total_requests=123 ok_requests=106 failed_requests=17
+2026/05/20 17:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:40:40 INFO scrape complete entries=442 topics=103 links=44 total_requests=127 ok_requests=111 failed_requests=16
+2026/05/20 17:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:46:17 INFO scrape complete entries=478 topics=102 links=51 total_requests=123 ok_requests=111 failed_requests=12
+2026/05/20 17:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:52:16 INFO scrape complete entries=446 topics=102 links=54 total_requests=122 ok_requests=104 failed_requests=18
+2026/05/20 17:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 17:58:11 INFO scrape complete entries=496 topics=103 links=55 total_requests=123 ok_requests=114 failed_requests=9
+2026/05/20 18:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:04:07 INFO scrape complete entries=510 topics=103 links=58 total_requests=124 ok_requests=116 failed_requests=8
+2026/05/20 18:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:10:08 INFO scrape complete entries=535 topics=102 links=48 total_requests=127 ok_requests=118 failed_requests=9
+2026/05/20 18:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:16:05 INFO scrape complete entries=515 topics=102 links=41 total_requests=127 ok_requests=117 failed_requests=10
+2026/05/20 18:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:22:06 INFO scrape complete entries=497 topics=103 links=41 total_requests=132 ok_requests=122 failed_requests=10
+2026/05/20 18:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:28:04 INFO scrape complete entries=514 topics=103 links=41 total_requests=126 ok_requests=117 failed_requests=9
+2026/05/20 18:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:34:03 INFO scrape complete entries=526 topics=103 links=43 total_requests=127 ok_requests=118 failed_requests=9
+2026/05/20 18:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:40:07 INFO scrape complete entries=527 topics=102 links=45 total_requests=123 ok_requests=112 failed_requests=11
+2026/05/20 18:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:46:04 INFO scrape complete entries=526 topics=103 links=47 total_requests=135 ok_requests=129 failed_requests=6
+2026/05/20 18:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:52:04 INFO scrape complete entries=518 topics=103 links=45 total_requests=134 ok_requests=127 failed_requests=7
+2026/05/20 18:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 18:58:08 INFO scrape complete entries=487 topics=103 links=39 total_requests=129 ok_requests=119 failed_requests=10
+2026/05/20 19:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:04:05 INFO scrape complete entries=521 topics=102 links=41 total_requests=129 ok_requests=119 failed_requests=10
+2026/05/20 19:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:10:09 INFO scrape complete entries=511 topics=102 links=44 total_requests=133 ok_requests=126 failed_requests=7
+2026/05/20 19:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:16:05 INFO scrape complete entries=503 topics=102 links=44 total_requests=121 ok_requests=113 failed_requests=8
+2026/05/20 19:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:22:06 INFO scrape complete entries=540 topics=102 links=56 total_requests=124 ok_requests=119 failed_requests=5
+2026/05/20 19:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:28:07 INFO scrape complete entries=680 topics=104 links=89 total_requests=140 ok_requests=130 failed_requests=10
+2026/05/20 19:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:34:09 INFO scrape complete entries=531 topics=104 links=50 total_requests=136 ok_requests=126 failed_requests=10
+2026/05/20 19:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:40:07 INFO scrape complete entries=493 topics=103 links=37 total_requests=130 ok_requests=120 failed_requests=10
+2026/05/20 19:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:46:07 INFO scrape complete entries=510 topics=102 links=34 total_requests=127 ok_requests=118 failed_requests=9
+2026/05/20 19:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:52:05 INFO scrape complete entries=488 topics=102 links=34 total_requests=125 ok_requests=111 failed_requests=14
+2026/05/20 19:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 19:58:09 INFO scrape complete entries=468 topics=103 links=34 total_requests=127 ok_requests=110 failed_requests=17
+2026/05/20 20:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:04:12 INFO scrape complete entries=489 topics=103 links=38 total_requests=127 ok_requests=111 failed_requests=16
+2026/05/20 20:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:10:06 INFO scrape complete entries=496 topics=103 links=45 total_requests=130 ok_requests=116 failed_requests=14
+2026/05/20 20:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:16:05 INFO scrape complete entries=482 topics=103 links=31 total_requests=127 ok_requests=117 failed_requests=10
+2026/05/20 20:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:22:00 INFO scrape complete entries=465 topics=102 links=34 total_requests=124 ok_requests=116 failed_requests=8
+2026/05/20 20:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:28:06 INFO scrape complete entries=502 topics=102 links=37 total_requests=131 ok_requests=123 failed_requests=8
+2026/05/20 20:33:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:34:05 INFO scrape complete entries=489 topics=102 links=31 total_requests=125 ok_requests=115 failed_requests=10
+2026/05/20 20:39:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:40:03 INFO scrape complete entries=522 topics=102 links=37 total_requests=127 ok_requests=119 failed_requests=8
+2026/05/20 20:45:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:46:07 INFO scrape complete entries=503 topics=100 links=38 total_requests=125 ok_requests=111 failed_requests=14
+2026/05/20 20:51:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:52:01 INFO scrape complete entries=244 topics=50 links=19 total_requests=52 ok_requests=48 failed_requests=4
+2026/05/20 20:57:32 INFO scraping popular topics from eksisozluk
+2026/05/20 20:58:15 INFO scrape complete entries=623 topics=101 links=41 total_requests=150 ok_requests=139 failed_requests=11
+2026/05/20 21:03:32 INFO scraping popular topics from eksisozluk
+2026/05/20 21:04:03 INFO scrape complete entries=506 topics=101 links=39 total_requests=128 ok_requests=118 failed_requests=10
+2026/05/20 21:09:32 INFO scraping popular topics from eksisozluk
+2026/05/20 21:10:08 INFO scrape complete entries=549 topics=102 links=40 total_requests=137 ok_requests=127 failed_requests=10
+2026/05/20 21:15:32 INFO scraping popular topics from eksisozluk
+2026/05/20 21:21:32 INFO scraping popular topics from eksisozluk
+2026/05/20 21:26:32 INFO scrape complete entries=17382 topics=103 links=2470 total_requests=1821 ok_requests=1812 failed_requests=9
+2026/05/20 21:27:32 INFO scraping popular topics from eksisozluk
+2026/05/20 21:28:22 INFO scrape complete entries=836 topics=105 links=64 total_requests=176 ok_requests=160 failed_requests=16
+2026/05/20 21:32:40 INFO scrape complete entries=17466 topics=103 links=2472 total_requests=1832 ok_requests=1817 failed_requests=15
+2026/05/20 21:33:33 INFO scraping popular topics from eksisozluk
+2026/05/20 21:34:08 INFO scrape complete entries=492 topics=106 links=43 total_requests=132 ok_requests=112 failed_requests=20
+2026/05/20 21:39:33 INFO scraping popular topics from eksisozluk
+2026/05/20 21:40:08 INFO scrape complete entries=522 topics=106 links=47 total_requests=131 ok_requests=117 failed_requests=14
+2026/05/20 21:45:33 INFO scraping popular topics from eksisozluk
+2026/05/20 21:46:09 INFO scrape complete entries=517 topics=106 links=45 total_requests=141 ok_requests=131 failed_requests=10
+2026/05/20 21:51:33 INFO scraping popular topics from eksisozluk
+2026/05/20 21:52:09 INFO scrape complete entries=573 topics=106 links=51 total_requests=142 ok_requests=130 failed_requests=12
+2026/05/20 21:57:33 INFO scraping popular topics from eksisozluk
+2026/05/20 21:58:12 INFO scrape complete entries=546 topics=106 links=47 total_requests=137 ok_requests=124 failed_requests=13
+2026/05/20 22:03:33 INFO scraping popular topics from eksisozluk
+2026/05/20 22:04:07 INFO scrape complete entries=519 topics=105 links=51 total_requests=137 ok_requests=128 failed_requests=9
+2026/05/20 22:09:33 INFO scraping popular topics from eksisozluk
+2026/05/20 23:23:28 INFO starting scraper cron job
+2026/05/20 23:23:28 INFO scraping popular topics from eksisozluk
+2026/05/20 23:25:08 INFO scrape complete entries=2788 topics=104 links=277 total_requests=394 ok_requests=386 failed_requests=8
+2026/05/20 23:29:28 INFO scraping popular topics from eksisozluk
+2026/05/20 23:29:57 INFO scrape complete entries=530 topics=103 links=49 total_requests=124 ok_requests=112 failed_requests=12
+2026/05/20 23:35:28 INFO scraping popular topics from eksisozluk
+2026/05/20 23:35:57 INFO scrape complete entries=520 topics=102 links=51 total_requests=125 ok_requests=118 failed_requests=7
+2026/05/20 23:41:28 INFO scraping popular topics from eksisozluk
+2026/05/20 23:41:57 INFO scrape complete entries=497 topics=102 links=53 total_requests=123 ok_requests=115 failed_requests=8
+2026/05/20 23:47:28 INFO scraping popular topics from eksisozluk
+2026/05/20 23:47:58 INFO scrape complete entries=464 topics=101 links=52 total_requests=119 ok_requests=106 failed_requests=13
+2026/05/20 23:53:28 INFO scraping popular topics from eksisozluk
+2026/05/20 23:53:58 INFO scrape complete entries=463 topics=101 links=47 total_requests=122 ok_requests=111 failed_requests=11
+2026/05/20 23:59:28 INFO scraping popular topics from eksisozluk
+2026/05/20 23:59:56 INFO scrape complete entries=485 topics=100 links=46 total_requests=123 ok_requests=112 failed_requests=11
+2026/05/21 00:05:28 INFO scraping popular topics from eksisozluk
+2026/05/21 00:05:50 INFO scrape complete entries=475 topics=99 links=43 total_requests=112 ok_requests=103 failed_requests=9
+2026/05/21 00:11:28 INFO scraping popular topics from eksisozluk
+2026/05/21 00:11:57 INFO scrape complete entries=471 topics=99 links=53 total_requests=118 ok_requests=113 failed_requests=5
+2026/05/21 00:17:28 INFO scraping popular topics from eksisozluk
+2026/05/21 00:18:22 INFO scrape complete entries=1585 topics=101 links=72 total_requests=230 ok_requests=224 failed_requests=6
+2026/05/21 00:23:28 INFO scraping popular topics from eksisozluk
+2026/05/21 00:23:57 INFO scrape complete entries=480 topics=101 links=51 total_requests=121 ok_requests=115 failed_requests=6
+2026/05/21 00:29:28 INFO scraping popular topics from eksisozluk
+2026/05/21 00:29:53 INFO scrape complete entries=495 topics=99 links=49 total_requests=118 ok_requests=112 failed_requests=6
+2026/05/21 00:35:28 INFO scraping popular topics from eksisozluk
+2026/05/21 00:35:54 INFO scrape complete entries=539 topics=100 links=48 total_requests=119 ok_requests=113 failed_requests=6
+2026/05/21 00:41:28 INFO scraping popular topics from eksisozluk
+2026/05/21 00:41:54 INFO scrape complete entries=496 topics=100 links=49 total_requests=120 ok_requests=110 failed_requests=10
+2026/05/21 00:47:28 INFO scraping popular topics from eksisozluk
+2026/05/21 00:47:53 INFO scrape complete entries=472 topics=100 links=48 total_requests=118 ok_requests=111 failed_requests=7
+2026/05/21 00:53:28 INFO scraping popular topics from eksisozluk
+2026/05/21 00:53:55 INFO scrape complete entries=492 topics=101 links=50 total_requests=119 ok_requests=111 failed_requests=8
+2026/05/21 00:59:28 INFO scraping popular topics from eksisozluk
+2026/05/21 01:00:18 INFO scrape complete entries=1192 topics=103 links=63 total_requests=189 ok_requests=177 failed_requests=12
+2026/05/21 01:05:28 INFO scraping popular topics from eksisozluk
+2026/05/21 01:05:54 INFO scrape complete entries=508 topics=103 links=54 total_requests=119 ok_requests=107 failed_requests=12
+2026/05/21 01:11:28 INFO scraping popular topics from eksisozluk
+2026/05/21 01:11:52 INFO scrape complete entries=489 topics=101 links=53 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/21 01:17:28 INFO scraping popular topics from eksisozluk
+2026/05/21 01:17:57 INFO scrape complete entries=495 topics=102 links=54 total_requests=117 ok_requests=104 failed_requests=13
+2026/05/21 01:23:28 INFO scraping popular topics from eksisozluk
+2026/05/21 01:23:58 INFO scrape complete entries=525 topics=103 links=54 total_requests=124 ok_requests=111 failed_requests=13
+2026/05/21 01:29:28 INFO scraping popular topics from eksisozluk
+2026/05/21 01:29:57 INFO scrape complete entries=495 topics=103 links=54 total_requests=117 ok_requests=104 failed_requests=13
+2026/05/21 01:35:29 INFO scraping popular topics from eksisozluk
+2026/05/21 01:35:57 INFO scrape complete entries=526 topics=105 links=58 total_requests=117 ok_requests=105 failed_requests=12
+2026/05/21 01:41:29 INFO scraping popular topics from eksisozluk
+2026/05/21 01:42:01 INFO scrape complete entries=483 topics=105 links=42 total_requests=117 ok_requests=100 failed_requests=17
+2026/05/21 01:47:29 INFO scraping popular topics from eksisozluk
+2026/05/21 01:47:52 INFO scrape complete entries=481 topics=104 links=44 total_requests=117 ok_requests=104 failed_requests=13
+2026/05/21 01:53:29 INFO scraping popular topics from eksisozluk
+2026/05/21 01:53:54 INFO scrape complete entries=490 topics=104 links=44 total_requests=116 ok_requests=103 failed_requests=13
+2026/05/21 01:59:29 INFO scraping popular topics from eksisozluk
+2026/05/21 01:59:56 INFO scrape complete entries=484 topics=104 links=45 total_requests=119 ok_requests=103 failed_requests=16
+2026/05/21 02:05:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:05:56 INFO scrape complete entries=469 topics=104 links=43 total_requests=116 ok_requests=102 failed_requests=14
+2026/05/21 02:11:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:11:56 INFO scrape complete entries=455 topics=104 links=44 total_requests=113 ok_requests=101 failed_requests=12
+2026/05/21 02:17:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:18:00 INFO scrape complete entries=441 topics=104 links=43 total_requests=114 ok_requests=99 failed_requests=15
+2026/05/21 02:23:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:23:57 INFO scrape complete entries=460 topics=102 links=44 total_requests=113 ok_requests=102 failed_requests=11
+2026/05/21 02:29:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:29:53 INFO scrape complete entries=466 topics=102 links=45 total_requests=113 ok_requests=102 failed_requests=11
+2026/05/21 02:35:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:35:56 INFO scrape complete entries=464 topics=102 links=45 total_requests=114 ok_requests=103 failed_requests=11
+2026/05/21 02:41:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:41:59 INFO scrape complete entries=453 topics=102 links=46 total_requests=114 ok_requests=102 failed_requests=12
+2026/05/21 02:47:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:47:57 INFO scrape complete entries=461 topics=102 links=46 total_requests=114 ok_requests=104 failed_requests=10
+2026/05/21 02:53:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:54:22 INFO scrape complete entries=1127 topics=102 links=81 total_requests=179 ok_requests=168 failed_requests=11
+2026/05/21 02:59:29 INFO scraping popular topics from eksisozluk
+2026/05/21 02:59:54 INFO scrape complete entries=449 topics=101 links=44 total_requests=109 ok_requests=98 failed_requests=11
+2026/05/21 03:05:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:05:55 INFO scrape complete entries=448 topics=101 links=41 total_requests=111 ok_requests=100 failed_requests=11
+2026/05/21 03:11:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:11:54 INFO scrape complete entries=455 topics=101 links=43 total_requests=109 ok_requests=98 failed_requests=11
+2026/05/21 03:17:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:17:58 INFO scrape complete entries=437 topics=101 links=42 total_requests=107 ok_requests=93 failed_requests=14
+2026/05/21 03:23:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:23:55 INFO scrape complete entries=443 topics=101 links=42 total_requests=108 ok_requests=96 failed_requests=12
+2026/05/21 03:29:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:29:56 INFO scrape complete entries=442 topics=100 links=42 total_requests=111 ok_requests=98 failed_requests=13
+2026/05/21 03:35:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:35:56 INFO scrape complete entries=429 topics=100 links=42 total_requests=112 ok_requests=98 failed_requests=14
+2026/05/21 03:41:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:41:55 INFO scrape complete entries=442 topics=100 links=42 total_requests=108 ok_requests=94 failed_requests=14
+2026/05/21 03:47:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:47:57 INFO scrape complete entries=442 topics=100 links=38 total_requests=107 ok_requests=95 failed_requests=12
+2026/05/21 03:53:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:53:54 INFO scrape complete entries=444 topics=100 links=38 total_requests=106 ok_requests=94 failed_requests=12
+2026/05/21 03:59:29 INFO scraping popular topics from eksisozluk
+2026/05/21 03:59:54 INFO scrape complete entries=452 topics=100 links=38 total_requests=108 ok_requests=97 failed_requests=11
+2026/05/21 04:05:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:05:57 INFO scrape complete entries=445 topics=99 links=38 total_requests=106 ok_requests=92 failed_requests=14
+2026/05/21 04:11:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:11:54 INFO scrape complete entries=435 topics=99 links=37 total_requests=104 ok_requests=92 failed_requests=12
+2026/05/21 04:17:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:17:59 INFO scrape complete entries=442 topics=99 links=37 total_requests=109 ok_requests=96 failed_requests=13
+2026/05/21 04:23:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:23:57 INFO scrape complete entries=441 topics=99 links=37 total_requests=104 ok_requests=93 failed_requests=11
+2026/05/21 04:29:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:29:57 INFO scrape complete entries=443 topics=99 links=38 total_requests=107 ok_requests=94 failed_requests=13
+2026/05/21 04:35:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:35:51 INFO scrape complete entries=437 topics=99 links=38 total_requests=106 ok_requests=95 failed_requests=11
+2026/05/21 04:41:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:41:53 INFO scrape complete entries=440 topics=99 links=38 total_requests=105 ok_requests=95 failed_requests=10
+2026/05/21 04:47:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:47:56 INFO scrape complete entries=440 topics=99 links=38 total_requests=105 ok_requests=90 failed_requests=15
+2026/05/21 04:53:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:53:58 INFO scrape complete entries=429 topics=99 links=37 total_requests=105 ok_requests=93 failed_requests=12
+2026/05/21 04:59:29 INFO scraping popular topics from eksisozluk
+2026/05/21 04:59:54 INFO scrape complete entries=445 topics=99 links=37 total_requests=106 ok_requests=94 failed_requests=12
+2026/05/21 05:05:29 INFO scraping popular topics from eksisozluk
+2026/05/21 05:05:55 INFO scrape complete entries=417 topics=99 links=38 total_requests=107 ok_requests=93 failed_requests=14
+2026/05/21 05:11:29 INFO scraping popular topics from eksisozluk
+2026/05/21 05:12:00 INFO scrape complete entries=409 topics=99 links=36 total_requests=108 ok_requests=93 failed_requests=15
+2026/05/21 05:17:29 INFO scraping popular topics from eksisozluk
+2026/05/21 05:17:51 INFO scrape complete entries=440 topics=99 links=40 total_requests=107 ok_requests=98 failed_requests=9
+2026/05/21 05:23:29 INFO scraping popular topics from eksisozluk
+2026/05/21 05:23:53 INFO scrape complete entries=440 topics=99 links=41 total_requests=103 ok_requests=93 failed_requests=10
+2026/05/21 05:29:29 INFO scraping popular topics from eksisozluk
+2026/05/21 05:29:59 INFO scrape complete entries=443 topics=99 links=42 total_requests=105 ok_requests=96 failed_requests=9
+2026/05/21 05:35:29 INFO scraping popular topics from eksisozluk
+2026/05/21 05:35:52 INFO scrape complete entries=432 topics=99 links=42 total_requests=108 ok_requests=95 failed_requests=13
+2026/05/21 05:41:29 INFO scraping popular topics from eksisozluk
+2026/05/21 05:41:54 INFO scrape complete entries=460 topics=99 links=43 total_requests=109 ok_requests=99 failed_requests=10
+2026/05/21 05:47:30 INFO scraping popular topics from eksisozluk
+2026/05/21 05:47:55 INFO scrape complete entries=457 topics=99 links=43 total_requests=107 ok_requests=100 failed_requests=7
+2026/05/21 05:53:30 INFO scraping popular topics from eksisozluk
+2026/05/21 05:53:53 INFO scrape complete entries=456 topics=98 links=39 total_requests=108 ok_requests=100 failed_requests=8
+2026/05/21 05:59:30 INFO scraping popular topics from eksisozluk
+2026/05/21 05:59:56 INFO scrape complete entries=455 topics=98 links=39 total_requests=106 ok_requests=99 failed_requests=7
+2026/05/21 06:05:30 INFO scraping popular topics from eksisozluk
+2026/05/21 06:05:57 INFO scrape complete entries=473 topics=99 links=43 total_requests=110 ok_requests=103 failed_requests=7
+2026/05/21 06:11:30 INFO scraping popular topics from eksisozluk
+2026/05/21 06:11:57 INFO scrape complete entries=467 topics=99 links=40 total_requests=111 ok_requests=103 failed_requests=8
+2026/05/21 06:17:30 INFO scraping popular topics from eksisozluk
+2026/05/21 06:17:57 INFO scrape complete entries=477 topics=98 links=45 total_requests=109 ok_requests=103 failed_requests=6
+2026/05/21 06:23:30 INFO scraping popular topics from eksisozluk
+2026/05/21 06:24:02 INFO scrape complete entries=488 topics=98 links=44 total_requests=111 ok_requests=102 failed_requests=9
+2026/05/21 06:29:30 INFO scraping popular topics from eksisozluk
+2026/05/21 06:29:57 INFO scrape complete entries=464 topics=98 links=44 total_requests=106 ok_requests=95 failed_requests=11
+2026/05/21 06:35:30 INFO scraping popular topics from eksisozluk
+2026/05/21 06:35:56 INFO scrape complete entries=482 topics=98 links=44 total_requests=110 ok_requests=102 failed_requests=8
+2026/05/21 06:41:30 INFO scraping popular topics from eksisozluk
+2026/05/21 06:41:59 INFO scrape complete entries=459 topics=98 links=41 total_requests=110 ok_requests=102 failed_requests=8
+2026/05/21 06:47:30 INFO scraping popular topics from eksisozluk
+2026/05/21 06:47:57 INFO scrape complete entries=472 topics=98 links=41 total_requests=105 ok_requests=97 failed_requests=8
+2026/05/21 06:53:30 INFO scraping popular topics from eksisozluk
+2026/05/21 06:54:06 INFO scrape complete entries=723 topics=99 links=44 total_requests=134 ok_requests=126 failed_requests=8
+2026/05/21 06:59:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:00:00 INFO scrape complete entries=461 topics=99 links=35 total_requests=112 ok_requests=102 failed_requests=10
+2026/05/21 07:05:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:05:55 INFO scrape complete entries=513 topics=100 links=39 total_requests=116 ok_requests=108 failed_requests=8
+2026/05/21 07:11:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:11:55 INFO scrape complete entries=486 topics=100 links=39 total_requests=116 ok_requests=107 failed_requests=9
+2026/05/21 07:17:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:17:54 INFO scrape complete entries=458 topics=100 links=38 total_requests=114 ok_requests=101 failed_requests=13
+2026/05/21 07:23:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:24:00 INFO scrape complete entries=468 topics=100 links=38 total_requests=116 ok_requests=105 failed_requests=11
+2026/05/21 07:29:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:29:57 INFO scrape complete entries=472 topics=101 links=38 total_requests=113 ok_requests=101 failed_requests=12
+2026/05/21 07:35:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:35:54 INFO scrape complete entries=476 topics=101 links=38 total_requests=115 ok_requests=102 failed_requests=13
+2026/05/21 07:41:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:41:56 INFO scrape complete entries=458 topics=101 links=36 total_requests=114 ok_requests=99 failed_requests=15
+2026/05/21 07:47:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:48:00 INFO scrape complete entries=465 topics=102 links=38 total_requests=116 ok_requests=101 failed_requests=15
+2026/05/21 07:53:30 INFO scraping popular topics from eksisozluk
+2026/05/21 07:53:58 INFO scrape complete entries=463 topics=102 links=36 total_requests=119 ok_requests=106 failed_requests=13
+2026/05/21 07:59:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:00:00 INFO scrape complete entries=449 topics=102 links=35 total_requests=121 ok_requests=105 failed_requests=16
+2026/05/21 08:05:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:05:58 INFO scrape complete entries=438 topics=100 links=32 total_requests=117 ok_requests=102 failed_requests=15
+2026/05/21 08:11:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:12:02 INFO scrape complete entries=453 topics=99 links=33 total_requests=115 ok_requests=100 failed_requests=15
+2026/05/21 08:17:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:17:59 INFO scrape complete entries=482 topics=99 links=35 total_requests=118 ok_requests=108 failed_requests=10
+2026/05/21 08:23:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:23:59 INFO scrape complete entries=476 topics=99 links=35 total_requests=114 ok_requests=105 failed_requests=9
+2026/05/21 08:29:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:29:58 INFO scrape complete entries=467 topics=99 links=33 total_requests=120 ok_requests=112 failed_requests=8
+2026/05/21 08:35:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:35:57 INFO scrape complete entries=456 topics=99 links=31 total_requests=114 ok_requests=107 failed_requests=7
+2026/05/21 08:41:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:42:09 INFO scrape complete entries=461 topics=98 links=29 total_requests=121 ok_requests=108 failed_requests=13
+2026/05/21 08:47:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:48:15 INFO scrape complete entries=423 topics=98 links=28 total_requests=109 ok_requests=93 failed_requests=16
+2026/05/21 08:53:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:54:06 INFO scrape complete entries=424 topics=98 links=31 total_requests=114 ok_requests=97 failed_requests=17
+2026/05/21 08:59:30 INFO scraping popular topics from eksisozluk
+2026/05/21 08:59:59 INFO scrape complete entries=472 topics=98 links=31 total_requests=119 ok_requests=109 failed_requests=10
+2026/05/21 09:05:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:06:07 INFO scrape complete entries=708 topics=98 links=46 total_requests=140 ok_requests=124 failed_requests=16
+2026/05/21 09:11:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:12:36 INFO scrape complete entries=1499 topics=100 links=132 total_requests=231 ok_requests=218 failed_requests=13
+2026/05/21 09:17:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:18:01 INFO scrape complete entries=429 topics=99 links=35 total_requests=121 ok_requests=108 failed_requests=13
+2026/05/21 09:23:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:24:04 INFO scrape complete entries=419 topics=98 links=26 total_requests=118 ok_requests=104 failed_requests=14
+2026/05/21 09:29:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:30:02 INFO scrape complete entries=439 topics=98 links=30 total_requests=116 ok_requests=103 failed_requests=13
+2026/05/21 09:35:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:35:58 INFO scrape complete entries=424 topics=98 links=28 total_requests=114 ok_requests=100 failed_requests=14
+2026/05/21 09:41:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:42:03 INFO scrape complete entries=403 topics=98 links=28 total_requests=116 ok_requests=97 failed_requests=19
+2026/05/21 09:47:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:48:02 INFO scrape complete entries=426 topics=97 links=32 total_requests=119 ok_requests=107 failed_requests=12
+2026/05/21 09:53:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:53:56 INFO scrape complete entries=467 topics=97 links=36 total_requests=119 ok_requests=110 failed_requests=9
+2026/05/21 09:59:30 INFO scraping popular topics from eksisozluk
+2026/05/21 09:59:56 INFO scrape complete entries=451 topics=97 links=34 total_requests=115 ok_requests=104 failed_requests=11
+2026/05/21 10:05:30 INFO scraping popular topics from eksisozluk
+2026/05/21 10:06:02 INFO scrape complete entries=443 topics=96 links=27 total_requests=119 ok_requests=104 failed_requests=15
+2026/05/21 10:11:30 INFO scraping popular topics from eksisozluk
+2026/05/21 10:11:59 INFO scrape complete entries=430 topics=97 links=27 total_requests=117 ok_requests=105 failed_requests=12
+2026/05/21 10:17:30 INFO scraping popular topics from eksisozluk
+2026/05/21 10:17:56 INFO scrape complete entries=418 topics=95 links=29 total_requests=112 ok_requests=103 failed_requests=9
+2026/05/21 10:23:30 INFO scraping popular topics from eksisozluk
+2026/05/21 10:23:58 INFO scrape complete entries=421 topics=94 links=30 total_requests=111 ok_requests=101 failed_requests=10
+2026/05/21 10:29:30 INFO scraping popular topics from eksisozluk
+2026/05/21 10:29:59 INFO scrape complete entries=412 topics=93 links=29 total_requests=110 ok_requests=100 failed_requests=10
+2026/05/21 10:35:30 INFO scraping popular topics from eksisozluk
+2026/05/21 10:36:00 INFO scrape complete entries=466 topics=94 links=37 total_requests=114 ok_requests=105 failed_requests=9
+2026/05/21 10:41:30 INFO scraping popular topics from eksisozluk
+2026/05/21 10:41:59 INFO scrape complete entries=472 topics=94 links=31 total_requests=115 ok_requests=104 failed_requests=11
+2026/05/21 10:47:30 INFO scraping popular topics from eksisozluk
+2026/05/21 10:48:01 INFO scrape complete entries=423 topics=94 links=30 total_requests=114 ok_requests=105 failed_requests=9
+2026/05/21 10:53:30 INFO scraping popular topics from eksisozluk
+2026/05/21 10:53:53 INFO scrape complete entries=427 topics=94 links=30 total_requests=110 ok_requests=99 failed_requests=11
+2026/05/21 10:59:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:00:02 INFO scrape complete entries=441 topics=93 links=28 total_requests=115 ok_requests=103 failed_requests=12
+2026/05/21 11:05:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:06:00 INFO scrape complete entries=418 topics=93 links=31 total_requests=112 ok_requests=101 failed_requests=11
+2026/05/21 11:11:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:12:00 INFO scrape complete entries=404 topics=93 links=26 total_requests=113 ok_requests=98 failed_requests=15
+2026/05/21 11:17:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:18:01 INFO scrape complete entries=472 topics=93 links=33 total_requests=121 ok_requests=112 failed_requests=9
+2026/05/21 11:23:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:23:58 INFO scrape complete entries=437 topics=93 links=25 total_requests=113 ok_requests=102 failed_requests=11
+2026/05/21 11:29:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:30:06 INFO scrape complete entries=453 topics=94 links=28 total_requests=115 ok_requests=104 failed_requests=11
+2026/05/21 11:35:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:35:55 INFO scrape complete entries=454 topics=94 links=30 total_requests=107 ok_requests=94 failed_requests=13
+2026/05/21 11:41:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:41:58 INFO scrape complete entries=468 topics=94 links=30 total_requests=114 ok_requests=101 failed_requests=13
+2026/05/21 11:47:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:48:00 INFO scrape complete entries=448 topics=94 links=32 total_requests=110 ok_requests=93 failed_requests=17
+2026/05/21 11:53:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:54:00 INFO scrape complete entries=433 topics=94 links=31 total_requests=111 ok_requests=98 failed_requests=13
+2026/05/21 11:59:30 INFO scraping popular topics from eksisozluk
+2026/05/21 11:59:59 INFO scrape complete entries=414 topics=92 links=31 total_requests=109 ok_requests=93 failed_requests=16
+2026/05/21 12:05:30 INFO scraping popular topics from eksisozluk
+2026/05/21 12:06:04 INFO scrape complete entries=435 topics=92 links=33 total_requests=113 ok_requests=98 failed_requests=15
+2026/05/21 12:11:30 INFO scraping popular topics from eksisozluk
+2026/05/21 12:11:57 INFO scrape complete entries=437 topics=92 links=31 total_requests=114 ok_requests=100 failed_requests=14
+2026/05/21 12:17:30 INFO scraping popular topics from eksisozluk
+2026/05/21 12:17:59 INFO scrape complete entries=466 topics=93 links=33 total_requests=114 ok_requests=100 failed_requests=14
+2026/05/21 12:23:30 INFO scraping popular topics from eksisozluk
+2026/05/21 12:23:55 INFO scrape complete entries=432 topics=93 links=41 total_requests=109 ok_requests=92 failed_requests=17
+2026/05/21 12:29:30 INFO scraping popular topics from eksisozluk
+2026/05/21 12:30:01 INFO scrape complete entries=447 topics=93 links=41 total_requests=115 ok_requests=97 failed_requests=18
+2026/05/21 12:35:30 INFO scraping popular topics from eksisozluk
+2026/05/21 12:35:58 INFO scrape complete entries=442 topics=93 links=39 total_requests=115 ok_requests=101 failed_requests=14

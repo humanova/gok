@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"gok/internal/config"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -46,11 +47,27 @@ func prepareDb() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	err = database.AutoMigrate(&Entry{}, &Topic{}, &PopularTopic{}, &EntryAttachment{}, &Request{})
+	// Enable pgvector extension
+	if err := database.Exec("CREATE EXTENSION IF NOT EXISTS vector").Error; err != nil {
+		slog.Warn("could not create pgvector extension (may already exist)", "error", err)
+	}
 
+	err = database.AutoMigrate(&Entry{}, &Topic{}, &PopularTopic{}, &EntryAttachment{}, &Request{}, &Digest{})
 	if err != nil {
 		slog.Error("couldn't create new table", "error", err)
 		return nil, err
+	}
+
+	// HNSW index for vector similarity search
+	if err := database.Exec(`CREATE INDEX IF NOT EXISTS idx_entries_embedding
+		ON entries USING hnsw (embedding vector_cosine_ops)`).Error; err != nil {
+		slog.Warn("could not create HNSW index", "error", err)
+	}
+
+	// GIN index for BM25-style full-text search (Turkish content — using 'simple' config)
+	if err := database.Exec(`CREATE INDEX IF NOT EXISTS idx_entries_fts
+		ON entries USING gin (to_tsvector('simple', coalesce(text,'')))`).Error; err != nil {
+		slog.Warn("could not create GIN index", "error", err)
 	}
 
 	return database, nil

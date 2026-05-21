@@ -7,5 +7,10 @@
   "DbPassword" : "password",
   "DbSSLMode" : "disable",
   "EntryCollectorDelay" : 20,
-  "EntryCollectorRandomDelay" : 100
+  "EntryCollectorRandomDelay" : 100,
+  "EmbedderUrl" : "http://localhost:8765",
+  "GeminiApiKey" : "",
+  "GeminiModel" : "gemini-3.5-flash",
+  "DigestIntervalMinutes" : 30,
+  "ApiPort" : 8080
 }

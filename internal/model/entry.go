@@ -1,18 +1,23 @@
 package model
 
 import (
+	"time"
+
+	"github.com/pgvector/pgvector-go"
 	"gorm.io/gorm"
 )
 
 type Entry struct {
 	gorm.Model
-	EntryId   uint64 `gorm:"unique;index:idx_entries_topic_entry,priority:2,sort:desc"`
-	Timestamp int64  `gorm:"index:idx_entries_timestamp"` // unix time UTC
-	Author    string
-	Text      string
-	Url       string `gorm:"unique"`
-	Score     int64
-	TopicId   uint64 `gorm:"index:idx_entries_topic_entry,priority:1"`
+	EntryId     uint64 `gorm:"unique;index:idx_entries_topic_entry,priority:2,sort:desc"`
+	Timestamp   int64  `gorm:"index:idx_entries_timestamp"` // unix time UTC
+	Author      string
+	Text        string
+	Url         string `gorm:"unique"`
+	Score       int64
+	TopicId     uint64          `gorm:"index:idx_entries_topic_entry,priority:1"`
+	Embedding   pgvector.Vector `gorm:"type:vector(1024)"`
+	EmbeddingAt *time.Time
 }
 
 func InitDb() error {
@@ -22,6 +27,11 @@ func InitDb() error {
 	}
 	database = db
 	return nil
+}
+
+// DB returns the underlying *gorm.DB for use by packages that need raw queries (e.g. rag).
+func DB() *gorm.DB {
+	return database
 }
 
 func AddEntry(newEntry Entry) error {
