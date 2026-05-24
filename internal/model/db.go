@@ -52,11 +52,17 @@ func prepareDb() (*gorm.DB, error) {
 		slog.Warn("could not create pgvector extension (may already exist)", "error", err)
 	}
 
-	err = database.AutoMigrate(&Entry{}, &Topic{}, &PopularTopic{}, &EntryAttachment{}, &Request{}, &Digest{})
-	if err != nil {
-		slog.Error("couldn't create new table", "error", err)
+	// AutoMigrate the Digest table (new). Existing tables managed by the scraper binary
+	// are left untouched to avoid constraint-name conflicts across GORM versions.
+	if err = database.AutoMigrate(&Digest{}); err != nil {
+		slog.Error("couldn't migrate digest table", "error", err)
 		return nil, err
 	}
+
+	// Idempotently add embedding columns if this is the first run after the feature was added.
+	// These are no-ops once the columns exist, so the overhead is negligible.
+	database.Exec(`ALTER TABLE entries ADD COLUMN IF NOT EXISTS embedding vector(384)`)
+	database.Exec(`ALTER TABLE entries ADD COLUMN IF NOT EXISTS embedding_at timestamptz`)
 
 	// HNSW index for vector similarity search
 	if err := database.Exec(`CREATE INDEX IF NOT EXISTS idx_entries_embedding
@@ -64,10 +70,11 @@ func prepareDb() (*gorm.DB, error) {
 		slog.Warn("could not create HNSW index", "error", err)
 	}
 
-	// GIN index for BM25-style full-text search (Turkish content — using 'simple' config)
-	if err := database.Exec(`CREATE INDEX IF NOT EXISTS idx_entries_fts
-		ON entries USING gin (to_tsvector('simple', coalesce(text,'')))`).Error; err != nil {
-		slog.Warn("could not create GIN index", "error", err)
+	// GIN index for BM25-style full-text search using the Turkish text search configuration.
+	// Built CONCURRENTLY so it never takes a write lock on the (large) entries table.
+	if err := database.Exec(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_entries_fts
+		ON entries USING gin (to_tsvector('turkish', coalesce(text,'')))`).Error; err != nil {
+		slog.Warn("could not create GIN FTS index", "error", err)
 	}
 
 	return database, nil
@@ -167,9 +174,7 @@ func getEntriesFiltered(database *gorm.DB, filters Filters) ([]Entry, error) {
 		tx = tx.Where("author ILIKE ?", fmt.Sprintf("%%%s%%", filters.Author))
 	}
 	if filters.QueryText != "" {
-		tx = tx.Where("text ILIKE ? OR title ILIKE ?",
-			fmt.Sprintf("%%%s%%", filters.QueryText),
-			fmt.Sprintf("%%%s%%", filters.QueryText))
+		tx = tx.Where("to_tsvector('turkish', coalesce(text,'')) @@ plainto_tsquery('turkish', ?)", filters.QueryText)
 	}
 
 	// if nothing is passed as a filter, return entries from last 12 hours

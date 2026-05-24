@@ -27,9 +27,9 @@ func NewClient(ctx context.Context, apiKey, modelName string) (*Client, error) {
 	return &Client{client: c, modelName: modelName}, nil
 }
 
-// SynthesizeDigest generates a structured daily digest from retrieved entries and viewpoints.
-func (c *Client) SynthesizeDigest(ctx context.Context, entries []model.Entry, viewpoints []model.Viewpoint, topicTitles []string) (*model.DigestPayload, error) {
-	prompt := buildDigestPrompt(entries, viewpoints, topicTitles)
+// SynthesizeDigest generates a structured daily digest from per-topic entry bundles.
+func (c *Client) SynthesizeDigest(ctx context.Context, bundles []model.TopicBundle) (*model.DigestPayload, error) {
+	prompt := buildDigestPrompt(bundles)
 	return c.callStructured(ctx, prompt)
 }
 
@@ -107,40 +107,57 @@ func (c *Client) callStructured(ctx context.Context, prompt string) (*model.Dige
 }
 
 func systemPrompt() string {
-	return `Sen Ekşi Sözlük'teki Türkçe girdileri analiz eden bir asistansın.
-Kullanıcıların "bugün ne oluyor?" sorusuna net, tarafsız ve bilgilendirici cevaplar veriyorsun.
+	return `Sen Ekşi Sözlük'teki Türkçe girdileri analiz eden bir gazetecilik asistansın.
+Görevin sadece özetlemek değil; okuyucuya "bugün gerçekte ne oluyor ve neden önemli?" sorusuna cevap vermek.
+Analizin keskin, bağlamsal ve nüanslı olmalı. Yüzeysel özetlerden kaçın; tartışmanın özündeki gerilimleri, farklı bakış açılarını ve dikkat çekici momentleri öne çıkar.
 Cevaplarını her zaman Türkçe yaz.
+
 JSON çıktısı istediğinde şu şemayı kullan:
 {
-  "summary": "Genel özet (2-4 cümle)",
-  "dominant_sentiment": "pozitif | negatif | karışık | nötr",
-  "key_viewpoints": [
-    {"stance": "görüş etiketi", "representative_quote": "alıntı", "author": "yazar", "entry_count": 0}
+  "headline": "Günün ruhunu ve ana temayı yakalayan tek, çarpıcı cümle",
+  "overview": "2-3 cümle: Gündemin özü, neden şu an bu konular konuşuluyor, genel atmosfer",
+  "top_stories": [
+    {
+      "title": "Konu başlığı",
+      "summary": "Ne tartışılıyor (2-3 cümle)",
+      "why_it_matters": "Bu neden önemli, ne anlama geliyor, hangi derin meseleye işaret ediyor (1-2 cümle)",
+      "sentiment": "pozitif | negatif | karışık | nötr"
+    }
   ],
-  "trending_topics": ["konu1", "konu2"]
+  "debates": [
+    {
+      "topic": "Tartışma konusu",
+      "side_a": {"label": "Bu tarafı tanımlayan etiket", "argument": "Bu tarafın temel argümanı", "quote": "Temsili alıntı"},
+      "side_b": {"label": "Diğer tarafı tanımlayan etiket", "argument": "Bu tarafın temel argümanı", "quote": "Temsili alıntı"},
+      "tension": "Anlaşmazlığın özündeki gerilimi tek cümleyle açıkla"
+    }
+  ],
+  "mood_snapshot": "Günün kolektif ruh halinin nüanslı tasviri (hayal kırıklığı mı, öfke mi, umut mu, ironi mi, vb.)",
+  "notable_quotes": [
+    {"text": "Alıntı metni", "author": "Yazar", "context": "Bu alıntı neden dikkat çekici?"}
+  ],
+  "under_the_radar": "Gürültünün gölgesinde kalan ama aslında önemli olan bir konu veya gözlem"
 }`
 }
 
-func buildDigestPrompt(entries []model.Entry, viewpoints []model.Viewpoint, topicTitles []string) string {
+func buildDigestPrompt(bundles []model.TopicBundle) string {
 	var sb strings.Builder
-	sb.WriteString("## Bugünün Popüler Konuları\n")
-	for _, t := range topicTitles {
-		sb.WriteString("- ")
-		sb.WriteString(t)
+	sb.WriteString(fmt.Sprintf("Aşağıda %d adet güncel popüler konu var. ", len(bundles)))
+	sb.WriteString("Her konu için birbirinden farklı bakış açılarını temsil eden girdi grupları (perspektif kümeleri) verilmiştir.\n\n")
+
+	for i, bundle := range bundles {
+		sb.WriteString(fmt.Sprintf("### Konu %d: %s\n", i+1, bundle.TopicTitle))
+		for ci, cluster := range bundle.Clusters {
+			sb.WriteString(fmt.Sprintf("  [Perspektif %d]\n", ci+1))
+			for _, e := range cluster.Entries {
+				sb.WriteString(fmt.Sprintf("  - [%s]: %s\n", e.Author, truncate(e.Text, 300)))
+			}
+		}
 		sb.WriteString("\n")
 	}
-	sb.WriteString("\n## Seçilmiş Girdiler\n")
-	for i, e := range entries {
-		if i >= 30 {
-			break
-		}
-		sb.WriteString(fmt.Sprintf("[%s]: %s\n---\n", e.Author, truncate(e.Text, 400)))
-	}
-	sb.WriteString("\n## Tespit Edilen Görüşler\n")
-	for _, v := range viewpoints {
-		sb.WriteString(fmt.Sprintf("- %s (%d girdi): \"%s\" — %s\n", v.Stance, v.EntryCount, v.RepresentativeQuote, v.Author))
-	}
-	sb.WriteString("\nYukarıdaki verilere dayanarak JSON özet oluştur.")
+
+	sb.WriteString("Yukarıdaki yapılandırılmış veriyi bir gazeteci gözüyle analiz et ve belirtilen JSON şemasına göre içgörü dolu bir özet oluştur.\n")
+	sb.WriteString("Önemli: Sadece özetleme. Tartışmaların özündeki gerilimleri, beklenmedik boyutları ve 'neden önemli' sorularını yanıtla.")
 	return sb.String()
 }
 
@@ -164,6 +181,7 @@ func buildQueryPrompt(query string, entries []model.Entry, viewpoints []model.Vi
 	return sb.String()
 }
 
+// truncate clips s to at most max Unicode code points, appending an ellipsis if needed.
 func truncate(s string, max int) string {
 	runes := []rune(s)
 	if len(runes) <= max {

@@ -25,13 +25,8 @@ func main() {
 
 	ctx := context.Background()
 
-	// Build shared clients (embedder + LLM) — used by the digest cron job.
+	// build shared clients (embedder + LLM)
 	embedClient := embedder.NewClient(config.Config.EmbedderUrl)
-	llmClient, err := llm.NewClient(ctx, config.Config.GeminiApiKey, config.Config.GeminiModel)
-	if err != nil {
-		slog.Error("couldn't create LLM client", "error", err)
-		os.Exit(1)
-	}
 
 	slog.Info("starting scraper cron job")
 	scraperCron := gocron.NewScheduler(time.UTC)
@@ -42,18 +37,28 @@ func main() {
 		os.Exit(1)
 	}
 
-	digestInterval := config.Config.DigestIntervalMinutes
-	if digestInterval <= 0 {
-		digestInterval = 30
-	}
-	_, err = scraperCron.Every(digestInterval).Minutes().Do(func() {
-		if _, err := rag.GenerateDigest(ctx, embedClient, llmClient); err != nil {
-			slog.Error("digest generation failed", "error", err)
+	if config.Config.GeminiApiKey == "" {
+		slog.Warn("GeminiApiKey is not set. Digest generation will be skipped")
+	} else {
+		llmClient, err := llm.NewClient(ctx, config.Config.GeminiApiKey, config.Config.GeminiModel)
+		if err != nil {
+			slog.Error("couldn't create LLM client", "error", err)
+			os.Exit(1)
 		}
-	})
-	if err != nil {
-		slog.Error("couldn't create digest cron job", "error", err)
-		os.Exit(1)
+
+		digestInterval := config.Config.DigestIntervalMinutes
+		if digestInterval <= 0 {
+			digestInterval = 240
+		}
+		_, err = scraperCron.Every(digestInterval).Minutes().Do(func() {
+			if _, err := rag.GenerateDigest(ctx, embedClient, llmClient); err != nil {
+				slog.Error("digest generation failed", "error", err)
+			}
+		})
+		if err != nil {
+			slog.Error("couldn't create digest cron job", "error", err)
+			os.Exit(1)
+		}
 	}
 
 	scraperCron.StartBlocking()

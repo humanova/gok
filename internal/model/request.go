@@ -5,10 +5,10 @@ import (
 )
 
 type Request struct {
-	ID          uint       `gorm:"primarykey"`
-	CreatedAt   time.Time
-	Url         string
-	StatusCode  uint16
+	ID         uint `gorm:"primarykey"`
+	CreatedAt  time.Time
+	Url        string
+	StatusCode uint16
 }
 
 func AddRequest(newRequest Request) error {

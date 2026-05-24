@@ -6,3 +6,6 @@ config.json
 log.txt
 .github/
 gok
+print-digest
+embedder/__pycache__/
+.venv/

@@ -15,8 +15,8 @@ type Entry struct {
 	Text        string
 	Url         string `gorm:"unique"`
 	Score       int64
-	TopicId     uint64          `gorm:"index:idx_entries_topic_entry,priority:1"`
-	Embedding   pgvector.Vector `gorm:"type:vector(1024)"`
+	TopicId     uint64           `gorm:"index:idx_entries_topic_entry,priority:1"`
+	Embedding   *pgvector.Vector `gorm:"type:vector(384)"`
 	EmbeddingAt *time.Time
 }
 
@@ -32,6 +32,21 @@ func InitDb() error {
 // DB returns the underlying *gorm.DB for use by packages that need raw queries (e.g. rag).
 func DB() *gorm.DB {
 	return database
+}
+
+// GetRecentTopicEntries returns the most recent entries for a topic published after the given unix timestamp.
+// Results are ordered newest-first and capped at limit.
+func GetRecentTopicEntries(topicID uint64, since int64, limit int) ([]Entry, error) {
+	var entries []Entry
+	tx := database.
+		Where("topic_id = ? AND timestamp > ? AND deleted_at IS NULL", topicID, since).
+		Order("entry_id DESC").
+		Limit(limit).
+		Find(&entries)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return entries, nil
 }
 
 func AddEntry(newEntry Entry) error {

@@ -92,11 +92,23 @@ func ScrapeAll() {
 }
 
 // embedEntries calls the embedder sidecar and persists embeddings for a batch of entries.
-// Runs asynchronously — errors are logged but do not fail the scrape.
 func embedEntries(entries []model.Entry) {
 	if config.Config.EmbedderUrl == "" {
 		return
 	}
+
+	// filter to only entries that need embedding.
+	toEmbed := entries[:0]
+	for _, e := range entries {
+		if e.EmbeddingAt == nil {
+			toEmbed = append(toEmbed, e)
+		}
+	}
+	if len(toEmbed) == 0 {
+		return
+	}
+	entries = toEmbed
+
 	client := embedder.NewClient(config.Config.EmbedderUrl)
 	ctx := context.Background()
 
@@ -105,7 +117,7 @@ func embedEntries(entries []model.Entry) {
 		return
 	}
 
-	batchSize := 64
+	batchSize := 32
 	for i := 0; i < len(entries); i += batchSize {
 		j := min(i+batchSize, len(entries))
 		batch := entries[i:j]
@@ -126,5 +138,5 @@ func embedEntries(entries []model.Entry) {
 		}
 	}
 
-	slog.Info("embedding complete", "entries", len(entries))
+	slog.Info("embedding complete", "embedded", len(entries))
 }
