@@ -8,4 +8,4 @@ log.txt
 gok
 print-digest
 embedder/__pycache__/
-.venv/
+.venv/log.txt
