@@ -7,6 +7,9 @@ log.txt
 .github/
 gok
 print-digest
+digen
+ask
+check-digest
 embedder/__pycache__/
 .venv/
 .venv/log.txt
