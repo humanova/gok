@@ -20,51 +20,45 @@ type Digest struct {
 
 // DigestPayload is the structured output of the daily digest generation.
 type DigestPayload struct {
-	Headline      string         `json:"headline"`        // One punchy sentence capturing the day's theme
-	Overview      string         `json:"overview"`        // 2-3 sentences: what's dominating discourse and why now
-	TopStories    []StoryDigest  `json:"top_stories"`     // 3-5 key stories with context and analysis
-	Debates       []DebateDigest `json:"debates"`         // Active debates with real, named opposing sides
-	MoodSnapshot  string         `json:"mood_snapshot"`   // Nuanced description of the collective mood/tone
-	NotableQuotes []NotableQuote `json:"notable_quotes"`  // 2-3 striking quotes that capture the moment
-	UnderTheRadar string         `json:"under_the_radar"` // Something noteworthy that might be flying under the radar
+	Headline   string               `json:"headline"`   // 10-word max mood/theme line
+	Stories    []Story              `json:"stories"`    // Compact stories with expandable detail
+	QuickHits  []string             `json:"quick_hits"` // Brief mentions of other topics
+	Mood       string               `json:"mood"`       // 5-word emotional snapshot
+	Expansions map[string]Expansion `json:"expansions"` // Full context for each story
 }
 
-type StoryDigest struct {
-	Title        string `json:"title"`
-	Summary      string `json:"summary"`        // What is being discussed
-	WhyItMatters string `json:"why_it_matters"` // Significance, context, what it reveals
-	Sentiment    string `json:"sentiment"`      // pozitif | negatif | karışık | nötr
+// Story is the compact view of a digest entry
+type Story struct {
+	ID         string `json:"id"`             // story_1, story_2, etc.
+	Topic      string `json:"topic"`          // Topic title (5-8 words)
+	Line       string `json:"line"`           // What happened in one sentence (25 words max)
+	Hook       string `json:"hook,omitempty"` // Optional quote/data/twist (15 words max)
+	Type       string `json:"type"`           // debate | event | trend
+	Expandable bool   `json:"expandable"`     // Has expansion data
 }
 
-type DebateDigest struct {
-	Topic   string     `json:"topic"`
-	SideA   DebateSide `json:"side_a"`
-	SideB   DebateSide `json:"side_b"`
-	Tension string     `json:"tension"` // The core of the disagreement in one sentence
+// Expansion provides full context for a story
+type Expansion struct {
+	Type      string       `json:"type"`                // debate | event | trend
+	Context   string       `json:"context"`             // 50-word background
+	Sides     []DebateSide `json:"sides,omitempty"`     // For debates
+	Timeline  []string     `json:"timeline,omitempty"`  // For events
+	Reactions []string     `json:"reactions,omitempty"` // Key quotes
 }
 
+// DebateSide represents one position in a debate
 type DebateSide struct {
-	Label    string `json:"label"`    // Descriptive label for this camp (e.g. "hükümet eleştirmenleri")
-	Argument string `json:"argument"` // Their main argument
-	Quote    string `json:"quote"`    // A representative quote
-}
-
-type NotableQuote struct {
-	Text    string `json:"text"`
-	Author  string `json:"author"`
-	Context string `json:"context"` // Why this quote stands out
+	Stance   string   `json:"stance"`   // Descriptive label (not "görüş 1")
+	Argument string   `json:"argument"` // 20-word synthesis
+	Quotes   []string `json:"quotes"`   // 1-2 representative quotes
+	Support  string   `json:"support"`  // majority | minority | balanced
 }
 
 // TopicBundle is a structured per-topic package fed to the LLM for digest synthesis.
-// Each bundle contains the topic title and its entries pre-grouped into perspective clusters.
+// Each bundle contains the topic title and its entries (no pre-clustering).
 type TopicBundle struct {
-	TopicTitle  string              `json:"topic_title"`
-	Clusters    []PerspectiveCluster `json:"clusters"`
-}
-
-// PerspectiveCluster is one group of thematically similar entries within a topic.
-type PerspectiveCluster struct {
-	Entries []Entry `json:"-"` // raw entries; only representative fields sent to LLM
+	TopicTitle string  `json:"topic_title"`
+	Entries    []Entry `json:"entries"`
 }
 
 // Viewpoint is used by the query/chat path for embedding-based clustering.

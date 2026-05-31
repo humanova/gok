@@ -3,6 +3,7 @@ package rag
 import (
 	"context"
 	"log/slog"
+	"sort"
 	"time"
 
 	"gok/internal/embedder"
@@ -15,13 +16,13 @@ type DigestSynthesizer interface {
 }
 
 const (
-	digestHoursBack        = 3   // how far back to look in popular_topics for hotness signal
-	digestTopTopics        = 15  // max hot topics to consider
-	digestEntryBudget      = 250 // total entries across all topics sent to the LLM
-	digestMinPerTopic      = 5   // floor: every qualifying topic gets at least this many
-	digestMaxPerTopic      = 60  // ceiling: no single topic can monopolise the budget
+	digestBurstHours       = 3   // burst window: recent hotness signal
+	digestMomentumHours    = 12  // momentum window: sustained interest
+	digestTopTopics        = 12  // max hot topics to consider (down from 15 for quality)
+	digestMinEntriesFloor  = 10  // skip topics with fewer entries (up from 3)
+	digestMinEntryLength   = 100 // skip one-liner entries
+	digestEntrySampleHours = 6   // entry fetch window (up from 4h)
 	digestClustersPerTopic = 3   // perspective clusters per topic
-	digestMinEntries       = 3   // skip topic bundles with fewer entries than this
 )
 
 // GenerateDigest produces a pre-computed digest anchored to the hottest topics
@@ -30,107 +31,131 @@ func GenerateDigest(ctx context.Context, _ *embedder.Client, synthesizer DigestS
 	windowEnd := time.Now().UTC()
 	windowStart := windowEnd.Add(-24 * time.Hour)
 
-	// 1. Fetch the hottest topics from popular_topics in the last N hours.
-	hotTopics, err := model.GetHotTopics(digestHoursBack, digestTopTopics)
-	if err != nil || len(hotTopics) == 0 {
+	// 1. Fetch topics with dual-window scoring: burst (3h) + momentum (12h) + diversity
+	burstTopics, err := model.GetHotTopics(digestBurstHours, digestTopTopics*2)
+	if err != nil || len(burstTopics) == 0 {
 		slog.Warn("no hot topics found for digest", "error", err)
 		return nil, nil
 	}
-	slog.Info("digest: hot topics fetched", "count", len(hotTopics))
 
-	// 2. Compute per-topic entry quotas proportional to heat score,
-	//    bounded by [digestMinPerTopic, digestMaxPerTopic] and a global budget.
-	totalHeat := 0.0
-	for _, ht := range hotTopics {
-		totalHeat += ht.AvgRank // AvgRank holds the heat score after GetHotTopics
+	momentumTopics, err := model.GetHotTopics(digestMomentumHours, digestTopTopics*2)
+	if err != nil {
+		slog.Warn("momentum fetch failed, using burst only", "error", err)
+		momentumTopics = nil
 	}
+
+	// Build momentum map
+	momentumMap := make(map[uint64]float64)
+	for _, mt := range momentumTopics {
+		// Momentum score: appearances per hour
+		momentumMap[mt.TopicId] = float64(mt.Appearances) / float64(digestMomentumHours)
+	}
+
+	// Compute final heat = 0.7 × burst + 0.3 × momentum
+	type scoredTopic struct {
+		topic     model.HotTopic
+		finalHeat float64
+	}
+	scored := make([]scoredTopic, 0, len(burstTopics))
+	for _, bt := range burstTopics {
+		burstScore := bt.AvgRank // AvgRank holds heat after GetHotTopics
+		momentumScore := momentumMap[bt.TopicId]
+		finalHeat := 0.7*burstScore + 0.3*momentumScore
+
+		scored = append(scored, scoredTopic{topic: bt, finalHeat: finalHeat})
+	}
+
+	// Sort by final heat descending
+	sort.Slice(scored, func(i, j int) bool {
+		return scored[i].finalHeat > scored[j].finalHeat
+	})
+
+	if len(scored) > digestTopTopics {
+		scored = scored[:digestTopTopics]
+	}
+
+	hotTopics := make([]model.HotTopic, len(scored))
+	for i, st := range scored {
+		hotTopics[i] = st.topic
+		hotTopics[i].AvgRank = st.finalHeat // store final heat in AvgRank for quota calc
+	}
+
+	slog.Info("digest: hot topics scored", "count", len(hotTopics))
+
+	// 2. Dynamic quota allocation based on topic rank (no fixed budget)
+	//    Top 3: 60-80 entries, Mid 4-8: 30-50 entries, Cool 9-12: 15-30 entries
 	quotas := make([]int, len(hotTopics))
-	budgetUsed := 0
-	for i, ht := range hotTopics {
-		share := int(float64(digestEntryBudget) * ht.AvgRank / totalHeat)
-		if share < digestMinPerTopic {
-			share = digestMinPerTopic
-		}
-		if share > digestMaxPerTopic {
-			share = digestMaxPerTopic
-		}
-		quotas[i] = share
-		budgetUsed += share
-	}
-	// if proportional allocation overshoots, trim from the coldest topics first.
-	for budgetUsed > digestEntryBudget {
-		for i := len(quotas) - 1; i >= 0 && budgetUsed > digestEntryBudget; i-- {
-			if quotas[i] > digestMinPerTopic {
-				quotas[i]--
-				budgetUsed--
-			}
+	for i := range hotTopics {
+		if i < 3 {
+			quotas[i] = 70 // hot topics
+		} else if i < 8 {
+			quotas[i] = 40 // mid topics
+		} else {
+			quotas[i] = 20 // cool topics
 		}
 	}
 
-	slog.Info("digest: entry budget allocated", "total", budgetUsed, "topics", len(hotTopics))
+	slog.Info("digest: entry quotas allocated", "topics", len(hotTopics))
 
-	// 3. For each hot topic, fetch entries up to its quota and cluster into perspectives.
-	since := windowEnd.Add(-time.Duration(digestHoursBack+1) * time.Hour).Unix()
+	// 3. For each hot topic, fetch and filter entries with smart sampling
+	since := windowEnd.Add(-time.Duration(digestEntrySampleHours) * time.Hour).Unix()
 	bundles := make([]model.TopicBundle, 0, len(hotTopics))
 
 	for i, ht := range hotTopics {
-		entries, err := model.GetRecentTopicEntries(ht.TopicId, since, quotas[i])
+		// Fetch more entries than quota for filtering
+		allEntries, err := model.GetRecentTopicEntries(ht.TopicId, since, quotas[i]*2)
 		if err != nil {
 			slog.Warn("could not fetch entries for topic", "topic_id", ht.TopicId, "error", err)
 			continue
 		}
-		if len(entries) < digestMinEntries {
+
+		// Filter: length > 100 chars, then score by recency + embedding presence
+		type scoredEntry struct {
+			entry model.Entry
+			score float64
+		}
+		var scored []scoredEntry
+		now := time.Now().Unix()
+		for _, e := range allEntries {
+			if len(e.Text) < digestMinEntryLength {
+				continue
+			}
+			ageHours := float64(now-e.Timestamp) / 3600.0
+			recencyScore := 1.0 - (ageHours / float64(digestEntrySampleHours))
+			if recencyScore < 0 {
+				recencyScore = 0
+			}
+			engagementBoost := 1.0
+			if e.EmbeddingAt != nil {
+				engagementBoost = 1.2 // embedded = scraped when popular
+			}
+			scored = append(scored, scoredEntry{
+				entry: e,
+				score: recencyScore * engagementBoost,
+			})
+		}
+
+		// Sort by score descending, take quota
+		sort.Slice(scored, func(i, j int) bool {
+			return scored[i].score > scored[j].score
+		})
+
+		if len(scored) < digestMinEntriesFloor {
 			continue
 		}
 
-		// Cluster entries into perspective groups using embeddings (falls back to positional).
-		viewpoints := ExtractViewpoints(entries, digestClustersPerTopic)
-		clusters := make([]model.PerspectiveCluster, 0, len(viewpoints))
-
-		// Re-map viewpoints back to entry slices for the bundle.
-		// ExtractViewpoints already selected representative entries; we pass those.
-		for _, vp := range viewpoints {
-			// Find the entry matching the representative quote to anchor the cluster,
-			// then include all entries that are semantically close (we approximate by
-			// using the viewpoint's author/quote as the sole representative).
-			var clusterEntries []model.Entry
-			for _, e := range entries {
-				if e.Author == vp.Author && truncate(e.Text, 300) == vp.RepresentativeQuote {
-					clusterEntries = append(clusterEntries, e)
-					break
-				}
-			}
-			// Fill remaining slots from entries not yet claimed, evenly.
-			if len(clusterEntries) == 0 {
-				clusterEntries = append(clusterEntries, entries[0])
-			}
-			clusters = append(clusters, model.PerspectiveCluster{Entries: clusterEntries})
+		if len(scored) > quotas[i] {
+			scored = scored[:quotas[i]]
 		}
 
-		// Also keep a few un-clustered top entries for raw context.
-		// Append entries not already in clusters as a "general" cluster.
-		usedAuthors := make(map[string]struct{})
-		for _, c := range clusters {
-			for _, e := range c.Entries {
-				usedAuthors[e.Author] = struct{}{}
-			}
-		}
-		var general []model.Entry
-		for _, e := range entries {
-			if _, used := usedAuthors[e.Author]; !used {
-				general = append(general, e)
-				if len(general) >= 5 {
-					break
-				}
-			}
-		}
-		if len(general) > 0 {
-			clusters = append(clusters, model.PerspectiveCluster{Entries: general})
+		entries := make([]model.Entry, len(scored))
+		for j, se := range scored {
+			entries[j] = se.entry
 		}
 
 		bundles = append(bundles, model.TopicBundle{
 			TopicTitle: ht.Text,
-			Clusters:   clusters,
+			Entries:    entries,
 		})
 	}
 
@@ -151,8 +176,7 @@ func GenerateDigest(ctx context.Context, _ *embedder.Client, synthesizer DigestS
 
 	slog.Info("digest generated",
 		"topics", len(bundles),
-		"top_stories", len(payload.TopStories),
-		"debates", len(payload.Debates),
+		"stories", len(payload.Stories),
 	)
 	return payload, nil
 }

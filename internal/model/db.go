@@ -52,6 +52,11 @@ func prepareDb() (*gorm.DB, error) {
 		slog.Warn("could not create pgvector extension (may already exist)", "error", err)
 	}
 
+	// Enable unaccent for diacritic-insensitive search (e.g. "ozan guven" → "ozan güven")
+	if err := database.Exec("CREATE EXTENSION IF NOT EXISTS unaccent").Error; err != nil {
+		slog.Warn("could not create unaccent extension", "error", err)
+	}
+
 	// AutoMigrate the Digest table (new). Existing tables managed by the scraper binary
 	// are left untouched to avoid constraint-name conflicts across GORM versions.
 	if err = database.AutoMigrate(&Digest{}); err != nil {

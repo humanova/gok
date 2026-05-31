@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"gok/internal/model"
 
@@ -37,6 +38,42 @@ func (c *Client) SynthesizeDigest(ctx context.Context, bundles []model.TopicBund
 func (c *Client) SynthesizeQuery(ctx context.Context, query string, entries []model.Entry, viewpoints []model.Viewpoint) (*model.DigestPayload, error) {
 	prompt := buildQueryPrompt(query, entries, viewpoints)
 	return c.callStructured(ctx, prompt)
+}
+
+// StreamAnswer streams a focused Q&A answer (non-digest, no JSON, cites authors).
+func (c *Client) StreamAnswer(ctx context.Context, question string, entries []model.Entry, viewpoints []model.Viewpoint) (<-chan string, <-chan error) {
+	tokenCh := make(chan string, 64)
+	errCh := make(chan error, 1)
+
+	go func() {
+		defer close(tokenCh)
+		defer close(errCh)
+
+		prompt := buildAnswerPrompt(question, entries, viewpoints)
+		fullPrompt := qaSystemPrompt() + "\n\n" + prompt
+
+		contents := []*genai.Content{genai.NewContentFromText(fullPrompt, genai.RoleUser)}
+		iter := c.client.Models.GenerateContentStream(ctx, c.modelName, contents, nil)
+
+		for resp, err := range iter {
+			if err != nil {
+				errCh <- err
+				return
+			}
+			for _, cand := range resp.Candidates {
+				if cand.Content == nil {
+					continue
+				}
+				for _, part := range cand.Content.Parts {
+					if part.Text != "" {
+						tokenCh <- part.Text
+					}
+				}
+			}
+		}
+	}()
+
+	return tokenCh, errCh
 }
 
 // StreamQuery streams a conversational answer as text tokens via the returned channel.
@@ -107,57 +144,102 @@ func (c *Client) callStructured(ctx context.Context, prompt string) (*model.Dige
 }
 
 func systemPrompt() string {
-	return `Sen Ekşi Sözlük'teki Türkçe girdileri analiz eden bir gazetecilik asistansın.
-Görevin sadece özetlemek değil; okuyucuya "bugün gerçekte ne oluyor ve neden önemli?" sorusuna cevap vermek.
-Analizin keskin, bağlamsal ve nüanslı olmalı. Yüzeysel özetlerden kaçın; tartışmanın özündeki gerilimleri, farklı bakış açılarını ve dikkat çekici momentleri öne çıkar.
-Cevaplarını her zaman Türkçe yaz.
+	return `Sen bir haber özet botusun. Kullanıcılar sabahları 90 saniyede günü öğrenmek istiyor.
 
-JSON çıktısı istediğinde şu şemayı kullan:
+ÇIKTI KURALLARI:
+- Compact view: Her hikaye 1 satır (25 kelime max) + opsiyonel kanca (15 kelime max)
+- Expansion view: 50 kelime bağlam + tartışma/olay detayları
+- Yasak kelimeler: "önemli", "dikkat çekici", "ilginç", "nüanslı" — bunlar boş
+- Kural: Göster, anlatma. Veri ver, yorum yapma. Somut ol: "Fiyatlar arttı" değil "Ekmeğe %40 zam"
+
+TARTIŞMA TESPİTİ:
+- Eğer bir konuda kümelenmeler varsa ve dengeli dağılım (en az 2 küme):
+  → type: "debate", her tarafa gerçek stance etiketi ver (örn: "Zam Yeterli" vs "Zam Yetersiz")
+- Eğer 1 küme hakimse veya kümeleme yok:
+  → type: "event" veya "trend", tartışma yokmuş gibi yaz
+- Stance etiketleri açıklayıcı olmalı, "görüş 1" gibi genel etiketler kullanma
+
+EXPANSION BAĞLAMI:
+- Expansion'da neden bu konu gündemde olduğunu 50 kelimeyle açıkla
+- Timeline varsa zamanları ekle (örn: "12:00 X oldu", "14:30 Y açıklama yaptı")
+- Alıntılar kısa ve vurucu (15 kelime max)
+- Debate için: Her tarafın argümanını 20 kelimeyle özetle + 1-2 alıntı
+
+KELİME SINIRLARI (kesinlikle aşma):
+- headline: 10 kelime
+- story.line: 25 kelime
+- story.hook: 15 kelime (opsiyonel)
+- mood: 5 kelime
+- expansion.context: 50 kelime
+- expansion debate argument: 20 kelime
+- expansion quotes: 15 kelime
+
+Her zaman Türkçe yaz.
+
+JSON çıktı şeması:
 {
-  "headline": "Günün ruhunu ve ana temayı yakalayan tek, çarpıcı cümle",
-  "overview": "2-3 cümle: Gündemin özü, neden şu an bu konular konuşuluyor, genel atmosfer",
-  "top_stories": [
+  "headline": "10-kelime günün ruhu",
+  "stories": [
     {
-      "title": "Konu başlığı",
-      "summary": "Ne tartışılıyor (2-3 cümle)",
-      "why_it_matters": "Bu neden önemli, ne anlama geliyor, hangi derin meseleye işaret ediyor (1-2 cümle)",
-      "sentiment": "pozitif | negatif | karışık | nötr"
+      "id": "story_1",
+      "topic": "Konu başlığı (5-8 kelime)",
+      "line": "Ne oldu (25 kelime)",
+      "hook": "Opsiyonel quote/data/twist (15 kelime)",
+      "type": "debate|event|trend",
+      "expandable": true
     }
   ],
-  "debates": [
-    {
-      "topic": "Tartışma konusu",
-      "side_a": {"label": "Bu tarafı tanımlayan etiket", "argument": "Bu tarafın temel argümanı", "quote": "Temsili alıntı"},
-      "side_b": {"label": "Diğer tarafı tanımlayan etiket", "argument": "Bu tarafın temel argümanı", "quote": "Temsili alıntı"},
-      "tension": "Anlaşmazlığın özündeki gerilimi tek cümleyle açıkla"
+  "quick_hits": ["Kısa konu: 3-5 kelime"],
+  "mood": "5-kelime duygusal snapshot",
+  "expansions": {
+    "story_1": {
+      "type": "debate",
+      "context": "50-kelime arka plan",
+      "sides": [
+        {
+          "stance": "Açıklayıcı etiket",
+          "argument": "20-kelime argüman",
+          "quotes": ["alıntı 1", "alıntı 2"],
+          "support": "majority|minority|balanced"
+        }
+      ]
+    },
+    "story_2": {
+      "type": "event",
+      "context": "50-kelime arka plan",
+      "timeline": ["12:00 X", "14:30 Y"],
+      "reactions": ["alıntı 1", "alıntı 2"]
     }
-  ],
-  "mood_snapshot": "Günün kolektif ruh halinin nüanslı tasviri (hayal kırıklığı mı, öfke mi, umut mu, ironi mi, vb.)",
-  "notable_quotes": [
-    {"text": "Alıntı metni", "author": "Yazar", "context": "Bu alıntı neden dikkat çekici?"}
-  ],
-  "under_the_radar": "Gürültünün gölgesinde kalan ama aslında önemli olan bir konu veya gözlem"
+  }
 }`
 }
 
 func buildDigestPrompt(bundles []model.TopicBundle) string {
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("Aşağıda %d adet güncel popüler konu var. ", len(bundles)))
-	sb.WriteString("Her konu için birbirinden farklı bakış açılarını temsil eden girdi grupları (perspektif kümeleri) verilmiştir.\n\n")
+	sb.WriteString("Her konu için girdiler verilmiştir. LLM tartışma yapısını organik olarak belirleyecek.\n")
+	sb.WriteString("Compact + expansion formatında özet oluştur. Kelime sınırlarını kesinlikle aşma.\n\n")
 
 	for i, bundle := range bundles {
 		sb.WriteString(fmt.Sprintf("### Konu %d: %s\n", i+1, bundle.TopicTitle))
-		for ci, cluster := range bundle.Clusters {
-			sb.WriteString(fmt.Sprintf("  [Perspektif %d]\n", ci+1))
-			for _, e := range cluster.Entries {
-				sb.WriteString(fmt.Sprintf("  - [%s]: %s\n", e.Author, truncate(e.Text, 300)))
+		sb.WriteString(fmt.Sprintf("(%d girdi)\n\n", len(bundle.Entries)))
+
+		for ei, e := range bundle.Entries {
+			if ei >= 30 { // max 30 entries per topic shown in prompt
+				sb.WriteString(fmt.Sprintf("...ve %d girdi daha\n", len(bundle.Entries)-30))
+				break
 			}
+			timestamp := time.Unix(e.Timestamp, 0).Format("15:04")
+			sb.WriteString(fmt.Sprintf("  - [%s, %s]: %s\n", e.Author, timestamp, truncate(e.Text, 300)))
 		}
 		sb.WriteString("\n")
 	}
 
-	sb.WriteString("Yukarıdaki yapılandırılmış veriyi bir gazeteci gözüyle analiz et ve belirtilen JSON şemasına göre içgörü dolu bir özet oluştur.\n")
-	sb.WriteString("Önemli: Sadece özetleme. Tartışmaların özündeki gerilimleri, beklenmedik boyutları ve 'neden önemli' sorularını yanıtla.")
+	sb.WriteString("Her story için:\n")
+	sb.WriteString("1. Compact: id, topic, line (25 kelime), hook (opsiyonel, 15 kelime), type (debate/event/trend)\n")
+	sb.WriteString("2. Expansion: context (50 kelime), sides/timeline/reactions type'a göre\n")
+	sb.WriteString("3. Debate detection: Eğer girdilerde karşıt görüşler varsa → debate, değilse → event/trend\n")
+	sb.WriteString("4. Quick hits: Önemli ama ana hikaye olmayan 3-5 konu için kısa etiketler\n")
 	return sb.String()
 }
 
@@ -178,6 +260,40 @@ func buildQueryPrompt(query string, entries []model.Entry, viewpoints []model.Vi
 		}
 	}
 	sb.WriteString("\nBu soruyu JSON formatında yanıtla.")
+	return sb.String()
+}
+
+func qaSystemPrompt() string {
+	return `Sen Ekşi Sözlük girdilerine dayalı çalışan bir soru-cevap asistanısın.
+
+KURALLAR:
+- Soruyu doğrudan ve net yanıtla; günlük Türkçe kullan
+- Cevabını girdi yazarlarından alıntılarla destekle; alıntıyı "yazar_adı: '...'" formatında göster
+- Farklı görüşler varsa hepsini dengeli biçimde aktar, kendi yorumunu katma
+- Yeterli bilgi yoksa bunu açıkça söyle
+- Uzun cevaplar için paragraf kullan; liste/başlık yalnızca gerçekten gerekiyorsa
+- JSON çıktısı üretme; düz metin yaz`
+}
+
+func buildAnswerPrompt(question string, entries []model.Entry, viewpoints []model.Viewpoint) string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("## Soru\n%s\n\n", question))
+	sb.WriteString(fmt.Sprintf("## Girdiler (%d adet)\n", len(entries)))
+	for i, e := range entries {
+		if i >= 60 {
+			sb.WriteString(fmt.Sprintf("...ve %d girdi daha\n", len(entries)-60))
+			break
+		}
+		ts := time.Unix(e.Timestamp, 0).Format("02.01.2006 15:04")
+		sb.WriteString(fmt.Sprintf("[%s, %s]: %s\n---\n", e.Author, ts, truncate(e.Text, 500)))
+	}
+	if len(viewpoints) > 0 {
+		sb.WriteString("\n## Öne Çıkan Görüşler\n")
+		for _, v := range viewpoints {
+			sb.WriteString(fmt.Sprintf("- %s: \"%s\" — %s\n", v.Stance, v.RepresentativeQuote, v.Author))
+		}
+	}
+	sb.WriteString("\nYukarıdaki girdilere dayanarak soruyu yanıtla.")
 	return sb.String()
 }
 
