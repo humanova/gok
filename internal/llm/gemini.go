@@ -155,12 +155,15 @@ func systemPrompt() string {
 TARTIŞMA TESPİTİ:
 - Eğer bir konuda kümelenmeler varsa ve dengeli dağılım (en az 2 küme):
   → type: "debate", her tarafa gerçek stance etiketi ver (örn: "Zam Yeterli" vs "Zam Yetersiz")
-- Eğer 1 küme hakimse veya kümeleme yok:
-  → type: "event" veya "trend", tartışma yokmuş gibi yaz
+- Eğer belirli bir olay/gelişme/açıklama gündemin tetikçisiyse (kaza, karar, konuşma, duyuru):
+  → type: "event"; timeline ile anlat
+- Eğer tetikleyici tek bir olay değil, organik birikim/kültürel moment/gündem kaymasıysa (meme, tartışma trendi, sosyal gözlem):
+  → type: "trend"; reactions ile anlat
 - Stance etiketleri açıklayıcı olmalı, "görüş 1" gibi genel etiketler kullanma
 
 EXPANSION BAĞLAMI:
-- Expansion'da neden bu konu gündemde olduğunu 50 kelimeyle açıkla
+- context alanında line ve hook'ta geçmeyen ek bilgi ver: isimler, rakamlar, arka plan, önceki gelişmeler
+- line/hook'u tekrar etme; context onları tamamlamalı, özetlememeli
 - Timeline varsa zamanları ekle (örn: "12:00 X oldu", "14:30 Y açıklama yaptı")
 - Alıntılar kısa ve vurucu (15 kelime max)
 - Debate için: Her tarafın argümanını 20 kelimeyle özetle + 1-2 alıntı
@@ -170,7 +173,7 @@ KELİME SINIRLARI (kesinlikle aşma):
 - story.line: 25 kelime
 - story.hook: 15 kelime (opsiyonel)
 - mood: 5 kelime
-- expansion.context: 50 kelime
+- expansion.context: 50 kelime (line/hook'ı tekrar etme)
 - expansion debate argument: 20 kelime
 - expansion quotes: 15 kelime
 
@@ -194,7 +197,7 @@ JSON çıktı şeması:
   "expansions": {
     "story_1": {
       "type": "debate",
-      "context": "50-kelime arka plan",
+      "context": "50-kelime — line/hook'ta olmayan isimler, rakamlar, arka plan",
       "sides": [
         {
           "stance": "Açıklayıcı etiket",
@@ -206,7 +209,7 @@ JSON çıktı şeması:
     },
     "story_2": {
       "type": "event",
-      "context": "50-kelime arka plan",
+      "context": "50-kelime — line/hook'ta olmayan isimler, rakamlar, arka plan",
       "timeline": ["12:00 X", "14:30 Y"],
       "reactions": ["alıntı 1", "alıntı 2"]
     }
