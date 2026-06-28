@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gok pulse</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div id="title-area">
+        <span id="title">gok</span>
+        <span id="live-dot" class="dot" title="canlı"></span>
+      </div>
+      <div id="stats">
+        <span id="topic-count">—</span>&nbsp;konu
+        <span id="last-updated"></span>
+      </div>
+      <div id="speed-control">
+        <button class="speed-btn active" data-speed="1">1×</button>
+        <button class="speed-btn" data-speed="2">2×</button>
+        <button class="speed-btn" data-speed="5">5×</button>
+        <button class="speed-btn" data-speed="20">20×</button>
+        <button class="speed-btn" data-speed="60">60×</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <div id="grid"></div>
+      <aside id="debug-panel">
+        <div id="debug-header">queue · 0 pending</div>
+        <ul id="debug-list"></ul>
+      </aside>
+    </main>
+
+    <footer id="bottombar">
+      <div id="scrubber-wrap">
+        <span class="scrubber-label" id="scrubber-left">−12h</span>
+        <input type="range" id="scrubber" min="0" max="1000" value="1000" step="1">
+        <span class="scrubber-label" id="scrubber-right">canlı</span>
+      </div>
+      <div id="playback-time">—</div>
+    </footer>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

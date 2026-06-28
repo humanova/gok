@@ -1,0 +1,365 @@
+:root {
+  --bg: #090c12;
+  --surface: #0f1520;
+  --border: #1c2336;
+  --text: #c9d1d9;
+  --text-dim: #44546a;
+  --live-green: #3fb950;
+  --tile-radius: 5px;
+  --topbar-h: 46px;
+  --bottombar-h: 56px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Topbar ─────────────────────────────────────────────── */
+#topbar {
+  height: var(--topbar-h);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+#title-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  color: var(--text);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  display: inline-block;
+  transition: background 0.4s;
+  flex-shrink: 0;
+}
+
+.is-live .dot {
+  background: var(--live-green);
+  animation: dot-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+#stats {
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+#last-updated {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Speed Control ─────────────────────────────────────────── */
+#speed-control {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.speed-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 10px;
+  font-family: inherit;
+  padding: 2px 7px;
+  border-radius: 3px;
+  cursor: pointer;
+  line-height: 1.6;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.speed-btn:hover {
+  border-color: var(--text-dim);
+  color: var(--text);
+}
+
+.speed-btn.active {
+  border-color: var(--live-green);
+  color: var(--live-green);
+}
+
+/* Speed buttons are dimmed in live mode — speed only applies during replay */
+.is-live .speed-btn:not(.active) {
+  opacity: 0.4;
+}
+
+/* ── Main / Grid ─────────────────────────────────────────── */
+#main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  /* Fit inside the available viewport area while staying square */
+  width: min(
+    calc(100dvh - var(--topbar-h) - var(--bottombar-h) - 20px),
+    calc(100dvw - 20px)
+  );
+  aspect-ratio: 1 / 1;
+}
+
+/* ── Tile ─────────────────────────────────────────────────── */
+.tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--tile-radius);
+
+  /* Hue shifts from warm amber (rank 1) to cool slate (rank 25).
+     CSS custom props: --rank-idx [0..24], --heat [0.05..1.0] */
+  --tile-hue: calc(28 + var(--rank-idx, 12) * 8);
+  background: hsl(
+    var(--tile-hue),
+    calc(28% + var(--heat, 0.5) * 28%),
+    calc(9%  + var(--heat, 0.5) * 8%)
+  );
+  transition: background 1.2s ease;
+}
+
+.tile-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 3px 5px 4px;
+  font-size: 8.5px;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Ping ─────────────────────────────────────────────────── */
+.ping {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ping-color, #f97316);
+  /* Origin is set via --ox / --oy (percentage offsets from 50%) */
+  top:  calc(50% + var(--oy, 0%));
+  left: calc(50% + var(--ox, 0%));
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  animation: ping-expand 1.25s cubic-bezier(0.15, 0, 0.85, 1) forwards;
+}
+
+@keyframes ping-expand {
+  0%   { transform: translate(-50%, -50%) scale(0);   opacity: 1; }
+  55%  { opacity: 0.75; }
+  100% { transform: translate(-50%, -50%) scale(4.5); opacity: 0; }
+}
+
+/* ── Bottom bar / Scrubber ────────────────────────────────── */
+#bottombar {
+  height: var(--bottombar-h);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 16px 4px;
+  border-top: 1px solid var(--border);
+}
+
+#scrubber-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.scrubber-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  min-width: 28px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+#scrubber-right {
+  text-align: right;
+}
+
+/* Range input — cross-browser custom track + thumb */
+#scrubber {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+
+#scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.25s, transform 0.15s;
+}
+
+#scrubber:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+
+.is-live #scrubber::-webkit-slider-thumb {
+  background: var(--live-green);
+}
+
+#scrubber::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.is-live #scrubber::-moz-range-thumb {
+  background: var(--live-green);
+}
+
+#playback-time {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* ── Debug Panel ─────────────────────────────────────────── */
+#debug-panel {
+  position: fixed;
+  right: 8px;
+  top: calc(var(--topbar-h) + 8px);
+  bottom: calc(var(--bottombar-h) + 8px);
+  width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 100;
+}
+
+#debug-header {
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+#debug-list {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+  padding: 2px 0;
+}
+
+#debug-list::-webkit-scrollbar { width: 3px; }
+#debug-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.dbg-item {
+  display: flex;
+  gap: 5px;
+  align-items: baseline;
+  padding: 2px 8px;
+  line-height: 1.6;
+  color: var(--text);
+  transition: opacity 0.4s;
+}
+
+.dbg-item.fired {
+  opacity: 0.3;
+}
+
+.dbg-icon {
+  flex-shrink: 0;
+  width: 10px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 9px;
+}
+
+.dbg-item.fired .dbg-icon {
+  color: var(--live-green);
+}
+
+.dbg-time {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+  font-size: 9px;
+}
+
+.dbg-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  font-size: 10px;
+}

@@ -107,3 +107,9 @@ func UpdateScore(entry Entry, score int64) error {
 	}
 	return nil
 }
+
+// GetTopicEntryTimestamps returns entry timestamps grouped by topic ID,
+// filtered to entries newer than since (unix UTC). Results within each topic are sorted ascending.
+func GetTopicEntryTimestamps(topicIDs []uint64, since int64) (map[uint64][]int64, error) {
+	return getTopicEntryTimestamps(database, topicIDs, since)
+}

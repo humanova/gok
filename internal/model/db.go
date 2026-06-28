@@ -97,6 +97,9 @@ func createEntry(database *gorm.DB, entry Entry) error {
 }
 
 func createEntries(database *gorm.DB, entries []Entry) error {
+	if len(entries) == 0 {
+		return nil
+	}
 	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&entries)
 
 	if tx.Error != nil {
@@ -211,6 +214,9 @@ func createTopic(database *gorm.DB, topic Topic) error {
 }
 
 func createTopics(database *gorm.DB, topics []Topic) error {
+	if len(topics) == 0 {
+		return nil
+	}
 	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&topics)
 
 	if tx.Error != nil {
@@ -234,6 +240,9 @@ func createPopularTopic(database *gorm.DB, topic PopularTopic) error {
 }
 
 func createPopularTopics(database *gorm.DB, topics []PopularTopic) error {
+	if len(topics) == 0 {
+		return nil
+	}
 	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&topics)
 
 	if tx.Error != nil {
@@ -281,6 +290,9 @@ func createEntryAttachment(database *gorm.DB, topic EntryAttachment) error {
 }
 
 func createEntryAttachments(database *gorm.DB, topics []EntryAttachment) error {
+	if len(topics) == 0 {
+		return nil
+	}
 	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&topics)
 
 	if tx.Error != nil {
@@ -289,6 +301,56 @@ func createEntryAttachments(database *gorm.DB, topics []EntryAttachment) error {
 	}
 
 	return nil
+}
+
+// getTopicEntryTimestamps returns entry timestamps grouped by topic ID for the given
+// topic IDs, filtered to entries newer than since (unix UTC).
+// Results within each topic are sorted ascending.
+func getTopicEntryTimestamps(db *gorm.DB, topicIDs []uint64, since int64) (map[uint64][]int64, error) {
+	if len(topicIDs) == 0 {
+		return map[uint64][]int64{}, nil
+	}
+	type row struct {
+		TopicId   uint64
+		Timestamp int64
+	}
+	var rows []row
+	tx := db.Model(&Entry{}).
+		Select("topic_id, timestamp").
+		Where("topic_id IN ? AND timestamp > ? AND deleted_at IS NULL", topicIDs, since).
+		Order("timestamp ASC").
+		Scan(&rows)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	result := make(map[uint64][]int64, len(topicIDs))
+	for _, r := range rows {
+		result[r.TopicId] = append(result[r.TopicId], r.Timestamp)
+	}
+	return result, nil
+}
+
+// getPopularTopicsSince returns all popular_topics rows with timestamp > since, ascending.
+func getPopularTopicsSince(db *gorm.DB, since int64) ([]PopularTopic, error) {
+	var rows []PopularTopic
+	tx := db.Where("timestamp > ?", since).Order("timestamp ASC").Find(&rows)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return rows, nil
+}
+
+// getTopicsByIDs fetches Topic records for the given topic_id list.
+func getTopicsByIDs(db *gorm.DB, ids []uint64) ([]Topic, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	var topics []Topic
+	tx := db.Where("topic_id IN ?", ids).Find(&topics)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return topics, nil
 }
 
 // Request
@@ -304,6 +366,9 @@ func createRequest(database *gorm.DB, request Request) error {
 }
 
 func createRequests(database *gorm.DB, requests []Request) error {
+	if len(requests) == 0 {
+		return nil
+	}
 	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&requests)
 
 	if tx.Error != nil {

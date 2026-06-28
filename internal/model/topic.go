@@ -172,3 +172,13 @@ func GetPopularTopicsAfter(timestamp int64) ([]PopularTopic, error) {
 	}
 	return topics, nil
 }
+
+// GetPopularTopicsSince returns all popular_topics rows with timestamp > since.
+func GetPopularTopicsSince(since int64) ([]PopularTopic, error) {
+	return getPopularTopicsSince(database, since)
+}
+
+// GetTopicsByIDs fetches Topic records for the given topic_id list.
+func GetTopicsByIDs(ids []uint64) ([]Topic, error) {
+	return getTopicsByIDs(database, ids)
+}
