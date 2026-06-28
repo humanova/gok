@@ -9,6 +9,7 @@ gok
 print-digest
 digen
 ask
+/api
 check-digest
 embedder/__pycache__/
 .venv/
