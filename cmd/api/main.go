@@ -41,162 +41,122 @@ type PulseSnapshot struct {
 	Topics     []TopicPulse `json:"topics"`
 }
 
+// TopicBriefResponse is deliberately a cache/database read only. A browser
+// request never invokes Gemini; unavailable means no pre-generated brief exists.
+type TopicBriefResponse struct {
+	Available   bool                     `json:"available"`
+	GeneratedAt *time.Time               `json:"generated_at,omitempty"`
+	WindowStart *time.Time               `json:"window_start,omitempty"`
+	WindowEnd   *time.Time               `json:"window_end,omitempty"`
+	EntryCount  int                      `json:"entry_count,omitempty"`
+	Payload     *model.TopicBriefPayload `json:"payload,omitempty"`
+}
+
 const (
-	cacheHours      = 48
+	cacheHours      = 24
 	liveWindowSecs  = 3600  // default live window: last 60 min
 	maxRangeSecs    = 21600 // max range per /range request: 6 h
 	refreshInterval = 60 * time.Second
 	gridSize        = 25
+	rankingWindow   = 60 * time.Minute
+	heatHalfLife    = 15 * time.Minute
 )
 
 var cache struct {
-	mu            sync.RWMutex
-	topics        []model.HotTopic       // top-gridSize for live view (fixed cacheHours ranking)
-	popularTopics []model.PopularTopic   // raw popular_topics rows in last cacheHours (dynamic range ranking)
-	timestamps    map[uint64][]int64     // topicId → timestamps for all topics that appeared in popular_topics
-	topicMeta     map[uint64]model.Topic // topicId → Topic metadata
-	updatedAt     int64
+	mu         sync.RWMutex
+	timestamps map[uint64][]int64     // topicId → entry timestamps for every active topic
+	topicMeta  map[uint64]model.Topic // topicId → Topic metadata
+	updatedAt  int64
+}
+
+type rankedTopic struct {
+	topic model.Topic
+	heat  float64
 }
 
 func refreshCache() {
 	since := time.Now().UTC().Add(-time.Duration(cacheHours) * time.Hour).Unix()
 
-	// 1. Fixed live ranking: top-N topics over the full cache window.
-	topics, err := model.GetHotTopics(cacheHours, gridSize)
+	// Refresh a single compact snapshot after scraping. Browser requests only
+	// read this cache; no entry text, author, or per-user database work is sent.
+	timestamps, topics, err := model.GetTopicsWithEntryTimestampsSince(since)
 	if err != nil {
-		slog.Error("pulse: GetHotTopics failed", "error", err)
+		slog.Error("pulse: GetTopicsWithEntryTimestampsSince failed", "error", err)
 		return
 	}
 
-	// 2. All popular_topics rows for dynamic per-window ranking.
-	popTopics, err := model.GetPopularTopicsSince(since)
-	if err != nil {
-		slog.Error("pulse: GetPopularTopicsSince failed", "error", err)
-		return
-	}
-
-	// Collect every topic ID that appeared on the popular page.
-	idSet := make(map[uint64]struct{})
-	for _, p := range popTopics {
-		idSet[p.TopicId] = struct{}{}
-	}
-	allIDs := make([]uint64, 0, len(idSet))
-	for id := range idSet {
-		allIDs = append(allIDs, id)
-	}
-
-	// 3. Entry timestamps for the full extended topic set.
-	timestamps, err := model.GetTopicEntryTimestamps(allIDs, since)
-	if err != nil {
-		slog.Error("pulse: GetTopicEntryTimestamps failed", "error", err)
-		return
-	}
-
-	// 4. Build a complete topic metadata map (id → Topic).
-	topicMeta := make(map[uint64]model.Topic, len(allIDs))
-	for _, ht := range topics {
-		topicMeta[ht.TopicId] = ht.Topic
-	}
-	extraIDs := make([]uint64, 0)
-	for id := range idSet {
-		if _, ok := topicMeta[id]; !ok {
-			extraIDs = append(extraIDs, id)
-		}
-	}
-	if len(extraIDs) > 0 {
-		extra, err := model.GetTopicsByIDs(extraIDs)
-		if err != nil {
-			slog.Warn("pulse: GetTopicsByIDs for extended set failed", "error", err)
-		} else {
-			for _, t := range extra {
-				topicMeta[t.TopicId] = t
-			}
-		}
+	topicMeta := make(map[uint64]model.Topic, len(topics))
+	for _, topic := range topics {
+		topicMeta[topic.TopicId] = topic
 	}
 
 	cache.mu.Lock()
-	cache.topics = topics
-	cache.popularTopics = popTopics
 	cache.timestamps = timestamps
 	cache.topicMeta = topicMeta
 	cache.updatedAt = time.Now().Unix()
 	cache.mu.Unlock()
 
-	slog.Info("pulse: cache refreshed", "topics", len(topics), "extended", len(allIDs))
+	slog.Info("pulse: cache refreshed", "topics", len(topics))
 }
 
-// computeRankingForWindowLocked computes a dynamic hot-topic ranking from cached
-// popular_topics rows filtered to [from, to]. Must be called with cache.mu held for reading.
-func computeRankingForWindowLocked(from, to int64) []model.HotTopic {
-	type agg struct {
-		appearances uint64
-		totalRank   uint64
-		maxNew      uint64
+// rankTopicsForWindowLocked ranks topics by entry velocity. Each event decays
+// by half every heatHalfLife, so the board reflects what is accelerating now
+// instead of which topic stayed on the popular page longest.
+func rankTopicsForWindowLocked(from, to int64) []rankedTopic {
+	if to <= from {
+		return nil
 	}
-	byTopic := make(map[uint64]*agg)
 
-	for _, r := range cache.popularTopics {
-		if r.Timestamp <= from || r.Timestamp > to {
+	weightFrom := to - int64(rankingWindow/time.Second)
+	if weightFrom < from {
+		weightFrom = from
+	}
+	halfLifeSecs := heatHalfLife.Seconds()
+	ranked := make([]rankedTopic, 0, len(cache.timestamps))
+
+	for topicID, timestamps := range cache.timestamps {
+		topic, ok := cache.topicMeta[topicID]
+		if !ok {
 			continue
 		}
-		a := byTopic[r.TopicId]
-		if a == nil {
-			a = &agg{}
-			byTopic[r.TopicId] = a
-		}
-		a.appearances++
-		a.totalRank += r.PageNumber + 1
-		if r.NewEntries > a.maxNew {
-			a.maxNew = r.NewEntries
-		}
-	}
-
-	type scored struct {
-		topicId uint64
-		heat    float64
-		a       *agg
-	}
-	scores := make([]scored, 0, len(byTopic))
-	for id, a := range byTopic {
-		if _, ok := cache.topicMeta[id]; !ok {
+		lo := sort.Search(len(timestamps), func(i int) bool { return timestamps[i] >= from })
+		hi := sort.Search(len(timestamps), func(i int) bool { return timestamps[i] > to })
+		if lo == hi {
 			continue
 		}
-		avgRank := float64(a.totalRank) / float64(a.appearances)
-		heat := float64(a.appearances) * float64(a.maxNew+1) / avgRank
-		scores = append(scores, scored{id, heat, a})
-	}
-	sort.Slice(scores, func(i, j int) bool { return scores[i].heat > scores[j].heat })
-	if len(scores) > gridSize {
-		scores = scores[:gridSize]
+
+		heat := 0.0
+		for _, ts := range timestamps[lo:hi] {
+			if ts < weightFrom {
+				continue
+			}
+			ageSecs := float64(to - ts)
+			heat += math.Exp(-math.Ln2 * ageSecs / halfLifeSecs)
+		}
+		ranked = append(ranked, rankedTopic{topic: topic, heat: heat})
 	}
 
-	result := make([]model.HotTopic, 0, len(scores))
-	for _, s := range scores {
-		t := cache.topicMeta[s.topicId]
-		avgRank := float64(s.a.totalRank) / float64(s.a.appearances)
-		result = append(result, model.HotTopic{
-			Topic:       t,
-			Appearances: s.a.appearances,
-			AvgRank:     avgRank,
-			TotalNew:    s.a.maxNew,
-		})
+	sort.Slice(ranked, func(i, j int) bool {
+		if ranked[i].heat == ranked[j].heat {
+			return ranked[i].topic.TopicId < ranked[j].topic.TopicId
+		}
+		return ranked[i].heat > ranked[j].heat
+	})
+	if len(ranked) > gridSize {
+		ranked = ranked[:gridSize]
 	}
-	return result
+	return ranked
 }
 
-// buildSnapshotFromTopicsLocked assembles a PulseSnapshot from a given hot-topic list and
+// buildSnapshotFromTopicsLocked assembles a PulseSnapshot from ranked topics and
 // slices timestamps to [from, to]. Must be called with cache.mu held for reading.
-func buildSnapshotFromTopicsLocked(hotTopics []model.HotTopic, from, to int64) PulseSnapshot {
+func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64) PulseSnapshot {
 	heats := make([]float64, len(hotTopics))
 	maxHeat := 0.0
 	for i, ht := range hotTopics {
-		h := 0.0
-		if ht.AvgRank > 0 {
-			h = float64(ht.Appearances) * float64(ht.TotalNew+1) / ht.AvgRank
-		}
-		heats[i] = h
-		if h > maxHeat {
-			maxHeat = h
+		heats[i] = ht.heat
+		if ht.heat > maxHeat {
+			maxHeat = ht.heat
 		}
 	}
 
@@ -207,7 +167,7 @@ func buildSnapshotFromTopicsLocked(hotTopics []model.HotTopic, from, to int64) P
 			normalizedHeat = math.Max(0.05, heats[rank]/maxHeat)
 		}
 
-		ts := cache.timestamps[ht.TopicId]
+		ts := cache.timestamps[ht.topic.TopicId]
 		lo := sort.Search(len(ts), func(i int) bool { return ts[i] >= from })
 		hi := sort.Search(len(ts), func(i int) bool { return ts[i] > to })
 		sliced := ts[lo:hi]
@@ -216,8 +176,8 @@ func buildSnapshotFromTopicsLocked(hotTopics []model.HotTopic, from, to int64) P
 
 		topics = append(topics, TopicPulse{
 			TopicMeta: TopicMeta{
-				ID:        ht.TopicId,
-				Title:     ht.Text,
+				ID:        ht.topic.TopicId,
+				Title:     ht.topic.Text,
 				Rank:      rank + 1,
 				HeatScore: normalizedHeat,
 			},
@@ -233,19 +193,16 @@ func buildSnapshotFromTopicsLocked(hotTopics []model.HotTopic, from, to int64) P
 	}
 }
 
-// buildSnapshot returns the live view: fixed cached ranking sliced to [from, to].
+// buildSnapshot ranks and slices the cache for the requested event window.
 func buildSnapshot(from, to int64) PulseSnapshot {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
-	return buildSnapshotFromTopicsLocked(cache.topics, from, to)
+	return buildSnapshotFromTopicsLocked(rankTopicsForWindowLocked(from, to), from, to)
 }
 
-// buildRangeSnapshot dynamically computes topic ranking for [from, to] from cached data.
+// buildRangeSnapshot ranks historical entries from the same cache.
 func buildRangeSnapshot(from, to int64) PulseSnapshot {
-	cache.mu.RLock()
-	defer cache.mu.RUnlock()
-	hotTopics := computeRankingForWindowLocked(from, to)
-	return buildSnapshotFromTopicsLocked(hotTopics, from, to)
+	return buildSnapshot(from, to)
 }
 
 // handlePulse returns the live view: last 60 min of the cached data.
@@ -259,7 +216,7 @@ func handlePulse(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handlePulseRange returns an arbitrary historical slice from the 48h cache.
+// handlePulseRange returns an arbitrary historical slice from the 24h cache.
 // Query params: since (unix), until (unix). Max range: 6 h.
 func handlePulseRange(w http.ResponseWriter, r *http.Request) {
 	sinceStr := r.URL.Query().Get("since")
@@ -275,7 +232,9 @@ func handlePulseRange(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().UTC().Unix()
 	minSince := now - int64(cacheHours)*3600
 
-	if since < minSince {
+	// Allow a small clock/request tolerance at the left edge of the rolling
+	// client timeline. The cache simply has no events before its true boundary.
+	if since < minSince-120 {
 		http.Error(w, fmt.Sprintf("since must be within last %dh", cacheHours), http.StatusBadRequest)
 		return
 	}
@@ -301,6 +260,47 @@ func handlePulseRange(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleTopicBrief returns a stored, pre-generated explanation for one topic.
+func handleTopicBrief(w http.ResponseWriter, r *http.Request) {
+	topicID, err := strconv.ParseUint(r.PathValue("topicID"), 10, 64)
+	if err != nil || topicID == 0 {
+		http.Error(w, "invalid topic id", http.StatusBadRequest)
+		return
+	}
+
+	brief, err := model.GetLatestTopicBrief(topicID)
+	if err != nil {
+		slog.Error("pulse: load topic brief failed", "topic_id", topicID, "error", err)
+		http.Error(w, "could not load topic brief", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "private, max-age=60")
+	if brief == nil {
+		_ = json.NewEncoder(w).Encode(TopicBriefResponse{Available: false})
+		return
+	}
+
+	var payload model.TopicBriefPayload
+	if err := json.Unmarshal(brief.Payload, &payload); err != nil {
+		slog.Error("pulse: decode topic brief failed", "topic_id", topicID, "error", err)
+		http.Error(w, "stored topic brief is invalid", http.StatusInternalServerError)
+		return
+	}
+	response := TopicBriefResponse{
+		Available:   true,
+		GeneratedAt: &brief.GeneratedAt,
+		WindowStart: &brief.WindowStart,
+		WindowEnd:   &brief.WindowEnd,
+		EntryCount:  brief.EntryCount,
+		Payload:     &payload,
+	}
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		slog.Error("pulse: encode topic brief failed", "topic_id", topicID, "error", err)
+	}
+}
+
 func main() {
 	if err := model.InitDb(); err != nil {
 		slog.Error("pulse: couldn't connect to database", "error", err)
@@ -320,6 +320,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	// More specific route must be registered first.
+	mux.HandleFunc("GET /api/topics/{topicID}/brief", handleTopicBrief)
 	mux.HandleFunc("GET /api/pulse/range", handlePulseRange)
 	mux.HandleFunc("GET /api/pulse", handlePulse)
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticFiles)))

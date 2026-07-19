@@ -18,6 +18,31 @@ type Digest struct {
 	Payload     datatypes.JSON
 }
 
+// TopicBrief is a pre-generated, topic-specific explanation for the radar UI.
+// It deliberately stores only generated JSON and source-window metadata; the
+// browser never needs the underlying entry text to display it.
+type TopicBrief struct {
+	ID          uint64 `gorm:"primarykey;autoIncrement"`
+	CreatedAt   time.Time
+	TopicID     uint64    `gorm:"index:idx_topic_briefs_topic_generated,priority:1"`
+	GeneratedAt time.Time `gorm:"index:idx_topic_briefs_topic_generated,priority:2,sort:desc"`
+	WindowStart time.Time
+	WindowEnd   time.Time
+	EntryCount  int
+	Payload     datatypes.JSON
+}
+
+// TopicBriefPayload contains a concise explanation and, only when supported
+// by the sampled entries, an optional debate breakdown.
+type TopicBriefPayload struct {
+	Summary string       `json:"summary"`
+	Debate  *TopicDebate `json:"debate,omitempty"`
+}
+
+type TopicDebate struct {
+	Sides []DebateSide `json:"sides"`
+}
+
 // DigestPayload is the structured output of the daily digest generation.
 type DigestPayload struct {
 	Headline   string               `json:"headline"`   // 10-word max mood/theme line
@@ -97,6 +122,52 @@ func GetLatestDigest() (*Digest, error) {
 		return nil, nil
 	}
 	return &d, nil
+}
+
+func AddTopicBrief(topicID uint64, windowStart, windowEnd time.Time, entryCount int, payload TopicBriefPayload) error {
+	b, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	brief := TopicBrief{
+		TopicID:     topicID,
+		GeneratedAt: time.Now().UTC(),
+		WindowStart: windowStart,
+		WindowEnd:   windowEnd,
+		EntryCount:  entryCount,
+		Payload:     datatypes.JSON(b),
+	}
+	if err := database.Create(&brief).Error; err != nil {
+		slog.Error("couldn't persist topic brief", "topic_id", topicID, "error", err)
+		return err
+	}
+	return nil
+}
+
+// GetLatestTopicBrief returns the most recently generated stored brief for a topic.
+func GetLatestTopicBrief(topicID uint64) (*TopicBrief, error) {
+	var brief TopicBrief
+	tx := database.Where("topic_id = ?", topicID).Order("generated_at desc").Limit(1).Find(&brief)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	if brief.ID == 0 {
+		return nil, nil
+	}
+	return &brief, nil
+}
+
+// LatestTopicBriefGeneratedAt returns the most recent topic-brief generation time.
+func LatestTopicBriefGeneratedAt() (*time.Time, error) {
+	var brief TopicBrief
+	tx := database.Order("generated_at desc").Limit(1).Find(&brief)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	if brief.ID == 0 {
+		return nil, nil
+	}
+	return &brief.GeneratedAt, nil
 }
 
 func updateEntryEmbedding(database *gorm.DB, id uint, embedding []float32, embeddedAt time.Time) error {

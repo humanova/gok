@@ -4,16 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>gok pulse</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
   <div id="app">
     <header id="topbar">
       <div id="title-area">
-        <span id="title">gok</span>
+        <span id="title">gok radar</span>
         <span id="live-dot" class="dot" title="canlı"></span>
+        <span id="delay-status">CANLI · 6 DK GECİKMELİ</span>
       </div>
       <div id="stats">
+        <span id="event-rate">—</span>
         <span id="topic-count">—</span>&nbsp;konu
         <span id="last-updated"></span>
       </div>
@@ -24,25 +26,50 @@
         <button class="speed-btn" data-speed="20">20×</button>
         <button class="speed-btn" data-speed="60">60×</button>
       </div>
+      <button id="event-toggle" type="button" aria-controls="debug-panel" aria-expanded="false">
+        olaylar <span id="event-toggle-count">0</span>
+      </button>
     </header>
 
     <main id="main">
       <div id="grid"></div>
+      <aside id="brief-panel" aria-live="polite">
+        <header id="brief-header">
+          <div>
+            <span id="brief-kicker">KONU ÖZETİ</span>
+            <h2 id="brief-topic">—</h2>
+          </div>
+          <div id="brief-actions">
+            <button id="brief-pin" type="button">sabitle</button>
+            <button id="brief-close" type="button" aria-label="Konu özetini kapat">×</button>
+          </div>
+        </header>
+        <div id="brief-content"></div>
+      </aside>
       <aside id="debug-panel">
-        <div id="debug-header">queue · 0 pending</div>
+        <div id="debug-header">
+          <span id="debug-title">olaylar · 0 sırada</span>
+          <button id="event-follow" type="button" title="Yeni olayları otomatik takip et">takipte</button>
+        </div>
         <ul id="debug-list"></ul>
       </aside>
     </main>
 
     <footer id="bottombar">
       <div id="scrubber-wrap">
-        <span class="scrubber-label" id="scrubber-left">−12h</span>
-        <input type="range" id="scrubber" min="0" max="1000" value="1000" step="1">
+        <span class="scrubber-label" id="scrubber-left">−24 sa</span>
+        <div id="scrubber-track">
+          <input type="range" id="scrubber" min="0" max="1000" value="1000" step="1">
+          <span id="live-marker" title="6 dakika gecikmeli canlı konum"></span>
+        </div>
         <span class="scrubber-label" id="scrubber-right">canlı</span>
+      </div>
+      <div class="timeline-ticks" aria-hidden="true">
+        <span>−24 sa</span><span>−18 sa</span><span>−12 sa</span><span>−6 sa</span><span>canlı</span>
       </div>
       <div id="playback-time">—</div>
     </footer>
   </div>
-  <script src="/static/app.js"></script>
+  <script src="static/app.js"></script>
 </body>
 </html>

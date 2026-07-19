@@ -5,17 +5,18 @@ const PLAYBACK_DELAY_S  = 360;        // 6-min real-time lag
 const LIVE_POLL_MS      = 30_000;     // poll server every 30 s in live mode
 const CATCHUP_SPREAD_MS = 10_000;     // spread catch-up pings over 10 s on load
 const SEEK_SPREAD_MS    = 3_000;      // spread catch-up pings over 3 s on seek
-const GRID_SIZE         = 25;         // max topics shown
 const RANGE_WINDOW_S    = 3_600;      // 1 h window fetched per seek
-const CACHE_WINDOW_S    = 12 * 3600;  // client playback window: 12 h
+const CACHE_WINDOW_S    = 24 * 3600;  // client playback window: 24 h
 const LIVE_THRESHOLD    = 0.998;      // scrubber frac ≥ this → live mode
+const MAX_VISIBLE_PINGS = 3;
+const METER_THRESHOLDS  = [1, 2, 4, 7, 11];
 
 // ── State ────────────────────────────────────────────────────────────────────
 const state = {
   mode: 'live',          // 'live' | 'scrub'
   topics: [],            // current topic list (ranked)
   pendingTimers: [],     // setTimeout IDs (for bulk cancel)
-  lastSeenTs: {},        // topicId → highest timestamp already scheduled
+  seenTimestampCounts: {}, // topicId → timestamp → event count already scheduled
   pollTimer: null,
   scrubInterval: null,
   lastSnapshotAt: 0,
@@ -24,27 +25,58 @@ const state = {
   replayWallMs: 0,       // Date.now() when replay started
   scrubWindowEnd: 0,     // end of last-fetched scrub window (unix s)
   fetchingNext: false,   // guard against concurrent window prefetches
+  activePings: {},       // topicId → currently visible pings
+  burstCounts: {},       // topicId → pings compressed into the visible burst marker
+  burstTimers: {},       // topicId → burst marker timeout
+  afterglowTimers: {},   // topicId → transient activity glow timeout
+  pinnedTopicId: null,   // topic kept in view while rankings refresh
+  selectedTopic: null,
+  briefCache: new Map(),
+  briefRequestID: 0,
+  previewPlaybackTs: null,
+  lastActivitySecond: -1,
+  transitioningLive: false,
 };
 
 let _rafId = null;
 
 // DOM refs (populated in init())
-let $grid, $scrubber, $topicCount, $lastUpdated, $playbackTime;
+let $grid, $scrubber, $topicCount, $eventRate, $lastUpdated, $playbackTime, $eventToggle;
 
 // ── Debug Panel ──────────────────────────────────────────────────────────────
 const debug = {
+  enabled:  true,
   _items:   new Map(),
   _nextId:  0,
   _pending: 0,
+  _autoFollow: true,
   _$list:   null,
   _$header: null,
 
   init() {
     this._$list   = $id('debug-list');
     this._$header = $id('debug-header');
+    this._$toggle = $id('event-toggle');
+    this._$count  = $id('event-toggle-count');
+    this._$follow = $id('event-follow');
+    this._$toggle.addEventListener('click', () => {
+      const isOpen = document.body.classList.toggle('events-open');
+      this._$toggle.setAttribute('aria-expanded', String(isOpen));
+      if (isOpen && this._autoFollow) this.scrollToLatest();
+    });
+    this._$follow.addEventListener('click', () => {
+      this._autoFollow = true;
+      this._updateHeader();
+      this.scrollToLatest();
+    });
+    this._$list.addEventListener('wheel', () => this.pauseFollowing(), { passive: true });
+    this._$list.addEventListener('touchstart', () => this.pauseFollowing(), { passive: true });
+    this._$list.addEventListener('pointerdown', () => this.pauseFollowing());
+    this._$list.addEventListener('keydown', () => this.pauseFollowing());
   },
 
-  add(debugId, topicTitle, entryTs, fireAt) {
+  add(debugId, topicTitle, entryTs, fireAt, minuteCount) {
+    if (!this.enabled) return;
     const li = document.createElement('li');
     li.id        = `dbg-${debugId}`;
     li.className = 'dbg-item pending';
@@ -65,6 +97,13 @@ const debug = {
     title.title       = topicTitle;
 
     li.append(icon, time, title);
+    if (minuteCount > 1) {
+      const burst = document.createElement('span');
+      burst.className = 'dbg-burst';
+      burst.textContent = `×${minuteCount}`;
+      burst.title = `Bu dakika ${minuteCount} girdi`;
+      li.appendChild(burst);
+    }
 
     let inserted = false;
     for (const child of this._$list.children) {
@@ -92,6 +131,7 @@ const debug = {
   },
 
   tick(debugId) {
+    if (!this.enabled) return;
     const li = this._items.get(debugId);
     if (!li) return;
     li.classList.remove('pending');
@@ -99,9 +139,11 @@ const debug = {
     li.querySelector('.dbg-icon').textContent = '✓';
     if (this._pending > 0) this._pending--;
     this._updateHeader();
+    if (this._autoFollow) this.scrollToItem(li);
   },
 
   clear() {
+    if (!this.enabled) return;
     this._$list.innerHTML = '';
     this._items.clear();
     this._pending = 0;
@@ -109,7 +151,27 @@ const debug = {
   },
 
   _updateHeader() {
-    this._$header.textContent = `queue · ${this._pending} pending`;
+    if (!this.enabled) return;
+    $id('debug-title').textContent = `olaylar · ${this._pending} sırada`;
+    this._$count.textContent = String(this._pending);
+    this._$follow.textContent = this._autoFollow ? 'takipte' : 'takibi aç';
+    this._$follow.classList.toggle('is-paused', !this._autoFollow);
+  },
+
+  pauseFollowing() {
+    if (!this._autoFollow) return;
+    this._autoFollow = false;
+    this._updateHeader();
+  },
+
+  scrollToLatest() {
+    const latest = this._$list.querySelector('.dbg-item.fired:last-of-type')
+      ?? this._$list.lastElementChild;
+    if (latest) this.scrollToItem(latest);
+  },
+
+  scrollToItem(item) {
+    item.scrollIntoView({ block: 'center', behavior: 'smooth' });
   },
 };
 
@@ -135,10 +197,39 @@ function fmtTs(ts) {
   });
 }
 
+// The source exposes minute-level timestamps only. Keep those raw timestamps
+// intact, but deterministically place same-minute events across that minute for
+// playback. This makes volume visible without inventing random source times.
+function virtualizeTimestampEvents(timestamps) {
+  const events = [];
+  for (let start = 0; start < timestamps.length;) {
+    const rawTs = timestamps[start];
+    let end = start + 1;
+    while (end < timestamps.length && timestamps[end] === rawTs) end++;
+
+    const minuteCount = end - start;
+    const minuteStart = Math.floor(rawTs / 60) * 60;
+    for (let index = 0; index < minuteCount; index++) {
+      events.push({
+        ts: rawTs,
+        playTs: minuteStart + 60 * (index + 0.5) / minuteCount,
+        minuteCount,
+      });
+    }
+    start = end;
+  }
+  return events;
+}
+
+function recentVisualEventCount(timestamps, playbackTs) {
+  return virtualizeTimestampEvents(timestamps)
+    .filter(event => event.playTs > playbackTs - 300 && event.playTs <= playbackTs).length;
+}
+
 // ── API calls ────────────────────────────────────────────────────────────────
 async function fetchLive() {
   try {
-    const r = await fetch('/api/pulse');
+    const r = await fetch('api/pulse');
     if (!r.ok) throw new Error(r.status);
     return await r.json();
   } catch (e) {
@@ -149,12 +240,23 @@ async function fetchLive() {
 
 async function fetchRange(since, until) {
   try {
-    const url = `/api/pulse/range?since=${Math.floor(since)}&until=${Math.floor(until)}`;
+    const url = `api/pulse/range?since=${Math.floor(since)}&until=${Math.floor(until)}`;
     const r = await fetch(url);
     if (!r.ok) throw new Error(r.status);
     return await r.json();
   } catch (e) {
     console.error('[pulse] fetchRange:', e);
+    return null;
+  }
+}
+
+async function fetchTopicBrief(topicID) {
+  try {
+    const response = await fetch(`api/topics/${topicID}/brief`);
+    if (!response.ok) throw new Error(response.status);
+    return await response.json();
+  } catch (error) {
+    console.error('[pulse] fetchTopicBrief:', error);
     return null;
   }
 }
@@ -165,26 +267,220 @@ function createTile(t) {
   tile.className = 'tile';
   tile.id = `tile-${t.id}`;
   tile.style.order = t.rank - 1;
+  tile.tabIndex = 0;
+  tile.setAttribute('role', 'button');
   applyHeat(tile, t);
+
+  const rank = document.createElement('span');
+  rank.className = 'tile-rank';
+  rank.textContent = String(t.rank).padStart(2, '0');
+  tile.appendChild(rank);
+
+  const meter = document.createElement('span');
+  meter.className = 'tile-meter';
+  for (let i = 0; i < 5; i++) meter.appendChild(document.createElement('i'));
+  tile.appendChild(meter);
+
+  const burst = document.createElement('span');
+  burst.className = 'burst-count';
+  tile.appendChild(burst);
 
   const label = document.createElement('div');
   label.className = 'tile-label';
   label.textContent = t.title;
   label.title = t.title;
   tile.appendChild(label);
+  updateTileDetails(tile, t);
+  tile.addEventListener('click', () => openTopicBrief(t));
+  tile.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openTopicBrief(t);
+    }
+  });
   return tile;
 }
 
 function buildGrid(topics) {
   $grid.innerHTML = '';
-  state.topics = topics;
-  $topicCount.textContent = topics.length;
-  topics.forEach(t => $grid.appendChild(createTile(t)));
+  state.topics = retainPinnedTopic(topics);
+  $topicCount.textContent = state.topics.length;
+  state.topics.forEach(t => $grid.appendChild(createTile(t)));
+  refreshPinnedTiles();
+  setEventRate(state.topics);
 }
 
 function applyHeat(tile, t) {
-  tile.style.setProperty('--heat', t.heat_score.toFixed(3));
-  tile.style.setProperty('--rank-idx', (t.rank - 1).toString());
+  const heat = Math.max(0.05, Math.min(1, t.heat_score));
+  tile.style.setProperty('--heat', heat.toFixed(3));
+  tile.style.setProperty('--tile-hue', String(Math.round(214 - heat * 185)));
+  tile.style.setProperty('--tile-saturation', `${Math.round(22 + heat * 52)}%`);
+  tile.style.setProperty('--tile-lightness', `${(94 - heat * 35).toFixed(1)}%`);
+  tile.classList.toggle('tile-top', t.rank <= 3);
+  tile.classList.toggle('is-pinned', t.id === state.pinnedTopicId);
+  tile.setAttribute('aria-pressed', String(t.id === state.pinnedTopicId));
+}
+
+function updateTileDetails(tile, t, playbackTs = currentPlaybackTs()) {
+  const rank = tile.querySelector('.tile-rank');
+  if (rank) rank.textContent = String(t.rank).padStart(2, '0');
+
+  const timestamps = t.timestamps ?? [];
+  const recentCount = recentVisualEventCount(timestamps, playbackTs);
+  tile.querySelectorAll('.tile-meter i').forEach((bar, index) => {
+    bar.classList.toggle('active', recentCount >= METER_THRESHOLDS[index]);
+  });
+  tile.classList.toggle('meter-overflow', recentCount > METER_THRESHOLDS.at(-1));
+}
+
+function refreshActivityIndicators(playbackTs, force = false) {
+  const second = Math.floor(playbackTs);
+  if (!force && second === state.lastActivitySecond) return;
+  state.lastActivitySecond = second;
+  state.topics.forEach(topic => {
+    const tile = $id(`tile-${topic.id}`);
+    if (tile) updateTileDetails(tile, topic, playbackTs);
+  });
+  setEventRate(state.topics, playbackTs);
+}
+
+function setEventRate(topics, playbackTs = currentPlaybackTs()) {
+  const count = topics.reduce((total, topic) => total
+    + recentVisualEventCount(topic.timestamps ?? [], playbackTs), 0);
+  $eventRate.textContent = `son 5 dk · ${count} girdi`;
+}
+
+function togglePinnedTopic(topicId) {
+  state.pinnedTopicId = state.pinnedTopicId === topicId ? null : topicId;
+  refreshPinnedTiles();
+  syncBriefPinButton();
+}
+
+function refreshPinnedTiles() {
+  document.querySelectorAll('.tile').forEach(tile => {
+    const isPinned = tile.id === `tile-${state.pinnedTopicId}`;
+    tile.classList.toggle('is-pinned', isPinned);
+    tile.setAttribute('aria-pressed', String(isPinned));
+  });
+}
+
+// If a pinned topic falls out of the top 25, retain its latest cached tile in
+// the final slot until the user unpins it. This keeps inspection possible with
+// the timestamp-only API contract.
+function retainPinnedTopic(topics) {
+  if (state.pinnedTopicId === null || topics.some(t => t.id === state.pinnedTopicId)) {
+    return topics;
+  }
+  const previous = state.topics.find(t => t.id === state.pinnedTopicId);
+  if (!previous) {
+    state.pinnedTopicId = null;
+    return topics;
+  }
+  const retained = [...topics.slice(0, Math.max(0, topics.length - 1)), previous];
+  return retained.map((topic, index) => ({ ...topic, rank: index + 1 }));
+}
+
+function openTopicBrief(topic) {
+  state.selectedTopic = topic;
+  const requestID = ++state.briefRequestID;
+  $id('brief-topic').textContent = topic.title;
+  document.body.classList.add('brief-open');
+  syncBriefPinButton();
+
+  const cached = state.briefCache.get(topic.id);
+  if (cached) {
+    renderTopicBrief(cached);
+    return;
+  }
+
+  renderBriefLoading();
+  fetchTopicBrief(topic.id).then(brief => {
+    if (requestID !== state.briefRequestID || state.selectedTopic?.id !== topic.id) return;
+    const resolved = brief ?? { available: false };
+    state.briefCache.set(topic.id, resolved);
+    renderTopicBrief(resolved);
+  });
+}
+
+function closeTopicBrief() {
+  document.body.classList.remove('brief-open');
+}
+
+function syncBriefPinButton() {
+  const button = $id('brief-pin');
+  const isPinned = state.selectedTopic?.id === state.pinnedTopicId;
+  button.textContent = isPinned ? 'sabiti kaldır' : 'sabitle';
+  button.classList.toggle('active', isPinned);
+}
+
+function renderBriefLoading() {
+  const content = $id('brief-content');
+  content.innerHTML = '';
+  const loading = document.createElement('p');
+  loading.className = 'brief-loading';
+  loading.textContent = 'Özet yükleniyor…';
+  content.appendChild(loading);
+}
+
+function renderTopicBrief(brief) {
+  const content = $id('brief-content');
+  content.innerHTML = '';
+  if (!brief?.available || !brief.payload?.summary) {
+    const unavailable = document.createElement('p');
+    unavailable.className = 'brief-unavailable';
+    unavailable.textContent = 'bu konunun ozeti henuz hazir degil';
+    content.appendChild(unavailable);
+    return;
+  }
+
+  if (brief.generated_at) {
+    const meta = document.createElement('p');
+    meta.className = 'brief-meta';
+    meta.textContent = `Özet · ${new Date(brief.generated_at).toLocaleString('tr-TR', {
+      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+    })} · ${brief.entry_count} girdi`;
+    content.appendChild(meta);
+  }
+
+  const summaryHeading = document.createElement('h3');
+  summaryHeading.textContent = 'Ne konuşuluyor?';
+  const summary = document.createElement('p');
+  summary.className = 'brief-summary';
+  summary.textContent = brief.payload.summary;
+  content.append(summaryHeading, summary);
+
+  const sides = brief.payload.debate?.sides ?? [];
+  if (sides.length === 0) return;
+
+  const debateHeading = document.createElement('h3');
+  debateHeading.textContent = 'Tartışma';
+  const debate = document.createElement('div');
+  debate.className = 'brief-debate';
+  sides.forEach(side => {
+    const card = document.createElement('article');
+    card.className = 'brief-side';
+    const stance = document.createElement('h4');
+    stance.textContent = side.stance;
+    const argument = document.createElement('p');
+    argument.textContent = side.argument;
+    const support = document.createElement('span');
+    support.className = `brief-support ${side.support ?? 'balanced'}`;
+    support.textContent = supportLabel(side.support);
+    card.append(stance, support, argument);
+    (side.quotes ?? []).slice(0, 2).forEach(quote => {
+      const blockquote = document.createElement('blockquote');
+      blockquote.textContent = `“${quote}”`;
+      card.appendChild(blockquote);
+    });
+    debate.appendChild(card);
+  });
+  content.append(debateHeading, debate);
+}
+
+function supportLabel(support) {
+  if (support === 'majority') return 'baskın görüş';
+  if (support === 'minority') return 'azınlık görüşü';
+  return 'denge';
 }
 
 /**
@@ -193,6 +489,7 @@ function applyHeat(tile, t) {
  * leaving tiles fade out and are removed after the transition.
  */
 function reorderGrid(newTopics) {
+  newTopics = retainPinnedTopic(newTopics);
   const newIds = new Set(newTopics.map(t => t.id));
   const oldIds = new Set(state.topics.map(t => t.id));
 
@@ -206,30 +503,44 @@ function reorderGrid(newTopics) {
   });
 
   // Step 2 — fade out departing tiles.
+  const gridRect = $grid.getBoundingClientRect();
   oldIds.forEach(id => {
     if (newIds.has(id)) return;
     const el = $id(`tile-${id}`);
     if (!el) return;
-    el.style.transition = 'opacity 0.35s ease';
-    el.style.opacity = '0';
-    setTimeout(() => el.remove(), 400);
+    const rect = el.getBoundingClientRect();
+    el.style.left = `${rect.left - gridRect.left}px`;
+    el.style.top = `${rect.top - gridRect.top}px`;
+    el.style.width = `${rect.width}px`;
+    el.style.height = `${rect.height}px`;
+    el.classList.add('tile-leaving');
+    el.addEventListener('animationend', () => el.remove(), { once: true });
   });
 
-  // Step 3 — add arriving tiles (hidden initially).
+  // Step 3 — add arriving tiles.
   newTopics.forEach(t => {
     if (oldIds.has(t.id)) return;
     const tile = createTile(t);
-    tile.style.opacity = '0';
+    tile.classList.add('tile-entering');
     $grid.appendChild(tile);
   });
 
-  // Step 4 — update CSS order and heat for surviving tiles (suppress transitions).
+  // Step 4 — update CSS order and animate heat for surviving tiles.
   newTopics.forEach(t => {
     const el = $id(`tile-${t.id}`);
     if (!el || !oldIds.has(t.id)) return;
+    const previousColor = getComputedStyle(el).backgroundColor;
     el.style.transition = 'none';
     el.style.order = t.rank - 1;
     applyHeat(el, t);
+    updateTileDetails(el, t);
+    const nextColor = getComputedStyle(el).backgroundColor;
+    if (previousColor !== nextColor) {
+      el.animate(
+        [{ backgroundColor: previousColor }, { backgroundColor: nextColor }],
+        { duration: 700, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' },
+      );
+    }
   });
 
   // Step 5 (FLIP: Last + Invert + Play) — force layout, compute deltas, animate.
@@ -259,34 +570,38 @@ function reorderGrid(newTopics) {
     }
   });
 
-  // Step 6 — fade in arriving tiles.
-  newTopics.forEach(t => {
-    if (oldIds.has(t.id)) return;
-    const el = $id(`tile-${t.id}`);
-    if (!el) return;
-    void el.offsetHeight;
-    el.style.transition = 'opacity 0.4s ease';
-    el.style.opacity    = '1';
-    el.addEventListener('transitionend', () => { el.style.transition = ''; }, { once: true });
-  });
-
   state.topics = newTopics;
   $topicCount.textContent = newTopics.length;
+  refreshPinnedTiles();
+  refreshActivityIndicators(currentPlaybackTs(), true);
 }
 
 // ── Ping ─────────────────────────────────────────────────────────────────────
-function firePing(topicId, rank) {
+function firePing(topicId, heat, minuteCount) {
   const tile = $id(`tile-${topicId}`);
   if (!tile) return;
+  const intensity = Math.min(1, Math.log1p(minuteCount) / Math.log(11));
+  const active = state.activePings[topicId] ?? 0;
+  if (active >= MAX_VISIBLE_PINGS) {
+    showBurst(tile, topicId, minuteCount);
+    return;
+  }
+  state.activePings[topicId] = active + 1;
+  showAfterglow(tile, topicId, intensity);
 
   const ping = document.createElement('div');
   ping.className = 'ping';
 
-  // Colour: warm orange (rank 1) → cool blue (rank 25).
-  const t = Math.max(0, Math.min(1, (rank - 1) / (GRID_SIZE - 1)));
-  const hue = Math.round(28 + t * 172);
-  const sat = Math.round(100 - t * 22);
-  ping.style.setProperty('--ping-color', `hsl(${hue},${sat}%,65%)`);
+  // Heat, not grid position, determines the event colour.
+  const normalizedHeat = Math.max(0, Math.min(1, heat ?? 0));
+  const hue = Math.round(214 - normalizedHeat * 185);
+  ping.style.setProperty('--ping-color', `hsl(${hue}, 92%, 67%)`);
+  ping.style.setProperty('--ping-ink', `hsl(${hue}, 76%, 35%)`);
+  ping.style.setProperty('--ping-energy', intensity.toFixed(2));
+  ping.style.setProperty('--ping-size', `${Math.round(14 + intensity * 12)}px`);
+  ping.style.setProperty('--ping-spread', `${Math.round(4 + intensity * 10)}px`);
+  ping.style.setProperty('--ping-glow', `${Math.round(13 + intensity * 18)}px`);
+  ping.style.setProperty('--ping-final-scale', (3.1 + intensity * 2.2).toFixed(2));
 
   const ox = ((Math.random() - 0.5) * 34).toFixed(1);
   const oy = ((Math.random() - 0.5) * 34).toFixed(1);
@@ -294,12 +609,39 @@ function firePing(topicId, rank) {
   ping.style.setProperty('--oy', `${oy}%`);
 
   tile.appendChild(ping);
-  ping.addEventListener('animationend', () => ping.remove(), { once: true });
+  ping.addEventListener('animationend', () => {
+    state.activePings[topicId] = Math.max(0, (state.activePings[topicId] ?? 1) - 1);
+    ping.remove();
+  }, { once: true });
+}
+
+function showAfterglow(tile, topicId, intensity) {
+  tile.style.setProperty('--activity-alpha', (0.18 + intensity * 0.42).toFixed(2));
+  tile.classList.add('tile-active');
+  clearTimeout(state.afterglowTimers[topicId]);
+  state.afterglowTimers[topicId] = setTimeout(() => {
+    tile.classList.remove('tile-active');
+    delete state.afterglowTimers[topicId];
+  }, 700);
+}
+
+function showBurst(tile, topicId, minuteCount) {
+  state.burstCounts[topicId] = (state.burstCounts[topicId] ?? 0) + 1;
+  tile.classList.add('tile-burst');
+  const label = tile.querySelector('.burst-count');
+  if (label) label.textContent = `${minuteCount}/dk`;
+  clearTimeout(state.burstTimers[topicId]);
+  state.burstTimers[topicId] = setTimeout(() => {
+    tile.classList.remove('tile-burst');
+    if (label) label.textContent = '';
+    delete state.burstCounts[topicId];
+    delete state.burstTimers[topicId];
+  }, 900);
 }
 
 // ── Scheduler ────────────────────────────────────────────────────────────────
 /**
- * Schedule pings for all topics, globally sorted by entry timestamp.
+ * Schedule pings for all topics, globally sorted by virtual playback time.
  *
  * Past pings use proportional spread: oldest entry fires first at delay≈0,
  * newest entry fires last at delay≈catchupSpreadMs — preserving chronological order.
@@ -312,62 +654,72 @@ function schedulePings(topics, originTs, catchupSpreadMs, maxCatchup) {
 
   const pastPings   = [];
   const futurePings = [];
-  const newMaxTs    = {};
-
   topics.forEach(t => {
-    const ts   = t.timestamps ?? [];
-    const seen = state.lastSeenTs[t.id] ?? 0;
+    const events = virtualizeTimestampEvents(t.timestamps ?? []);
+    const seen = state.seenTimestampCounts[t.id] ?? {};
+    const observed = {};
 
-    for (const v of ts) {
-      if (v <= seen) continue;
-      const entry = { topicId: t.id, rank: t.rank, title: t.title, ts: v };
-      if (v <= originTs) pastPings.push(entry);
-      else               futurePings.push(entry);
-      if ((newMaxTs[t.id] ?? 0) < v) newMaxTs[t.id] = v;
+    for (const event of events) {
+      const key = String(event.ts);
+      observed[key] = (observed[key] ?? 0) + 1;
+      if (observed[key] <= (seen[key] ?? 0)) continue;
+      const entry = { topicId: t.id, heat: t.heat_score, title: t.title, ...event };
+      if (entry.playTs <= originTs) pastPings.push(entry);
+      else                          futurePings.push(entry);
     }
+    for (const [timestamp, count] of Object.entries(observed)) {
+      seen[timestamp] = Math.max(seen[timestamp] ?? 0, count);
+    }
+    state.seenTimestampCounts[t.id] = seen;
   });
 
-  // Sort both globally by timestamp (ascending = oldest fires first).
-  pastPings.sort((a, b) => a.ts - b.ts);
-  futurePings.sort((a, b) => a.ts - b.ts);
+  // Sort both globally by virtual time (ascending = oldest fires first).
+  pastPings.sort((a, b) => a.playTs - b.playTs);
+  futurePings.sort((a, b) => a.playTs - b.playTs);
 
   // Catch-up: proportional spread so chronological order is preserved.
   const capped = isFinite(maxCatchup) ? pastPings.slice(-maxCatchup) : pastPings;
   if (capped.length > 0) {
-    const minTs = capped[0].ts;
+    const minTs = capped[0].playTs;
     const span  = Math.max(1, originTs - minTs);
     capped.forEach(p => {
-      const frac    = (p.ts - minTs) / span;
+      const frac    = (p.playTs - minTs) / span;
       const delay   = catchupSpreadMs > 0 ? frac * catchupSpreadMs : 0;
       const fireAt  = Date.now() + delay;
       const debugId = debug._nextId++;
-      debug.add(debugId, p.title, p.ts, fireAt);
-      const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.rank); }, delay);
+      debug.add(debugId, p.title, p.ts, fireAt, p.minuteCount);
+      const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.heat, p.minuteCount); }, delay);
       state.pendingTimers.push(timerId);
     });
   }
 
   // Future pings — apply speed divisor.
   futurePings.forEach(p => {
-    const delay = (p.ts - originTs) * 1000 / spd;
+    const delay = (p.playTs - originTs) * 1000 / spd;
     if (delay > 0 && delay < 86_400_000) {
       const fireAt  = Date.now() + delay;
       const debugId = debug._nextId++;
-      debug.add(debugId, p.title, p.ts, fireAt);
-      const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.rank); }, delay);
+      debug.add(debugId, p.title, p.ts, fireAt, p.minuteCount);
+      const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.heat, p.minuteCount); }, delay);
       state.pendingTimers.push(timerId);
     }
   });
-
-  // Advance per-topic high-water marks to prevent re-firing on re-runs.
-  for (const tid in newMaxTs) {
-    state.lastSeenTs[tid] = newMaxTs[tid];
-  }
 }
 
 function cancelAllTimers() {
   state.pendingTimers.forEach(id => clearTimeout(id));
   state.pendingTimers = [];
+  Object.values(state.burstTimers).forEach(id => clearTimeout(id));
+  Object.values(state.afterglowTimers).forEach(id => clearTimeout(id));
+  state.activePings = {};
+  state.burstCounts = {};
+  state.burstTimers = {};
+  state.afterglowTimers = {};
+  document.querySelectorAll('.tile-burst').forEach(tile => {
+    tile.classList.remove('tile-burst');
+    const label = tile.querySelector('.burst-count');
+    if (label) label.textContent = '';
+  });
   debug.clear();
 }
 
@@ -381,17 +733,28 @@ function startReplayAnimation() {
     const frac   = Math.max(0, Math.min(1, (playTs - minTs) / (maxTs - minTs)));
     $scrubber.value = (frac * 1000).toFixed(0);
     setPlaybackTime(playTs);
+    refreshActivityIndicators(playTs);
+    if (playTs >= maxTs && !state.transitioningLive) {
+      state.transitioningLive = true;
+      goLive().finally(() => { state.transitioningLive = false; });
+      return;
+    }
     // Prefetch the next window when within 30 s of the current window end,
     // so scrub playback continues seamlessly at any speed.
     if (!state.fetchingNext && state.scrubWindowEnd > 0 && playTs > state.scrubWindowEnd - 30) {
       state.fetchingNext = true;
       const nextFrom = state.scrubWindowEnd;
-      fetchRange(nextFrom, nextFrom + RANGE_WINDOW_S).then(snap => {
+      const nextUntil = Math.min(nextFrom + RANGE_WINDOW_S, maxTs);
+      if (nextUntil <= nextFrom) {
+        state.fetchingNext = false;
+        return;
+      }
+      fetchRange(nextFrom, nextUntil).then(snap => {
         state.fetchingNext = false;
         if (!snap || state.mode !== 'scrub') return;
         reorderGrid(snap.topics);
         schedulePings(snap.topics, nextFrom, 0, Infinity);
-        state.scrubWindowEnd = nextFrom + RANGE_WINDOW_S;
+        state.scrubWindowEnd = snap.window_to;
       });
     }
     _rafId = requestAnimationFrame(tick);
@@ -439,7 +802,9 @@ function exitLiveMode() {
 async function seekTo(targetTs) {
   cancelAllTimers();
   cancelReplayAnimation();
-  state.lastSeenTs  = {};
+  state.seenTimestampCounts = {};
+  state.previewPlaybackTs = null;
+  state.lastActivitySecond = -1;
   state.fetchingNext = false;
   state.mode = 'scrub';
 
@@ -449,9 +814,10 @@ async function seekTo(targetTs) {
   const snap = await fetchRange(targetTs, targetTs + RANGE_WINDOW_S);
   if (!snap) return;
 
-  state.scrubWindowEnd = targetTs + RANGE_WINDOW_S;
+  state.scrubWindowEnd = snap.window_to;
   reorderGrid(snap.topics);
   schedulePings(snap.topics, targetTs, SEEK_SPREAD_MS, Infinity);
+  refreshActivityIndicators(targetTs, true);
   setPlaybackTime(targetTs);
   startReplayAnimation();
 }
@@ -464,7 +830,9 @@ async function goLive() {
   exitLiveMode();
   cancelAllTimers();
   cancelReplayAnimation();
-  state.lastSeenTs = {};
+  state.seenTimestampCounts = {};
+  state.previewPlaybackTs = null;
+  state.lastActivitySecond = -1;
   const snap = await fetchLive();
   if (!snap) {
     // Restore live appearance so the indicator stays green and the user
@@ -506,12 +874,15 @@ function initScrubber() {
   $scrubber.addEventListener('input', () => {
     if (state.mode === 'live') exitLiveMode();
     cancelReplayAnimation();
-    setPlaybackTime(scrubToTs($scrubber.value));
+    state.previewPlaybackTs = scrubToTs($scrubber.value);
+    setPlaybackTime(state.previewPlaybackTs);
+    refreshActivityIndicators(state.previewPlaybackTs, true);
   });
 
   // On release: fetch data for the chosen position.
   $scrubber.addEventListener('change', async () => {
     const frac = $scrubber.value / 1000;
+    state.previewPlaybackTs = null;
     if (frac >= LIVE_THRESHOLD) {
       await goLive();
     } else {
@@ -523,7 +894,9 @@ function initScrubber() {
 /** Pin the scrubber thumb to the live (rightmost) position. */
 function syncScrubberToLive() {
   $scrubber.value = 1000;
-  setPlaybackTime(currentPlaybackTs());
+  const playbackTs = currentPlaybackTs();
+  setPlaybackTime(playbackTs);
+  refreshActivityIndicators(playbackTs);
 }
 
 // ── Status bar helpers ────────────────────────────────────────────────────────
@@ -541,9 +914,16 @@ async function init() {
   $grid         = $id('grid');
   $scrubber     = $id('scrubber');
   $topicCount   = $id('topic-count');
+  $eventRate    = $id('event-rate');
+  $eventToggle  = $id('event-toggle');
   $lastUpdated  = $id('last-updated');
   $playbackTime = $id('playback-time');
   debug.init();
+
+  $id('brief-close').addEventListener('click', closeTopicBrief);
+  $id('brief-pin').addEventListener('click', () => {
+    if (state.selectedTopic) togglePinnedTopic(state.selectedTopic.id);
+  });
 
   initScrubber();
 

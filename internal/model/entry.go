@@ -113,3 +113,9 @@ func UpdateScore(entry Entry, score int64) error {
 func GetTopicEntryTimestamps(topicIDs []uint64, since int64) (map[uint64][]int64, error) {
 	return getTopicEntryTimestamps(database, topicIDs, since)
 }
+
+// GetTopicsWithEntryTimestampsSince returns the minimal data the pulse view
+// needs: active topic metadata and each topic's entry timestamps.
+func GetTopicsWithEntryTimestampsSince(since int64) (map[uint64][]int64, []Topic, error) {
+	return getTopicsWithEntryTimestampsSince(database, since)
+}

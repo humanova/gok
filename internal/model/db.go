@@ -57,10 +57,10 @@ func prepareDb() (*gorm.DB, error) {
 		slog.Warn("could not create unaccent extension", "error", err)
 	}
 
-	// AutoMigrate the Digest table (new). Existing tables managed by the scraper binary
+	// AutoMigrate digest tables. Existing scrape tables managed by the scraper binary
 	// are left untouched to avoid constraint-name conflicts across GORM versions.
-	if err = database.AutoMigrate(&Digest{}); err != nil {
-		slog.Error("couldn't migrate digest table", "error", err)
+	if err = database.AutoMigrate(&Digest{}, &TopicBrief{}); err != nil {
+		slog.Error("couldn't migrate digest tables", "error", err)
 		return nil, err
 	}
 
@@ -328,6 +328,45 @@ func getTopicEntryTimestamps(db *gorm.DB, topicIDs []uint64, since int64) (map[u
 		result[r.TopicId] = append(result[r.TopicId], r.Timestamp)
 	}
 	return result, nil
+}
+
+// getTopicsWithEntryTimestampsSince returns every topic that has a non-deleted
+// entry since the given unix timestamp, along with its timestamps in ascending
+// order. It selects only pulse data; entry text and author data never leave the
+// database for this query.
+func getTopicsWithEntryTimestampsSince(db *gorm.DB, since int64) (map[uint64][]int64, []Topic, error) {
+	type row struct {
+		TopicId   uint64
+		Timestamp int64
+		Text      string
+		Url       string
+	}
+
+	var rows []row
+	tx := db.Model(&Entry{}).
+		Select("entries.topic_id, entries.timestamp, topics.text, topics.url").
+		Joins("JOIN topics ON topics.topic_id = entries.topic_id").
+		Where("entries.timestamp > ? AND entries.deleted_at IS NULL AND topics.deleted_at IS NULL", since).
+		Order("entries.timestamp ASC").
+		Scan(&rows)
+	if tx.Error != nil {
+		return nil, nil, tx.Error
+	}
+
+	timestamps := make(map[uint64][]int64)
+	topicByID := make(map[uint64]Topic)
+	for _, r := range rows {
+		timestamps[r.TopicId] = append(timestamps[r.TopicId], r.Timestamp)
+		if _, ok := topicByID[r.TopicId]; !ok {
+			topicByID[r.TopicId] = Topic{TopicId: r.TopicId, Text: r.Text, Url: r.Url}
+		}
+	}
+
+	topics := make([]Topic, 0, len(topicByID))
+	for _, topic := range topicByID {
+		topics = append(topics, topic)
+	}
+	return timestamps, topics, nil
 }
 
 // getPopularTopicsSince returns all popular_topics rows with timestamp > since, ascending.

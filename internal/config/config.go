@@ -28,11 +28,12 @@ type Configuration struct {
 	EntryCollectorDelay       int64
 	EntryCollectorRandomDelay int64
 	// EkşiPulse additions
-	EmbedderUrl           string // e.g. "http://localhost:8765"
-	GeminiApiKey          string
-	GeminiModel           string // e.g. "gemini-3.5-flash"
-	DigestIntervalMinutes int    // how often to regenerate precomputed digest (minutes)
-	ApiPort               int    // port for gok-api HTTP server
+	EmbedderUrl               string // e.g. "http://localhost:8765"
+	GeminiApiKey              string
+	GeminiModel               string // e.g. "gemini-3.5-flash"
+	DigestIntervalMinutes     int    // how often to regenerate precomputed digest (minutes)
+	TopicBriefIntervalMinutes int    // how often to regenerate topic radar briefs (minutes)
+	ApiPort                   int    // port for gok-api HTTP server
 }
 
 func GetConfig(configPath string, config *Configuration) error {

@@ -34,6 +34,36 @@ func (c *Client) SynthesizeDigest(ctx context.Context, bundles []model.TopicBund
 	return c.callStructured(ctx, prompt)
 }
 
+// SynthesizeTopicBrief produces one concise stored explanation for a radar topic.
+func (c *Client) SynthesizeTopicBrief(ctx context.Context, bundle model.TopicBundle) (*model.TopicBriefPayload, error) {
+	prompt := buildTopicBriefPrompt(bundle)
+	fullPrompt := topicBriefSystemPrompt() + "\n\n" + prompt
+
+	contents := []*genai.Content{genai.NewContentFromText(fullPrompt, genai.RoleUser)}
+	resp, err := c.client.Models.GenerateContent(ctx, c.modelName, contents,
+		&genai.GenerateContentConfig{ResponseMIMEType: "application/json"})
+	if err != nil {
+		return nil, fmt.Errorf("topic brief gemini call failed: %w", err)
+	}
+
+	if len(resp.Candidates) == 0 || resp.Candidates[0].Content == nil {
+		return nil, fmt.Errorf("empty topic brief response")
+	}
+	var raw strings.Builder
+	for _, part := range resp.Candidates[0].Content.Parts {
+		raw.WriteString(part.Text)
+	}
+
+	var payload model.TopicBriefPayload
+	if err := json.Unmarshal([]byte(raw.String()), &payload); err != nil {
+		return nil, fmt.Errorf("parsing topic brief: %w", err)
+	}
+	if err := validateTopicBriefPayload(payload); err != nil {
+		return nil, fmt.Errorf("invalid topic brief response: %w", err)
+	}
+	return &payload, nil
+}
+
 // SynthesizeQuery answers a free-form user question given retrieved context.
 func (c *Client) SynthesizeQuery(ctx context.Context, query string, entries []model.Entry, viewpoints []model.Viewpoint) (*model.DigestPayload, error) {
 	prompt := buildQueryPrompt(query, entries, viewpoints)
@@ -243,6 +273,106 @@ func buildDigestPrompt(bundles []model.TopicBundle) string {
 	sb.WriteString("2. Expansion: context (50 kelime), sides/timeline/reactions type'a göre\n")
 	sb.WriteString("3. Debate detection: Eğer girdilerde karşıt görüşler varsa → debate, değilse → event/trend\n")
 	sb.WriteString("4. Quick hits: Önemli ama ana hikaye olmayan 3-5 konu için kısa etiketler\n")
+	return sb.String()
+}
+
+func topicBriefSystemPrompt() string {
+	return `Sen Ekşi Sözlük girdilerinden radar için kısa konu özeti çıkaran bir asistansın.
+
+YALNIZCA verilen girdilere dayan. Dış dünyadan bilgi ekleme, zaman çizelgesi uydurma, olayın bütün resmini biliyormuş gibi yazma.
+
+RAPORLAMA DİLİ:
+- Göster, anlatma. Veri ver, yorum yapma. Somut ol: “tepkiler yükseldi” yerine hangi iddia veya itirazın konuşulduğunu yaz.
+- “önemli”, “dikkat çekici”, “ilginç”, “nüanslı” kelimelerini kullanma; bunlar bilgi taşımaz.
+- Kesinlik iddiası, genelleme veya dış bilgi ekleme. Girdilerin desteklemediği neden-sonuç ilişkisi kurma.
+- Özet haber diliyle, sade ve doğrudan yaz; yazarları veya grupları küçümseme, taraf tutma.
+
+ÇIKTI:
+- Her zaman Türkçe JSON üret.
+- summary: Konuda ne konuşulduğunu 50 kelimeyi aşmadan, somut ve tarafsız anlat.
+- debate: Yalnızca girdilerde belirgin ve karşıt iki veya daha fazla görüş varsa üret. Yoksa null yap.
+- debate.sides: Yalnızca 2 veya 3 taraf. stance en fazla 8 kelimeyle açıklayıcı, argument en fazla 20 kelime, support majority|minority|balanced, quotes en fazla 2 adet ve her biri en fazla 15 kelime.
+- Tartışma yoksa “trend”, “event”, “timeline”, “reactions” gibi alanlar üretme.
+- Alıntılar girdilerden türetilmeli, yeni iddia eklememeli.
+
+JSON şeması:
+{
+  "summary": "Kısa konu özeti",
+  "debate": null veya {
+    "sides": [
+      {
+        "stance": "Açıklayıcı taraf etiketi",
+        "argument": "Kısa argüman",
+        "support": "majority|minority|balanced",
+        "quotes": ["kısa alıntı"]
+      }
+    ]
+  }
+}`
+}
+
+const (
+	briefSummaryMaxWords  = 50
+	briefStanceMaxWords   = 8
+	briefArgumentMaxWords = 20
+	briefQuoteMaxWords    = 15
+	briefMaxSides         = 3
+	briefMaxQuotes        = 2
+)
+
+func validateTopicBriefPayload(payload model.TopicBriefPayload) error {
+	if err := requireWords("summary", payload.Summary, 1, briefSummaryMaxWords); err != nil {
+		return err
+	}
+	if payload.Debate == nil {
+		return nil
+	}
+	if len(payload.Debate.Sides) < 2 || len(payload.Debate.Sides) > briefMaxSides {
+		return fmt.Errorf("debate must contain 2-%d sides", briefMaxSides)
+	}
+
+	for i, side := range payload.Debate.Sides {
+		if err := requireWords(fmt.Sprintf("debate side %d stance", i+1), side.Stance, 1, briefStanceMaxWords); err != nil {
+			return err
+		}
+		if err := requireWords(fmt.Sprintf("debate side %d argument", i+1), side.Argument, 1, briefArgumentMaxWords); err != nil {
+			return err
+		}
+		if len(side.Quotes) > briefMaxQuotes {
+			return fmt.Errorf("debate side %d has more than %d quotes", i+1, briefMaxQuotes)
+		}
+		if side.Support != "majority" && side.Support != "minority" && side.Support != "balanced" {
+			return fmt.Errorf("debate side %d has invalid support %q", i+1, side.Support)
+		}
+		for quoteIndex, quote := range side.Quotes {
+			if err := requireWords(fmt.Sprintf("debate side %d quote %d", i+1, quoteIndex+1), quote, 1, briefQuoteMaxWords); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func requireWords(field, value string, minWords, maxWords int) error {
+	count := len(strings.Fields(value))
+	if count < minWords || count > maxWords {
+		return fmt.Errorf("%s must contain %d-%d words, got %d", field, minWords, maxWords, count)
+	}
+	return nil
+}
+
+func buildTopicBriefPrompt(bundle model.TopicBundle) string {
+	var sb strings.Builder
+	sb.WriteString("## Konu\n")
+	sb.WriteString(bundle.TopicTitle)
+	sb.WriteString("\n\n## Son girdiler\n")
+	for i, entry := range bundle.Entries {
+		if i >= 40 {
+			break
+		}
+		timestamp := time.Unix(entry.Timestamp, 0).Format("02.01 15:04")
+		sb.WriteString(fmt.Sprintf("[%s, %s] %s\n---\n", entry.Author, timestamp, truncate(entry.Text, 500)))
+	}
 	return sb.String()
 }
 
