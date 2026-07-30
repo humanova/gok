@@ -12,19 +12,28 @@
       <div id="title-area">
         <span id="title">gok radar</span>
         <span id="live-dot" class="dot" title="canlı"></span>
-        <span id="delay-status">CANLI · 6 DK GECİKMELİ</span>
+        <span id="delay-status">CANLI</span>
       </div>
-      <div id="stats">
-        <span id="event-rate">—</span>
-        <span id="topic-count">—</span>&nbsp;konu
-        <span id="last-updated"></span>
-      </div>
+      <div id="stats"><span id="last-updated">güncelleniyor</span></div>
       <div id="speed-control">
         <button class="speed-btn active" data-speed="1">1×</button>
-        <button class="speed-btn" data-speed="2">2×</button>
-        <button class="speed-btn" data-speed="5">5×</button>
         <button class="speed-btn" data-speed="20">20×</button>
         <button class="speed-btn" data-speed="60">60×</button>
+      </div>
+      <select id="speed-select" aria-label="Oynatma hızı">
+        <option value="1">Hız 1×</option>
+        <option value="20">Hız 20×</option>
+        <option value="60">Hız 60×</option>
+      </select>
+      <div id="view-toggle" role="group" aria-label="Görünüm">
+        <button class="view-btn active" type="button" data-view="grid" aria-pressed="true" title="Radar görünümü">
+          <span class="view-icon view-icon-grid" aria-hidden="true"></span>
+          <span class="sr-only">Radar görünümü</span>
+        </button>
+        <button class="view-btn" type="button" data-view="list" aria-pressed="false" title="Liste görünümü">
+          <span class="view-icon view-icon-list" aria-hidden="true"></span>
+          <span class="sr-only">Liste görünümü</span>
+        </button>
       </div>
       <button id="event-toggle" type="button" aria-controls="debug-panel" aria-expanded="false">
         olaylar <span id="event-toggle-count">0</span>
@@ -32,15 +41,19 @@
     </header>
 
     <main id="main">
-      <div id="grid"></div>
+      <div id="radar-wrap">
+        <div id="grid"></div>
+        <div id="topic-list" aria-label="Gündemdeki konular"></div>
+      </div>
       <aside id="brief-panel" aria-live="polite">
         <header id="brief-header">
-          <div>
+          <div id="brief-heading">
             <span id="brief-kicker">KONU ÖZETİ</span>
             <h2 id="brief-topic">—</h2>
           </div>
           <div id="brief-actions">
-            <button id="brief-pin" type="button">sabitle</button>
+            <a id="brief-search" class="brief-action" href="#" target="_blank" rel="noopener noreferrer" title="Google'da ara"><img src="https://www.google.com/favicon.ico" alt="">ara</a>
+            <a id="brief-topic-link" class="brief-action" href="#" target="_blank" rel="noopener noreferrer" title="Ekşi Sözlük başlığını aç"><img src="https://eksisozluk.com/favicon.ico" alt="">git</a>
             <button id="brief-close" type="button" aria-label="Konu özetini kapat">×</button>
           </div>
         </header>
@@ -57,18 +70,18 @@
 
     <footer id="bottombar">
       <div id="scrubber-wrap">
-        <span class="scrubber-label" id="scrubber-left">−24 sa</span>
         <div id="scrubber-track">
           <input type="range" id="scrubber" min="0" max="1000" value="1000" step="1">
           <span id="live-marker" title="6 dakika gecikmeli canlı konum"></span>
         </div>
-        <span class="scrubber-label" id="scrubber-right">canlı</span>
+        <button id="go-live" type="button">canlıya sar</button>
       </div>
       <div class="timeline-ticks" aria-hidden="true">
         <span>−24 sa</span><span>−18 sa</span><span>−12 sa</span><span>−6 sa</span><span>canlı</span>
       </div>
       <div id="playback-time">—</div>
     </footer>
+    <div id="replay-notice" role="status" aria-live="polite"><span id="replay-notice-text">son 1 saat oynatılıyor</span> <span>&gt;&gt;&gt;</span></div>
   </div>
   <script src="static/app.js"></script>
 </body>

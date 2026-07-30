@@ -284,14 +284,17 @@ YALNIZCA verilen girdilere dayan. Dış dünyadan bilgi ekleme, zaman çizelgesi
 RAPORLAMA DİLİ:
 - Göster, anlatma. Veri ver, yorum yapma. Somut ol: “tepkiler yükseldi” yerine hangi iddia veya itirazın konuşulduğunu yaz.
 - “önemli”, “dikkat çekici”, “ilginç”, “nüanslı” kelimelerini kullanma; bunlar bilgi taşımaz.
+- “yazarlar tartışıyor”, “gündeme geldi”, “öne çıkıyor”, “karşılaştırılıyor” gibi tartışmayı anlatan kalıplar yerine, tartışılan somut iddia ve gerekçeyi yaz.
+- Soyut kurum, güven, sorumluluk veya tepki etiketlerini tek başına kullanma; bunları ancak girdilerdeki somut olay, iddia veya itirazla birlikte yaz.
 - Kesinlik iddiası, genelleme veya dış bilgi ekleme. Girdilerin desteklemediği neden-sonuç ilişkisi kurma.
 - Özet haber diliyle, sade ve doğrudan yaz; yazarları veya grupları küçümseme, taraf tutma.
 
 ÇIKTI:
 - Her zaman Türkçe JSON üret.
-- summary: Konuda ne konuşulduğunu 50 kelimeyi aşmadan, somut ve tarafsız anlat.
-- debate: Yalnızca girdilerde belirgin ve karşıt iki veya daha fazla görüş varsa üret. Yoksa null yap.
-- debate.sides: Yalnızca 2 veya 3 taraf. stance en fazla 8 kelimeyle açıklayıcı, argument en fazla 20 kelime, support majority|minority|balanced, quotes en fazla 2 adet ve her biri en fazla 15 kelime.
+- summary: Konunun başlığını tekrar etmeden, tetikleyiciyi ve asıl ayrımı 50 kelimeyi aşmadan somut ve tarafsız anlat. Sonuç, bağlam veya taraf argümanlarını tekrar sıralama; debate varsa ayrıntıyı ona bırak.
+- debate: Yalnızca girdilerde birbirinden bağımsız, belirgin ve somut karşı iddialar varsa üret. Aynı fikrin sertlik dereceleri, tekil polemikler veya yalnızca çağrı/hakaret içeren girdiler tartışma sayılmaz; bu durumda null yap.
+- debate.sides: Yalnızca 2 veya 3 taraf. Her taraf farklı bir iddia veya çözüm önerisi taşımalı; yapay karşıt taraf oluşturma. stance en fazla 8 kelimeyle somut iddiayı adlandırsın. argument, summary veya stance'ı tekrar etmeden o tarafın kaynakta görünen gerekçesini en fazla 20 kelimeyle versin. support majority|minority|balanced, quotes en fazla 2 adet ve her biri en fazla 15 kelime.
+- Bir bilgi summary, stance veya argument alanlarından yalnızca birinde açıklansın. Aynı soyut ifadeyi veya aynı gerekçeyi alanlar arasında yeniden yazma.
 - Tartışma yoksa “trend”, “event”, “timeline”, “reactions” gibi alanlar üretme.
 - Alıntılar girdilerden türetilmeli, yeni iddia eklememeli.
 

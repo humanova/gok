@@ -13,5 +13,6 @@
   "GeminiModel" : "gemini-3.5-flash",
   "DigestIntervalMinutes" : 720,
   "TopicBriefIntervalMinutes" : 720,
-  "ApiPort" : 8080
+  "ApiPort" : 8080,
+  "SearchPort" : 8081
 }

@@ -7,22 +7,36 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gocolly/colly"
 	"gok/internal/config"
 	model "gok/internal/model"
+
+	"github.com/gocolly/colly"
 )
 
 type popularTopics []model.PTopic
 
-func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
-	// get topic url
-	urlSlice := []string{"https://eksisozluk.com", strings.Split(element.Attr("href"), "?")[0]}
-	topicUrl := strings.Join(urlSlice, "")
-	// get topic_id by using '--' seperator. format : /<topic>--<topic_id>.
-	topicId, err := strconv.ParseUint(strings.Split(topicUrl, "--")[1], 10, 64)
+const eksiBaseURL = "https://eksisozluk.com"
+
+func parsePopularTopicURL(href string) (string, uint64, bool) {
+	topicPath := strings.SplitN(href, "?", 2)[0]
+	topicIDIndex := strings.LastIndex(topicPath, "--")
+	if !strings.HasPrefix(topicPath, "/") || topicIDIndex <= 1 || topicIDIndex+2 == len(topicPath) {
+		return "", 0, false
+	}
+
+	topicID, err := strconv.ParseUint(topicPath[topicIDIndex+2:], 10, 64)
 	if err != nil {
-		topicId = 0
-		slog.Warn("couldn't scrape topic id")
+		return "", 0, false
+	}
+
+	return eksiBaseURL + topicPath, topicID, true
+}
+
+func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
+	topicURL, topicID, ok := parsePopularTopicURL(element.Attr("href"))
+	if !ok {
+		slog.Debug("skipping non-topic link in popular topics", "href", element.Attr("href"))
+		return
 	}
 
 	urlQuery := element.Request.URL.RawQuery
@@ -46,10 +60,10 @@ func (topics *popularTopics) appendTopics(id int, element *colly.HTMLElement) {
 	topicText := element.DOM.Text()[0 : len(element.DOM.Text())-len(newEntriesRaw)-1]
 
 	*topics = append(*topics, model.PTopic{Text: topicText,
-		Url:        topicUrl,
+		Url:        topicURL,
 		NewEntries: newEntryCount,
 		Timestamp:  time.Now().Unix(),
-		TopicId:    topicId,
+		TopicId:    topicID,
 		PageNumber: pageNumber})
 }
 
@@ -58,7 +72,7 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	attachmentsChan chan []model.EntryAttachment,
 	requestsChan chan map[string]uint16) {
 	const baseUrl = "https://eksisozluk.com"
-	const popularTopicsPath = "/basliklar/gundem"
+	const popularTopicsPath = "/basliklar/m/populer"
 	topicPages := []string{"1", "2", "3", "4", "5"}
 	const timeLayout = "02.01.2006 15:04"
 
@@ -109,16 +123,8 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	})
 
 	// scrape popular topics
-	topicCollector.OnHTML("ul[class]", func(e *colly.HTMLElement) {
-		if e.Attr("class") != "topic-list partial" {
-			return
-		}
+	topicCollector.OnHTML("ul.topic-list", func(e *colly.HTMLElement) {
 		e.ForEach("a", topics.appendTopics)
-
-		if len(topics) == 0 {
-			slog.Warn("couldn't scrape any topics")
-			return
-		}
 	})
 
 	// scrape entries
@@ -214,6 +220,9 @@ func scrapeEksiTopicsAndEntries(entriesChan chan []model.Entry,
 	for _, pageNum := range topicPages {
 		url := strings.Join([]string{baseUrl, popularTopicsPath, "?p=", pageNum}, "")
 		topicCollector.Visit(url)
+	}
+	if len(topics) == 0 {
+		slog.Warn("couldn't scrape any topics")
 	}
 	topicsChan <- topics
 

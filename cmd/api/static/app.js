@@ -10,6 +10,7 @@ const CACHE_WINDOW_S    = 24 * 3600;  // client playback window: 24 h
 const LIVE_THRESHOLD    = 0.998;      // scrubber frac ≥ this → live mode
 const MAX_VISIBLE_PINGS = 3;
 const METER_THRESHOLDS  = [1, 2, 4, 7, 11];
+const BRIEF_CACHE_TTL_MS = 60_000;
 
 // ── State ────────────────────────────────────────────────────────────────────
 const state = {
@@ -29,9 +30,9 @@ const state = {
   burstCounts: {},       // topicId → pings compressed into the visible burst marker
   burstTimers: {},       // topicId → burst marker timeout
   afterglowTimers: {},   // topicId → transient activity glow timeout
-  pinnedTopicId: null,   // topic kept in view while rankings refresh
   selectedTopic: null,
-  briefCache: new Map(),
+  view: 'grid',          // 'grid' | 'list'
+  briefCache: new Map(), // topicId → { brief, expiresAt }
   briefRequestID: 0,
   previewPlaybackTs: null,
   lastActivitySecond: -1,
@@ -41,7 +42,7 @@ const state = {
 let _rafId = null;
 
 // DOM refs (populated in init())
-let $grid, $scrubber, $topicCount, $eventRate, $lastUpdated, $playbackTime, $eventToggle;
+let $grid, $topicList, $scrubber, $lastUpdated, $playbackTime;
 
 // ── Debug Panel ──────────────────────────────────────────────────────────────
 const debug = {
@@ -73,6 +74,11 @@ const debug = {
     this._$list.addEventListener('touchstart', () => this.pauseFollowing(), { passive: true });
     this._$list.addEventListener('pointerdown', () => this.pauseFollowing());
     this._$list.addEventListener('keydown', () => this.pauseFollowing());
+  },
+
+  close() {
+    document.body.classList.remove('events-open');
+    this._$toggle.setAttribute('aria-expanded', 'false');
   },
 
   add(debugId, topicTitle, entryTs, fireAt, minuteCount) {
@@ -267,6 +273,7 @@ function createTile(t) {
   tile.className = 'tile';
   tile.id = `tile-${t.id}`;
   tile.style.order = t.rank - 1;
+  tile.classList.toggle('mobile-secondary', t.rank > 20);
   tile.tabIndex = 0;
   tile.setAttribute('role', 'button');
   applyHeat(tile, t);
@@ -303,11 +310,92 @@ function createTile(t) {
 
 function buildGrid(topics) {
   $grid.innerHTML = '';
-  state.topics = retainPinnedTopic(topics);
-  $topicCount.textContent = state.topics.length;
+  state.topics = topics;
   state.topics.forEach(t => $grid.appendChild(createTile(t)));
-  refreshPinnedTiles();
-  setEventRate(state.topics);
+}
+
+function formatRankMovement(delta) {
+  if (!Number.isFinite(delta) || delta === 0) return { label: '→', direction: 'steady' };
+  return delta > 0
+    ? { label: `↑ ${delta}`, direction: 'up' }
+    : { label: `↓ ${Math.abs(delta)}`, direction: 'down' };
+}
+
+function countRecentEntries(timestamps, playbackTs, windowSecs = 900) {
+  return (timestamps ?? []).filter(ts => ts > playbackTs - windowSecs && ts <= playbackTs).length;
+}
+
+function firstPopularLabel(firstPopularAt, playbackTs) {
+  if (!firstPopularAt) return '';
+  const ageSecs = playbackTs - firstPopularAt;
+  return ageSecs >= 0 && ageSecs < 24 * 3600 ? 'yeni' : '';
+}
+
+function createTopicRow(topic, playbackTs = currentPlaybackTs()) {
+  const row = document.createElement('div');
+  row.className = 'topic-row';
+  row.id = `topic-row-${topic.id}`;
+  row.tabIndex = 0;
+  row.setAttribute('role', 'button');
+
+  const title = document.createElement('span');
+  title.className = 'topic-row-title';
+  title.textContent = topic.title;
+  title.title = topic.title;
+
+  const trend = document.createElement('span');
+  trend.className = 'topic-row-trend';
+
+  const activity = document.createElement('span');
+  activity.className = 'topic-row-activity';
+
+  const status = document.createElement('span');
+  status.className = 'topic-row-status';
+
+  row.append(status, trend, title, activity);
+  updateTopicRowDetails(row, topic, playbackTs);
+  row.addEventListener('click', () => openTopicBrief(topic));
+  row.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openTopicBrief(topic);
+    }
+  });
+  return row;
+}
+
+function updateTopicRowDetails(row, topic, playbackTs = currentPlaybackTs()) {
+  const trend = row.querySelector('.topic-row-trend');
+  const activity = row.querySelector('.topic-row-activity');
+  if (state.mode === 'live') {
+    const movement = formatRankMovement(topic.rank_delta);
+    trend.textContent = movement.label;
+    trend.className = `topic-row-trend ${movement.direction}`;
+    const entryCount = countRecentEntries(topic.timestamps, playbackTs);
+    activity.textContent = `${entryCount} / 15 dk`;
+  } else {
+    trend.textContent = '';
+    trend.className = 'topic-row-trend';
+    activity.textContent = '';
+  }
+
+  const status = row.querySelector('.topic-row-status');
+  const label = firstPopularLabel(topic.first_popular_at, playbackTs);
+  status.textContent = label;
+  status.classList.toggle('is-new', label === 'yeni');
+}
+
+function buildTopicList(topics) {
+  $topicList.innerHTML = '';
+  topics.forEach(topic => $topicList.appendChild(createTopicRow(topic)));
+}
+
+function updateTopicList(topics) {
+  buildTopicList(topics);
+}
+
+function decorateRankMovement(topics) {
+  return topics;
 }
 
 function applyHeat(tile, t) {
@@ -317,8 +405,6 @@ function applyHeat(tile, t) {
   tile.style.setProperty('--tile-saturation', `${Math.round(22 + heat * 52)}%`);
   tile.style.setProperty('--tile-lightness', `${(94 - heat * 35).toFixed(1)}%`);
   tile.classList.toggle('tile-top', t.rank <= 3);
-  tile.classList.toggle('is-pinned', t.id === state.pinnedTopicId);
-  tile.setAttribute('aria-pressed', String(t.id === state.pinnedTopicId));
 }
 
 function updateTileDetails(tile, t, playbackTs = currentPlaybackTs()) {
@@ -340,77 +426,99 @@ function refreshActivityIndicators(playbackTs, force = false) {
   state.topics.forEach(topic => {
     const tile = $id(`tile-${topic.id}`);
     if (tile) updateTileDetails(tile, topic, playbackTs);
+    const row = $id(`topic-row-${topic.id}`);
+    if (row) updateTopicRowDetails(row, topic, playbackTs);
   });
-  setEventRate(state.topics, playbackTs);
-}
-
-function setEventRate(topics, playbackTs = currentPlaybackTs()) {
-  const count = topics.reduce((total, topic) => total
-    + recentVisualEventCount(topic.timestamps ?? [], playbackTs), 0);
-  $eventRate.textContent = `son 5 dk · ${count} girdi`;
-}
-
-function togglePinnedTopic(topicId) {
-  state.pinnedTopicId = state.pinnedTopicId === topicId ? null : topicId;
-  refreshPinnedTiles();
-  syncBriefPinButton();
-}
-
-function refreshPinnedTiles() {
-  document.querySelectorAll('.tile').forEach(tile => {
-    const isPinned = tile.id === `tile-${state.pinnedTopicId}`;
-    tile.classList.toggle('is-pinned', isPinned);
-    tile.setAttribute('aria-pressed', String(isPinned));
-  });
-}
-
-// If a pinned topic falls out of the top 25, retain its latest cached tile in
-// the final slot until the user unpins it. This keeps inspection possible with
-// the timestamp-only API contract.
-function retainPinnedTopic(topics) {
-  if (state.pinnedTopicId === null || topics.some(t => t.id === state.pinnedTopicId)) {
-    return topics;
-  }
-  const previous = state.topics.find(t => t.id === state.pinnedTopicId);
-  if (!previous) {
-    state.pinnedTopicId = null;
-    return topics;
-  }
-  const retained = [...topics.slice(0, Math.max(0, topics.length - 1)), previous];
-  return retained.map((topic, index) => ({ ...topic, rank: index + 1 }));
 }
 
 function openTopicBrief(topic) {
-  state.selectedTopic = topic;
-  const requestID = ++state.briefRequestID;
-  $id('brief-topic').textContent = topic.title;
-  document.body.classList.add('brief-open');
-  syncBriefPinButton();
-
-  const cached = state.briefCache.get(topic.id);
-  if (cached) {
-    renderTopicBrief(cached);
+  if (document.body.classList.contains('brief-open') && state.selectedTopic?.id === topic.id) {
+    closeTopicBrief();
     return;
   }
 
+  state.selectedTopic = topic;
+  const requestID = ++state.briefRequestID;
+  $id('brief-topic').textContent = topic.title;
+  $id('brief-search').href = `https://www.google.com/search?q=${encodeURIComponent(topic.title)}`;
+  $id('brief-topic-link').href = topicPopularURL(topic);
+  document.body.classList.add('brief-open');
+
+  const cached = state.briefCache.get(topic.id);
+  if (cached?.expiresAt > Date.now()) {
+    renderTopicBrief(cached.brief);
+    return;
+  }
+  state.briefCache.delete(topic.id);
   renderBriefLoading();
   fetchTopicBrief(topic.id).then(brief => {
+    if (brief?.available) {
+      state.briefCache.set(topic.id, {
+        brief,
+        expiresAt: Date.now() + BRIEF_CACHE_TTL_MS,
+      });
+    }
     if (requestID !== state.briefRequestID || state.selectedTopic?.id !== topic.id) return;
     const resolved = brief ?? { available: false };
-    state.briefCache.set(topic.id, resolved);
     renderTopicBrief(resolved);
   });
 }
 
-function closeTopicBrief() {
-  document.body.classList.remove('brief-open');
+function topicPopularURL(topic) {
+  const fallback = `https://eksisozluk.com/?q=${encodeURIComponent(topic.title)}`;
+  const url = new URL(topic.url || fallback);
+  url.searchParams.set('a', 'popular');
+  return url.href;
 }
 
-function syncBriefPinButton() {
-  const button = $id('brief-pin');
-  const isPinned = state.selectedTopic?.id === state.pinnedTopicId;
-  button.textContent = isPinned ? 'sabiti kaldır' : 'sabitle';
-  button.classList.toggle('active', isPinned);
+function closeTopicBrief() {
+  document.body.classList.remove('brief-open');
+  state.selectedTopic = null;
+  state.briefRequestID++;
+}
+
+function initBriefGestures() {
+  const panel = $id('brief-panel');
+  let touchStart = null;
+
+  panel.addEventListener('touchstart', event => {
+    const touch = event.touches[0];
+    touchStart = { x: touch.clientX, y: touch.clientY };
+  }, { passive: true });
+
+  panel.addEventListener('touchend', event => {
+    if (!touchStart || !document.body.classList.contains('brief-open')) return;
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStart.x;
+    const deltaY = touch.clientY - touchStart.y;
+    touchStart = null;
+
+    if (deltaX <= -64 && Math.abs(deltaX) > Math.abs(deltaY)) closeTopicBrief();
+  }, { passive: true });
+
+  panel.addEventListener('touchcancel', () => { touchStart = null; }, { passive: true });
+}
+
+function initEventGestures() {
+  const panel = $id('debug-panel');
+  let touchStart = null;
+
+  panel.addEventListener('touchstart', event => {
+    const touch = event.touches[0];
+    touchStart = { x: touch.clientX, y: touch.clientY };
+  }, { passive: true });
+
+  panel.addEventListener('touchend', event => {
+    if (!touchStart || !document.body.classList.contains('events-open')) return;
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStart.x;
+    const deltaY = touch.clientY - touchStart.y;
+    touchStart = null;
+
+    if (deltaX >= 64 && Math.abs(deltaX) > Math.abs(deltaY)) debug.close();
+  }, { passive: true });
+
+  panel.addEventListener('touchcancel', () => { touchStart = null; }, { passive: true });
 }
 
 function renderBriefLoading() {
@@ -436,7 +544,7 @@ function renderTopicBrief(brief) {
   if (brief.generated_at) {
     const meta = document.createElement('p');
     meta.className = 'brief-meta';
-    meta.textContent = `Özet · ${new Date(brief.generated_at).toLocaleString('tr-TR', {
+    meta.textContent = `${new Date(brief.generated_at).toLocaleString('tr-TR', {
       day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
     })} · ${brief.entry_count} girdi`;
     content.appendChild(meta);
@@ -483,13 +591,16 @@ function supportLabel(support) {
   return 'denge';
 }
 
+function hasLayoutBox(rect) {
+  return rect.width > 0 && rect.height > 0;
+}
+
 /**
  * Animate the grid to a new topic ranking using the FLIP technique.
  * Tiles that move animate via CSS transform. Entering tiles fade in,
  * leaving tiles fade out and are removed after the transition.
  */
 function reorderGrid(newTopics) {
-  newTopics = retainPinnedTopic(newTopics);
   const newIds = new Set(newTopics.map(t => t.id));
   const oldIds = new Set(state.topics.map(t => t.id));
 
@@ -498,7 +609,8 @@ function reorderGrid(newTopics) {
   state.topics.forEach(t => {
     const el = $id(`tile-${t.id}`);
     if (el && newIds.has(t.id)) {
-      beforeRects.set(t.id, el.getBoundingClientRect());
+      const rect = el.getBoundingClientRect();
+      if (hasLayoutBox(rect)) beforeRects.set(t.id, rect);
     }
   });
 
@@ -509,6 +621,10 @@ function reorderGrid(newTopics) {
     const el = $id(`tile-${id}`);
     if (!el) return;
     const rect = el.getBoundingClientRect();
+    if (!hasLayoutBox(rect)) {
+      el.remove();
+      return;
+    }
     el.style.left = `${rect.left - gridRect.left}px`;
     el.style.top = `${rect.top - gridRect.top}px`;
     el.style.width = `${rect.width}px`;
@@ -532,6 +648,7 @@ function reorderGrid(newTopics) {
     const previousColor = getComputedStyle(el).backgroundColor;
     el.style.transition = 'none';
     el.style.order = t.rank - 1;
+    el.classList.toggle('mobile-secondary', t.rank > 20);
     applyHeat(el, t);
     updateTileDetails(el, t);
     const nextColor = getComputedStyle(el).backgroundColor;
@@ -548,10 +665,15 @@ function reorderGrid(newTopics) {
 
   newTopics.forEach(t => {
     const el = $id(`tile-${t.id}`);
-    if (!el || !beforeRects.has(t.id)) return;
+    if (!el) return;
 
     const before = beforeRects.get(t.id);
     const after  = el.getBoundingClientRect();
+    if (!before || !hasLayoutBox(after)) {
+      el.style.transition = '';
+      el.style.transform = '';
+      return;
+    }
     const dx = before.left - after.left;
     const dy = before.top  - after.top;
 
@@ -571,8 +693,7 @@ function reorderGrid(newTopics) {
   });
 
   state.topics = newTopics;
-  $topicCount.textContent = newTopics.length;
-  refreshPinnedTiles();
+  updateTopicList(newTopics);
   refreshActivityIndicators(currentPlaybackTs(), true);
 }
 
@@ -819,11 +940,12 @@ async function seekTo(targetTs) {
   schedulePings(snap.topics, targetTs, SEEK_SPREAD_MS, Infinity);
   refreshActivityIndicators(targetTs, true);
   setPlaybackTime(targetTs);
+  showReplayNotice(`${fmtTs(targetTs)}'den itibaren oynatılıyor`);
   startReplayAnimation();
 }
 
 /** Re-enter live mode: fresh fetch, clear dedup state, re-schedule. */
-async function goLive() {
+async function goLive(showNotice = false) {
   // exitLiveMode first so we never leak a second pair of intervals if goLive
   // is triggered while already live (e.g. user clicks the rightmost scrubber
   // position without dragging, so no 'input' event fires beforehand).
@@ -847,6 +969,7 @@ async function goLive() {
   schedulePings(snap.topics, playbackNow(), CATCHUP_SPREAD_MS, Infinity);
   setLastUpdated(snap.snapshot_at);
   enterLiveMode();
+  if (showNotice) showReplayNotice();
 }
 
 // ── Speed control ─────────────────────────────────────────────────────────────
@@ -855,10 +978,19 @@ function setSpeed(s) {
   document.querySelectorAll('.speed-btn').forEach(b => {
     b.classList.toggle('active', parseFloat(b.dataset.speed) === s);
   });
+  $id('speed-select').value = String(s);
   // In scrub mode: restart replay from current position with new speed.
   if (state.mode === 'scrub') {
     seekTo(currentPlaybackTs());
   }
+}
+
+function showReplayNotice(message = 'son 1 saat oynatılıyor') {
+  const notice = $id('replay-notice');
+  $id('replay-notice-text').textContent = message;
+  notice.classList.remove('is-visible');
+  void notice.offsetWidth;
+  notice.classList.add('is-visible');
 }
 
 // ── Scrubber ─────────────────────────────────────────────────────────────────
@@ -905,31 +1037,61 @@ function setPlaybackTime(ts) {
 }
 
 function setLastUpdated(snapshotAt) {
-  $lastUpdated.textContent = '· ' + new Date(snapshotAt * 1000)
+  $lastUpdated.textContent = 'son güncelleme ' + new Date(snapshotAt * 1000)
     .toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function setView(view) {
+  state.view = view;
+  document.body.classList.toggle('list-view', view === 'list');
+  document.querySelectorAll('.view-btn').forEach(button => {
+    const selected = button.dataset.view === view;
+    button.classList.toggle('active', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
+  try {
+    localStorage.setItem('gok-pulse-view', view);
+  } catch (error) {
+    console.warn('[pulse] could not save view preference:', error);
+  }
+}
+
+function initViewToggle() {
+  let initialView = 'grid';
+  try {
+    initialView = localStorage.getItem('gok-pulse-view') === 'list' ? 'list' : 'grid';
+  } catch (error) {
+    console.warn('[pulse] could not read view preference:', error);
+  }
+  document.querySelectorAll('.view-btn').forEach(button => {
+    button.addEventListener('click', () => setView(button.dataset.view));
+  });
+  setView(initialView);
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
   $grid         = $id('grid');
+  $topicList    = $id('topic-list');
   $scrubber     = $id('scrubber');
-  $topicCount   = $id('topic-count');
-  $eventRate    = $id('event-rate');
-  $eventToggle  = $id('event-toggle');
   $lastUpdated  = $id('last-updated');
   $playbackTime = $id('playback-time');
   debug.init();
 
   $id('brief-close').addEventListener('click', closeTopicBrief);
-  $id('brief-pin').addEventListener('click', () => {
-    if (state.selectedTopic) togglePinnedTopic(state.selectedTopic.id);
-  });
+  initBriefGestures();
+  initEventGestures();
+  $id('go-live').addEventListener('click', () => goLive(true));
 
   initScrubber();
+  initViewToggle();
 
   // Wire up speed buttons.
   document.querySelectorAll('.speed-btn').forEach(btn => {
     btn.addEventListener('click', () => setSpeed(parseFloat(btn.dataset.speed)));
+  });
+  $id('speed-select').addEventListener('change', event => {
+    setSpeed(parseFloat(event.target.value));
   });
 
   const snap = await fetchLive();
@@ -938,12 +1100,15 @@ async function init() {
     return;
   }
 
+  decorateRankMovement(snap.topics);
   buildGrid(snap.topics);
+  buildTopicList(snap.topics);
   state.lastSnapshotAt = snap.snapshot_at;
   setLastUpdated(snap.snapshot_at);
 
   schedulePings(snap.topics, playbackNow(), CATCHUP_SPREAD_MS, Infinity);
   enterLiveMode();
+  showReplayNotice();
 }
 
 document.addEventListener('DOMContentLoaded', init);

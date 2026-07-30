@@ -17,3 +17,4 @@ embedder/__pycache__/
 *.drawio
 digen
 .vscode
+*notes.txt

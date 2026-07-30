@@ -21,10 +21,13 @@ var staticFiles embed.FS
 
 // TopicMeta holds rank and heat metadata for a topic.
 type TopicMeta struct {
-	ID        uint64  `json:"id"`
-	Title     string  `json:"title"`
-	Rank      int     `json:"rank"`       // 1-based; 1 = hottest
-	HeatScore float64 `json:"heat_score"` // normalised [0.05, 1.0]
+	ID             uint64  `json:"id"`
+	Title          string  `json:"title"`
+	URL            string  `json:"url"`
+	Rank           int     `json:"rank"`             // 1-based; 1 = hottest
+	RankDelta      int     `json:"rank_delta"`       // positive means higher than 15 minutes ago
+	HeatScore      float64 `json:"heat_score"`       // normalised [0.05, 1.0]
+	FirstPopularAt int64   `json:"first_popular_at"` // earliest recorded popular-list appearance
 }
 
 // TopicPulse is a topic's metadata with its entry timestamps sliced to the response window.
@@ -60,13 +63,15 @@ const (
 	gridSize        = 25
 	rankingWindow   = 60 * time.Minute
 	heatHalfLife    = 15 * time.Minute
+	rankComparison  = 15 * time.Minute
 )
 
 var cache struct {
-	mu         sync.RWMutex
-	timestamps map[uint64][]int64     // topicId → entry timestamps for every active topic
-	topicMeta  map[uint64]model.Topic // topicId → Topic metadata
-	updatedAt  int64
+	mu             sync.RWMutex
+	timestamps     map[uint64][]int64     // topicId → entry timestamps for every active topic
+	topicMeta      map[uint64]model.Topic // topicId → Topic metadata
+	firstPopularAt map[uint64]int64       // topicId → earliest popular-list appearance
+	updatedAt      int64
 }
 
 type rankedTopic struct {
@@ -86,13 +91,21 @@ func refreshCache() {
 	}
 
 	topicMeta := make(map[uint64]model.Topic, len(topics))
+	topicIDs := make([]uint64, 0, len(topics))
 	for _, topic := range topics {
 		topicMeta[topic.TopicId] = topic
+		topicIDs = append(topicIDs, topic.TopicId)
+	}
+	firstPopularAt, err := model.GetFirstPopularTimestamps(topicIDs)
+	if err != nil {
+		slog.Error("pulse: GetFirstPopularTimestamps failed", "error", err)
+		return
 	}
 
 	cache.mu.Lock()
 	cache.timestamps = timestamps
 	cache.topicMeta = topicMeta
+	cache.firstPopularAt = firstPopularAt
 	cache.updatedAt = time.Now().Unix()
 	cache.mu.Unlock()
 
@@ -102,7 +115,7 @@ func refreshCache() {
 // rankTopicsForWindowLocked ranks topics by entry velocity. Each event decays
 // by half every heatHalfLife, so the board reflects what is accelerating now
 // instead of which topic stayed on the popular page longest.
-func rankTopicsForWindowLocked(from, to int64) []rankedTopic {
+func rankTopicsForWindowLocked(from, to int64, limit int) []rankedTopic {
 	if to <= from {
 		return nil
 	}
@@ -142,8 +155,8 @@ func rankTopicsForWindowLocked(from, to int64) []rankedTopic {
 		}
 		return ranked[i].heat > ranked[j].heat
 	})
-	if len(ranked) > gridSize {
-		ranked = ranked[:gridSize]
+	if limit > 0 && len(ranked) > limit {
+		ranked = ranked[:limit]
 	}
 	return ranked
 }
@@ -151,6 +164,16 @@ func rankTopicsForWindowLocked(from, to int64) []rankedTopic {
 // buildSnapshotFromTopicsLocked assembles a PulseSnapshot from ranked topics and
 // slices timestamps to [from, to]. Must be called with cache.mu held for reading.
 func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64) PulseSnapshot {
+	previousTopics := rankTopicsForWindowLocked(
+		from-int64(rankComparison/time.Second),
+		to-int64(rankComparison/time.Second),
+		0,
+	)
+	previousRanks := make(map[uint64]int, len(previousTopics))
+	for rank, topic := range previousTopics {
+		previousRanks[topic.topic.TopicId] = rank + 1
+	}
+
 	heats := make([]float64, len(hotTopics))
 	maxHeat := 0.0
 	for i, ht := range hotTopics {
@@ -174,12 +197,16 @@ func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64) Puls
 		copied := make([]int64, len(sliced))
 		copy(copied, sliced)
 
+		previousRank := previousRanks[ht.topic.TopicId]
 		topics = append(topics, TopicPulse{
 			TopicMeta: TopicMeta{
-				ID:        ht.topic.TopicId,
-				Title:     ht.topic.Text,
-				Rank:      rank + 1,
-				HeatScore: normalizedHeat,
+				ID:             ht.topic.TopicId,
+				Title:          ht.topic.Text,
+				URL:            ht.topic.Url,
+				Rank:           rank + 1,
+				RankDelta:      previousRank - (rank + 1),
+				HeatScore:      normalizedHeat,
+				FirstPopularAt: cache.firstPopularAt[ht.topic.TopicId],
 			},
 			Timestamps: copied,
 		})
@@ -197,7 +224,7 @@ func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64) Puls
 func buildSnapshot(from, to int64) PulseSnapshot {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
-	return buildSnapshotFromTopicsLocked(rankTopicsForWindowLocked(from, to), from, to)
+	return buildSnapshotFromTopicsLocked(rankTopicsForWindowLocked(from, to, gridSize), from, to)
 }
 
 // buildRangeSnapshot ranks historical entries from the same cache.

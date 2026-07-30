@@ -56,6 +56,9 @@ func prepareDb() (*gorm.DB, error) {
 	if err := database.Exec("CREATE EXTENSION IF NOT EXISTS unaccent").Error; err != nil {
 		slog.Warn("could not create unaccent extension", "error", err)
 	}
+	if err := database.Exec("CREATE EXTENSION IF NOT EXISTS pg_trgm").Error; err != nil {
+		slog.Warn("could not create pg_trgm extension", "error", err)
+	}
 
 	// AutoMigrate digest tables. Existing scrape tables managed by the scraper binary
 	// are left untouched to avoid constraint-name conflicts across GORM versions.
@@ -80,6 +83,25 @@ func prepareDb() (*gorm.DB, error) {
 	if err := database.Exec(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_entries_fts
 		ON entries USING gin (to_tsvector('turkish', coalesce(text,'')))`).Error; err != nil {
 		slog.Warn("could not create GIN FTS index", "error", err)
+	}
+
+	// Archive search uses keyset pagination and typeahead. These indexes keep
+	// timestamp traversal and author/topic substring matching off sequential scans.
+	if err := database.Exec(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_entries_timestamp_id
+		ON entries (timestamp DESC, id DESC) WHERE deleted_at IS NULL`).Error; err != nil {
+		slog.Warn("could not create entry pagination index", "error", err)
+	}
+	if err := database.Exec(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_entries_author_trgm
+		ON entries USING gin (author gin_trgm_ops) WHERE deleted_at IS NULL`).Error; err != nil {
+		slog.Warn("could not create author search index", "error", err)
+	}
+	if err := database.Exec(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_popular_topics_topic_timestamp
+		ON popular_topics (topic_id, timestamp) WHERE deleted_at IS NULL`).Error; err != nil {
+		slog.Warn("could not create popular topic history index", "error", err)
+	}
+	if err := database.Exec(`CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_topics_text_trgm
+		ON topics USING gin (text gin_trgm_ops) WHERE deleted_at IS NULL`).Error; err != nil {
+		slog.Warn("could not create topic search index", "error", err)
 	}
 
 	return database, nil
@@ -377,6 +399,33 @@ func getPopularTopicsSince(db *gorm.DB, since int64) ([]PopularTopic, error) {
 		return nil, tx.Error
 	}
 	return rows, nil
+}
+
+// getFirstPopularTimestamps returns the first recorded popular-list appearance
+// for each requested topic.
+func getFirstPopularTimestamps(db *gorm.DB, topicIDs []uint64) (map[uint64]int64, error) {
+	if len(topicIDs) == 0 {
+		return map[uint64]int64{}, nil
+	}
+	type row struct {
+		TopicId   uint64
+		Timestamp int64
+	}
+	var rows []row
+	tx := db.Model(&PopularTopic{}).
+		Select("topic_id, MIN(timestamp) AS timestamp").
+		Where("topic_id IN ?", topicIDs).
+		Group("topic_id").
+		Scan(&rows)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	firstSeen := make(map[uint64]int64, len(rows))
+	for _, row := range rows {
+		firstSeen[row.TopicId] = row.Timestamp
+	}
+	return firstSeen, nil
 }
 
 // getTopicsByIDs fetches Topic records for the given topic_id list.

@@ -178,6 +178,12 @@ func GetPopularTopicsSince(since int64) ([]PopularTopic, error) {
 	return getPopularTopicsSince(database, since)
 }
 
+// GetFirstPopularTimestamps returns the first recorded popular-list appearance
+// for each requested topic.
+func GetFirstPopularTimestamps(topicIDs []uint64) (map[uint64]int64, error) {
+	return getFirstPopularTimestamps(database, topicIDs)
+}
+
 // GetTopicsByIDs fetches Topic records for the given topic_id list.
 func GetTopicsByIDs(ids []uint64) ([]Topic, error) {
 	return getTopicsByIDs(database, ids)
