@@ -601,6 +601,10 @@ function hasLayoutBox(rect) {
  * leaving tiles fade out and are removed after the transition.
  */
 function reorderGrid(newTopics) {
+  // A seek or mode change can start another reconciliation before a prior
+  // leave animation ends. Those tiles are no longer in state.topics.
+  $grid.querySelectorAll('.tile-leaving').forEach(tile => tile.remove());
+
   const newIds = new Set(newTopics.map(t => t.id));
   const oldIds = new Set(state.topics.map(t => t.id));
 
@@ -631,6 +635,7 @@ function reorderGrid(newTopics) {
     el.style.height = `${rect.height}px`;
     el.classList.add('tile-leaving');
     el.addEventListener('animationend', () => el.remove(), { once: true });
+    setTimeout(() => el.remove(), 400);
   });
 
   // Step 3 — add arriving tiles.

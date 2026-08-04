@@ -11,6 +11,7 @@ digen
 ask
 /api
 check-digest
+build-map
 embedder/__pycache__/
 .venv/
 .venv/log.txt
@@ -18,3 +19,6 @@ embedder/__pycache__/
 digen
 .vscode
 *notes.txt
+# unignore these later
+reports
+docs

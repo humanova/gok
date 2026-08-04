@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gok topic map</title>
+  <link rel="stylesheet" href="/static/map.css?v=20260804-2">
+</head>
+<body>
+  <main id="map-app">
+    <canvas id="map-canvas" aria-label="Ekşi Sözlük konu ilişkileri haritası"></canvas>
+
+    <header class="map-header">
+      <a class="brand" href="/" aria-label="gok radar">gok <span>atlas</span></a>
+      <div class="top-tools">
+        <div class="search-shell">
+          <label class="sr-only" for="topic-search">Konu ara</label>
+          <input id="topic-search" type="search" autocomplete="off" placeholder="konu ara" spellcheck="false">
+          <div id="search-results" role="listbox" aria-label="Konu sonuçları"></div>
+        </div>
+        <label class="region-filter" for="region-select">
+          <span class="sr-only">Bölge filtrele</span>
+          <select id="region-select">
+            <option value="all">tüm bölgeler</option>
+          </select>
+        </label>
+      </div>
+    </header>
+
+    <section class="map-controls" aria-label="Harita ayarları">
+      <button id="reset-view" type="button" title="Görünümü sıfırla" aria-label="Görünümü sıfırla">↺</button>
+      <label class="label-toggle" title="Bölge etiketlerini göster">
+        <input id="label-toggle" type="checkbox" checked>
+        <span>etiketler</span>
+      </label>
+    </section>
+
+    <aside id="topic-panel" aria-live="polite" hidden>
+      <div id="panel-detail">
+        <div class="panel-summary">
+          <div class="panel-heading">
+            <span id="panel-community">TOPLULUK</span>
+            <h1 id="panel-title"></h1>
+          </div>
+          <div class="panel-actions">
+            <a id="panel-link" target="_blank" rel="noopener noreferrer" aria-label="Ekşi Sözlük'te aç" title="Ekşi Sözlük'te aç">↗</a>
+            <button id="close-panel" type="button" aria-label="Detayı kapat" title="Detayı kapat">×</button>
+          </div>
+        </div>
+        <div id="panel-connections" aria-label="Bağlantılı konular"></div>
+      </div>
+    </aside>
+
+    <div id="hover-tooltip" role="tooltip" hidden></div>
+    <div id="map-status" role="status">harita yükleniyor</div>
+  </main>
+  <script src="/static/map.js?v=20260804-2"></script>
+</body>
+</html>

@@ -3,10 +3,13 @@ package main
 import (
 	"embed"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log/slog"
 	"math"
 	"net/http"
+	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"sync"
@@ -19,33 +22,28 @@ import (
 //go:embed static
 var staticFiles embed.FS
 
-// TopicMeta holds rank and heat metadata for a topic.
 type TopicMeta struct {
 	ID             uint64  `json:"id"`
 	Title          string  `json:"title"`
 	URL            string  `json:"url"`
-	Rank           int     `json:"rank"`             // 1-based; 1 = hottest
-	RankDelta      int     `json:"rank_delta"`       // positive means higher than 15 minutes ago
-	HeatScore      float64 `json:"heat_score"`       // normalised [0.05, 1.0]
-	FirstPopularAt int64   `json:"first_popular_at"` // earliest recorded popular-list appearance
+	Rank           int     `json:"rank"`
+	RankDelta      int     `json:"rank_delta"`
+	HeatScore      float64 `json:"heat_score"`
+	FirstPopularAt int64   `json:"first_popular_at"`
 }
 
-// TopicPulse is a topic's metadata with its entry timestamps sliced to the response window.
 type TopicPulse struct {
 	TopicMeta
-	Timestamps []int64 `json:"timestamps"` // unix UTC, ascending
+	Timestamps []int64 `json:"timestamps"`
 }
 
-// PulseSnapshot is the API response envelope.
 type PulseSnapshot struct {
-	SnapshotAt int64        `json:"snapshot_at"` // unix UTC of last cache refresh
+	SnapshotAt int64        `json:"snapshot_at"`
 	WindowFrom int64        `json:"window_from"`
 	WindowTo   int64        `json:"window_to"`
 	Topics     []TopicPulse `json:"topics"`
 }
 
-// TopicBriefResponse is deliberately a cache/database read only. A browser
-// request never invokes Gemini; unavailable means no pre-generated brief exists.
 type TopicBriefResponse struct {
 	Available   bool                     `json:"available"`
 	GeneratedAt *time.Time               `json:"generated_at,omitempty"`
@@ -57,8 +55,8 @@ type TopicBriefResponse struct {
 
 const (
 	cacheHours      = 24
-	liveWindowSecs  = 3600  // default live window: last 60 min
-	maxRangeSecs    = 21600 // max range per /range request: 6 h
+	liveWindowSecs  = 3600
+	maxRangeSecs    = 21600
 	refreshInterval = 60 * time.Second
 	gridSize        = 25
 	rankingWindow   = 60 * time.Minute
@@ -68,10 +66,15 @@ const (
 
 var cache struct {
 	mu             sync.RWMutex
-	timestamps     map[uint64][]int64     // topicId → entry timestamps for every active topic
-	topicMeta      map[uint64]model.Topic // topicId → Topic metadata
-	firstPopularAt map[uint64]int64       // topicId → earliest popular-list appearance
+	timestamps     map[uint64][]int64
+	topicMeta      map[uint64]model.Topic
+	firstPopularAt map[uint64]int64
 	updatedAt      int64
+}
+
+var mapCache struct {
+	mu       sync.RWMutex
+	snapshot *MapSnapshot
 }
 
 type rankedTopic struct {
@@ -81,9 +84,6 @@ type rankedTopic struct {
 
 func refreshCache() {
 	since := time.Now().UTC().Add(-time.Duration(cacheHours) * time.Hour).Unix()
-
-	// Refresh a single compact snapshot after scraping. Browser requests only
-	// read this cache; no entry text, author, or per-user database work is sent.
 	timestamps, topics, err := model.GetTopicsWithEntryTimestampsSince(since)
 	if err != nil {
 		slog.Error("pulse: GetTopicsWithEntryTimestampsSince failed", "error", err)
@@ -108,52 +108,44 @@ func refreshCache() {
 	cache.firstPopularAt = firstPopularAt
 	cache.updatedAt = time.Now().Unix()
 	cache.mu.Unlock()
-
 	slog.Info("pulse: cache refreshed", "topics", len(topics))
 }
 
-// rankTopicsForWindowLocked ranks topics by entry velocity. Each event decays
-// by half every heatHalfLife, so the board reflects what is accelerating now
-// instead of which topic stayed on the popular page longest.
 func rankTopicsForWindowLocked(from, to int64, limit int) []rankedTopic {
 	if to <= from {
 		return nil
 	}
-
 	weightFrom := to - int64(rankingWindow/time.Second)
 	if weightFrom < from {
 		weightFrom = from
 	}
 	halfLifeSecs := heatHalfLife.Seconds()
 	ranked := make([]rankedTopic, 0, len(cache.timestamps))
-
 	for topicID, timestamps := range cache.timestamps {
 		topic, ok := cache.topicMeta[topicID]
 		if !ok {
 			continue
 		}
-		lo := sort.Search(len(timestamps), func(i int) bool { return timestamps[i] >= from })
-		hi := sort.Search(len(timestamps), func(i int) bool { return timestamps[i] > to })
+		lo := sort.Search(len(timestamps), func(index int) bool { return timestamps[index] >= from })
+		hi := sort.Search(len(timestamps), func(index int) bool { return timestamps[index] > to })
 		if lo == hi {
 			continue
 		}
-
 		heat := 0.0
-		for _, ts := range timestamps[lo:hi] {
-			if ts < weightFrom {
+		for _, timestamp := range timestamps[lo:hi] {
+			if timestamp < weightFrom {
 				continue
 			}
-			ageSecs := float64(to - ts)
+			ageSecs := float64(to - timestamp)
 			heat += math.Exp(-math.Ln2 * ageSecs / halfLifeSecs)
 		}
 		ranked = append(ranked, rankedTopic{topic: topic, heat: heat})
 	}
-
-	sort.Slice(ranked, func(i, j int) bool {
-		if ranked[i].heat == ranked[j].heat {
-			return ranked[i].topic.TopicId < ranked[j].topic.TopicId
+	sort.Slice(ranked, func(left, right int) bool {
+		if ranked[left].heat == ranked[right].heat {
+			return ranked[left].topic.TopicId < ranked[right].topic.TopicId
 		}
-		return ranked[i].heat > ranked[j].heat
+		return ranked[left].heat > ranked[right].heat
 	})
 	if limit > 0 && len(ranked) > limit {
 		ranked = ranked[:limit]
@@ -161,112 +153,66 @@ func rankTopicsForWindowLocked(from, to int64, limit int) []rankedTopic {
 	return ranked
 }
 
-// buildSnapshotFromTopicsLocked assembles a PulseSnapshot from ranked topics and
-// slices timestamps to [from, to]. Must be called with cache.mu held for reading.
 func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64) PulseSnapshot {
-	previousTopics := rankTopicsForWindowLocked(
-		from-int64(rankComparison/time.Second),
-		to-int64(rankComparison/time.Second),
-		0,
-	)
+	previousTopics := rankTopicsForWindowLocked(from-int64(rankComparison/time.Second), to-int64(rankComparison/time.Second), 0)
 	previousRanks := make(map[uint64]int, len(previousTopics))
 	for rank, topic := range previousTopics {
 		previousRanks[topic.topic.TopicId] = rank + 1
 	}
-
-	heats := make([]float64, len(hotTopics))
 	maxHeat := 0.0
-	for i, ht := range hotTopics {
-		heats[i] = ht.heat
-		if ht.heat > maxHeat {
-			maxHeat = ht.heat
-		}
+	for _, topic := range hotTopics {
+		maxHeat = math.Max(maxHeat, topic.heat)
 	}
-
 	topics := make([]TopicPulse, 0, len(hotTopics))
-	for rank, ht := range hotTopics {
+	for rank, hotTopic := range hotTopics {
 		normalizedHeat := 0.05
 		if maxHeat > 0 {
-			normalizedHeat = math.Max(0.05, heats[rank]/maxHeat)
+			normalizedHeat = math.Max(0.05, hotTopic.heat/maxHeat)
 		}
-
-		ts := cache.timestamps[ht.topic.TopicId]
-		lo := sort.Search(len(ts), func(i int) bool { return ts[i] >= from })
-		hi := sort.Search(len(ts), func(i int) bool { return ts[i] > to })
-		sliced := ts[lo:hi]
-		copied := make([]int64, len(sliced))
-		copy(copied, sliced)
-
-		previousRank := previousRanks[ht.topic.TopicId]
-		topics = append(topics, TopicPulse{
-			TopicMeta: TopicMeta{
-				ID:             ht.topic.TopicId,
-				Title:          ht.topic.Text,
-				URL:            ht.topic.Url,
-				Rank:           rank + 1,
-				RankDelta:      previousRank - (rank + 1),
-				HeatScore:      normalizedHeat,
-				FirstPopularAt: cache.firstPopularAt[ht.topic.TopicId],
-			},
-			Timestamps: copied,
-		})
+		timestamps := cache.timestamps[hotTopic.topic.TopicId]
+		lo := sort.Search(len(timestamps), func(index int) bool { return timestamps[index] >= from })
+		hi := sort.Search(len(timestamps), func(index int) bool { return timestamps[index] > to })
+		copied := append([]int64(nil), timestamps[lo:hi]...)
+		topics = append(topics, TopicPulse{TopicMeta: TopicMeta{
+			ID:             hotTopic.topic.TopicId,
+			Title:          hotTopic.topic.Text,
+			URL:            hotTopic.topic.Url,
+			Rank:           rank + 1,
+			RankDelta:      previousRanks[hotTopic.topic.TopicId] - (rank + 1),
+			HeatScore:      normalizedHeat,
+			FirstPopularAt: cache.firstPopularAt[hotTopic.topic.TopicId],
+		}, Timestamps: copied})
 	}
-
-	return PulseSnapshot{
-		SnapshotAt: cache.updatedAt,
-		WindowFrom: from,
-		WindowTo:   to,
-		Topics:     topics,
-	}
+	return PulseSnapshot{SnapshotAt: cache.updatedAt, WindowFrom: from, WindowTo: to, Topics: topics}
 }
 
-// buildSnapshot ranks and slices the cache for the requested event window.
 func buildSnapshot(from, to int64) PulseSnapshot {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 	return buildSnapshotFromTopicsLocked(rankTopicsForWindowLocked(from, to, gridSize), from, to)
 }
 
-// buildRangeSnapshot ranks historical entries from the same cache.
-func buildRangeSnapshot(from, to int64) PulseSnapshot {
-	return buildSnapshot(from, to)
-}
-
-// handlePulse returns the live view: last 60 min of the cached data.
 func handlePulse(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().UTC().Unix()
-	snap := buildSnapshot(now-liveWindowSecs, now)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-cache")
-	if err := json.NewEncoder(w).Encode(snap); err != nil {
+	if err := json.NewEncoder(w).Encode(buildSnapshot(now-liveWindowSecs, now)); err != nil {
 		slog.Error("pulse: encode /api/pulse failed", "error", err)
 	}
 }
 
-// handlePulseRange returns an arbitrary historical slice from the 24h cache.
-// Query params: since (unix), until (unix). Max range: 6 h.
 func handlePulseRange(w http.ResponseWriter, r *http.Request) {
-	sinceStr := r.URL.Query().Get("since")
-	untilStr := r.URL.Query().Get("until")
-
-	since, err1 := strconv.ParseInt(sinceStr, 10, 64)
-	until, err2 := strconv.ParseInt(untilStr, 10, 64)
+	since, err1 := strconv.ParseInt(r.URL.Query().Get("since"), 10, 64)
+	until, err2 := strconv.ParseInt(r.URL.Query().Get("until"), 10, 64)
 	if err1 != nil || err2 != nil {
 		http.Error(w, "invalid since or until parameter", http.StatusBadRequest)
 		return
 	}
-
 	now := time.Now().UTC().Unix()
-	minSince := now - int64(cacheHours)*3600
-
-	// Allow a small clock/request tolerance at the left edge of the rolling
-	// client timeline. The cache simply has no events before its true boundary.
-	if since < minSince-120 {
+	if since < now-int64(cacheHours)*3600-120 {
 		http.Error(w, fmt.Sprintf("since must be within last %dh", cacheHours), http.StatusBadRequest)
 		return
 	}
-	// Silently clamp until to now; requesting future data is always empty
-	// and produces nonsensical window_to values in the JSON response.
 	if until > now {
 		until = now
 	}
@@ -278,57 +224,71 @@ func handlePulseRange(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("range exceeds maximum of %dh", maxRangeSecs/3600), http.StatusBadRequest)
 		return
 	}
-
-	snap := buildRangeSnapshot(since, until)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-cache")
-	if err := json.NewEncoder(w).Encode(snap); err != nil {
+	if err := json.NewEncoder(w).Encode(buildSnapshot(since, until)); err != nil {
 		slog.Error("pulse: encode /api/pulse/range failed", "error", err)
 	}
 }
 
-// handleTopicBrief returns a stored, pre-generated explanation for one topic.
 func handleTopicBrief(w http.ResponseWriter, r *http.Request) {
 	topicID, err := strconv.ParseUint(r.PathValue("topicID"), 10, 64)
 	if err != nil || topicID == 0 {
 		http.Error(w, "invalid topic id", http.StatusBadRequest)
 		return
 	}
-
 	brief, err := model.GetLatestTopicBrief(topicID)
 	if err != nil {
 		slog.Error("pulse: load topic brief failed", "topic_id", topicID, "error", err)
 		http.Error(w, "could not load topic brief", http.StatusInternalServerError)
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "private, max-age=60")
+	w.Header().Set("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=3600")
 	if brief == nil {
 		_ = json.NewEncoder(w).Encode(TopicBriefResponse{Available: false})
 		return
 	}
-
 	var payload model.TopicBriefPayload
 	if err := json.Unmarshal(brief.Payload, &payload); err != nil {
 		slog.Error("pulse: decode topic brief failed", "topic_id", topicID, "error", err)
 		http.Error(w, "stored topic brief is invalid", http.StatusInternalServerError)
 		return
 	}
-	response := TopicBriefResponse{
-		Available:   true,
-		GeneratedAt: &brief.GeneratedAt,
-		WindowStart: &brief.WindowStart,
-		WindowEnd:   &brief.WindowEnd,
-		EntryCount:  brief.EntryCount,
-		Payload:     &payload,
-	}
+	response := TopicBriefResponse{Available: true, GeneratedAt: &brief.GeneratedAt, WindowStart: &brief.WindowStart, WindowEnd: &brief.WindowEnd, EntryCount: brief.EntryCount, Payload: &payload}
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		slog.Error("pulse: encode topic brief failed", "topic_id", topicID, "error", err)
 	}
 }
 
+func handleMap(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400")
+	mapCache.mu.RLock()
+	snapshot := mapCache.snapshot
+	mapCache.mu.RUnlock()
+	if snapshot == nil {
+		_ = json.NewEncoder(w).Encode(MapSnapshot{Available: false})
+		return
+	}
+	if err := json.NewEncoder(w).Encode(snapshot); err != nil {
+		slog.Error("map: encode snapshot failed", "error", err)
+	}
+}
+
+func handleMapPage(w http.ResponseWriter, r *http.Request) {
+	data, err := staticFiles.ReadFile("static/map.html")
+	if err != nil {
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, _ = w.Write(data)
+}
+
 func main() {
+	port := flag.Int("port", config.Config.ApiPort, "HTTP server port")
+	flag.Parse()
 	if err := model.InitDb(); err != nil {
 		slog.Error("pulse: couldn't connect to database", "error", err)
 		panic(err)
@@ -336,6 +296,21 @@ func main() {
 
 	slog.Info("pulse: initial cache refresh...")
 	refreshCache()
+	layoutDir := os.Getenv("GOK_MAP_LAYOUT_DIR")
+	if layoutDir == "" {
+		layoutDir = filepath.Join("reports", "maps", "current", "layout")
+	}
+	graphDir := os.Getenv("GOK_MAP_GRAPH_DIR")
+	if graphDir == "" {
+		graphDir = filepath.Join("reports", "maps", "current", "graph")
+	}
+	snapshot, err := loadMapSnapshot(layoutDir, graphDir)
+	if err != nil {
+		slog.Warn("map: generated reports unavailable", "layout_dir", layoutDir, "graph_dir", graphDir, "error", err)
+	} else {
+		mapCache.snapshot = snapshot
+		slog.Info("map: snapshot loaded", "nodes", len(snapshot.Nodes), "edges", len(snapshot.Edges), "communities", len(snapshot.Clusters))
+	}
 
 	go func() {
 		ticker := time.NewTicker(refreshInterval)
@@ -346,11 +321,13 @@ func main() {
 	}()
 
 	mux := http.NewServeMux()
-	// More specific route must be registered first.
+	mux.HandleFunc("GET /api/map", handleMap)
 	mux.HandleFunc("GET /api/topics/{topicID}/brief", handleTopicBrief)
 	mux.HandleFunc("GET /api/pulse/range", handlePulseRange)
 	mux.HandleFunc("GET /api/pulse", handlePulse)
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticFiles)))
+	mux.HandleFunc("GET /map", handleMapPage)
+	mux.HandleFunc("GET /atlas", handleMapPage)
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		data, err := staticFiles.ReadFile("static/index.html")
 		if err != nil {
@@ -361,9 +338,17 @@ func main() {
 		_, _ = w.Write(data)
 	})
 
-	addr := fmt.Sprintf(":%d", config.Config.ApiPort)
+	addr := fmt.Sprintf(":%d", *port)
 	slog.Info("pulse: listening", "addr", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	server := &http.Server{
+		Addr:              addr,
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
+	if err := server.ListenAndServe(); err != nil {
 		slog.Error("pulse: server error", "error", err)
 	}
 }

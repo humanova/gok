@@ -106,6 +106,16 @@ body {
   align-items: center;
 }
 
+#atlas-link {
+  margin-left: 14px;
+  color: var(--accent, #17844e);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+#atlas-link:hover { text-decoration: underline; }
+
 #last-updated {
   font-variant-numeric: tabular-nums;
 }
@@ -298,6 +308,15 @@ body.list-view #topic-list {
   flex-direction: column;
 }
 
+body.list-view #main {
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+body.list-view #radar-wrap {
+  width: 100%;
+}
+
 @keyframes view-enter {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
@@ -331,8 +350,8 @@ body.list-view #topic-list {
 
 .topic-row-title {
   overflow: hidden;
-  font-size: 13px;
-  font-weight: 650;
+  font-size: 14px;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -358,6 +377,16 @@ body.list-view #topic-list {
 .topic-row-status.is-new {
   color: var(--live-green);
   font-weight: 800;
+  font-size: 0;
+}
+
+.topic-row-status.is-new::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--live-green);
 }
 
 #topic-count-toggle {
@@ -515,12 +544,11 @@ body.list-view #topic-list {
   font-size: 12px;
   font-weight: 650;
   line-height: 1.32;
+  max-height: calc(1.32em * 3);
   white-space: normal;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   pointer-events: none;
   user-select: none;
 }
@@ -1114,11 +1142,39 @@ body.events-open #debug-panel {
     height: calc(100dvh - var(--topbar-h) - var(--bottombar-h) - 12px);
   }
 
+  body.list-view #topic-list {
+    width: 100%;
+    height: 100%;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
   .topic-row {
     grid-template-columns: 32px 30px minmax(0, 1fr) 58px;
     gap: 7px;
     min-height: 42px;
     padding: 0 8px;
+  }
+
+  body.list-view .topic-row {
+    grid-template-columns: 12px 30px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  body.list-view .topic-row-status {
+    display: block;
+    grid-column: 1;
+  }
+
+  body.list-view .topic-row-trend {
+    grid-column: 2;
+  }
+
+  body.list-view .topic-row-title {
+    grid-column: 3;
+  }
+
+  body.list-view .topic-row-activity {
+    display: none;
   }
 
   .topic-row-status {

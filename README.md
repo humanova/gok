@@ -43,3 +43,23 @@ python embedder/main.py
 # Run scraper (with auto-restart loop)
 ./run.sh
 ```
+
+## Topic Map Pipeline
+
+The topic map is an offline, versioned snapshot. It builds behavioral writer-overlap communities, audits their semantic regions with Gemini, computes stable coordinates, validates the layout, then atomically publishes a new `reports/maps/current` snapshot.
+
+For a plain-language explanation of which topics appear and how they are grouped and labelled, see [Map curation](docs/map-curation.md).
+
+```bash
+./scripts/build-map-pipeline.sh
+```
+
+The API loads `reports/maps/current` once at startup, serves it at `/api/map`, and renders the interactive canvas at `/map`. The map response is browser-cacheable for five minutes and shared-cacheable for one hour; rebuild only when you deliberately want a new map, then restart the API.
+
+Optional environment overrides for a nonstandard snapshot location:
+
+```bash
+GOK_MAP_LAYOUT_DIR=/path/to/layout GOK_MAP_GRAPH_DIR=/path/to/graph ./api
+```
+The generated `reports/maps/current` snapshot is intentionally excluded from version control.
+
