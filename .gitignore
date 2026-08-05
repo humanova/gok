@@ -10,8 +10,6 @@ print-digest
 digen
 ask
 /api
-check-digest
-build-map
 embedder/__pycache__/
 .venv/
 .venv/log.txt
