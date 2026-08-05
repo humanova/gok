@@ -8,7 +8,6 @@ log.txt
 gok
 print-digest
 digen
-ask
 /api
 embedder/__pycache__/
 .venv/
