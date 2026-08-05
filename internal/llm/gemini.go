@@ -64,12 +64,6 @@ func (c *Client) SynthesizeTopicBrief(ctx context.Context, bundle model.TopicBun
 	return &payload, nil
 }
 
-// SynthesizeQuery answers a free-form user question given retrieved context.
-func (c *Client) SynthesizeQuery(ctx context.Context, query string, entries []model.Entry, viewpoints []model.Viewpoint) (*model.DigestPayload, error) {
-	prompt := buildQueryPrompt(query, entries, viewpoints)
-	return c.callStructured(ctx, prompt)
-}
-
 // StreamAnswer streams a focused Q&A answer (non-digest, no JSON, cites authors).
 func (c *Client) StreamAnswer(ctx context.Context, question string, entries []model.Entry, viewpoints []model.Viewpoint) (<-chan string, <-chan error) {
 	tokenCh := make(chan string, 64)
@@ -105,44 +99,6 @@ func (c *Client) StreamAnswer(ctx context.Context, question string, entries []mo
 
 	return tokenCh, errCh
 }
-
-// StreamQuery streams a conversational answer as text tokens via the returned channel.
-// The channel is closed when the stream ends or errors.
-func (c *Client) StreamQuery(ctx context.Context, query string, entries []model.Entry, viewpoints []model.Viewpoint) (<-chan string, <-chan error) {
-	tokenCh := make(chan string, 64)
-	errCh := make(chan error, 1)
-
-	go func() {
-		defer close(tokenCh)
-		defer close(errCh)
-
-		prompt := buildQueryPrompt(query, entries, viewpoints)
-		fullPrompt := systemPrompt() + "\n\n" + prompt
-
-		contents := []*genai.Content{genai.NewContentFromText(fullPrompt, genai.RoleUser)}
-		iter := c.client.Models.GenerateContentStream(ctx, c.modelName, contents, nil)
-
-		for resp, err := range iter {
-			if err != nil {
-				errCh <- err
-				return
-			}
-			for _, cand := range resp.Candidates {
-				if cand.Content == nil {
-					continue
-				}
-				for _, part := range cand.Content.Parts {
-					if part.Text != "" {
-						tokenCh <- part.Text
-					}
-				}
-			}
-		}
-	}()
-
-	return tokenCh, errCh
-}
-
 func (c *Client) callStructured(ctx context.Context, prompt string) (*model.DigestPayload, error) {
 	fullPrompt := systemPrompt() + "\n\n" + prompt
 
@@ -376,26 +332,6 @@ func buildTopicBriefPrompt(bundle model.TopicBundle) string {
 		timestamp := time.Unix(entry.Timestamp, 0).Format("02.01 15:04")
 		sb.WriteString(fmt.Sprintf("[%s, %s] %s\n---\n", entry.Author, timestamp, truncate(entry.Text, 500)))
 	}
-	return sb.String()
-}
-
-func buildQueryPrompt(query string, entries []model.Entry, viewpoints []model.Viewpoint) string {
-	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("## Kullanıcı Sorusu\n%s\n\n", query))
-	sb.WriteString("## İlgili Girdiler\n")
-	for i, e := range entries {
-		if i >= 20 {
-			break
-		}
-		sb.WriteString(fmt.Sprintf("[%s]: %s\n---\n", e.Author, truncate(e.Text, 400)))
-	}
-	if len(viewpoints) > 0 {
-		sb.WriteString("\n## Görüşler\n")
-		for _, v := range viewpoints {
-			sb.WriteString(fmt.Sprintf("- %s: \"%s\" — %s\n", v.Stance, v.RepresentativeQuote, v.Author))
-		}
-	}
-	sb.WriteString("\nBu soruyu JSON formatında yanıtla.")
 	return sb.String()
 }
 

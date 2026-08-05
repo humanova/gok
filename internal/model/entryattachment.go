@@ -11,16 +11,6 @@ type EntryAttachment struct {
 	Url       string `gorm:"primaryKey;autoIncrement:false"`
 }
 
-// EntryAttachment
-func AddEntryAttachment(newEntryAttachment EntryAttachment) error {
-	// insert to db
-	err := createEntryAttachment(database, newEntryAttachment)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func AddEntryAttachments(newEntryAttachments []EntryAttachment) error {
 	// insert to db
 	err := createEntryAttachments(database, newEntryAttachments)

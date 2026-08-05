@@ -49,16 +49,6 @@ func GetRecentTopicEntries(topicID uint64, since int64, limit int) ([]Entry, err
 	return entries, nil
 }
 
-func AddEntry(newEntry Entry) error {
-	// insert to db
-	err := createEntry(database, newEntry)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func AddEntries(newEntries []Entry) error {
 	// insert to db
 	err := createEntries(database, newEntries)
@@ -74,44 +64,6 @@ func GetLastTopicEntry(topicId uint64) (Entry, error) {
 		return entry, err
 	}
 	return entry, nil
-}
-
-func GetTopicEntries(topicId uint64) ([]Entry, error) {
-	var entries, err = getTopicEntries(database, topicId)
-	if err != nil {
-		return nil, err
-	}
-	return entries, nil
-}
-
-func GetEntriesSince(timestamp int64) ([]Entry, error) {
-	var entries, err = getEntriesPublishedAfter(database, timestamp)
-	if err != nil {
-		return nil, err
-	}
-	return entries, nil
-}
-
-func GetEntriesFiltered(filters Filters) ([]Entry, error) {
-	var entries, err = getEntriesFiltered(database, filters)
-	if err != nil {
-		return nil, err
-	}
-	return entries, nil
-}
-
-func UpdateScore(entry Entry, score int64) error {
-	err := updateEntryScore(database, entry, score)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// GetTopicEntryTimestamps returns entry timestamps grouped by topic ID,
-// filtered to entries newer than since (unix UTC). Results within each topic are sorted ascending.
-func GetTopicEntryTimestamps(topicIDs []uint64, since int64) (map[uint64][]int64, error) {
-	return getTopicEntryTimestamps(database, topicIDs, since)
 }
 
 // GetTopicsWithEntryTimestampsSince returns the minimal data the pulse view

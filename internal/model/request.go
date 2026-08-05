@@ -11,15 +11,6 @@ type Request struct {
 	StatusCode uint16
 }
 
-func AddRequest(newRequest Request) error {
-	// insert to db
-	err := createRequest(database, newRequest)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func AddRequests(newRequests []Request) error {
 	// insert to db
 	err := createRequests(database, newRequests)

@@ -118,30 +118,9 @@ type PTopic struct {
 	PageNumber uint64
 }
 
-// Topic
-func AddTopic(newTopic Topic) error {
-	// insert to db
-	err := createTopic(database, newTopic)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func AddTopics(newTopics []Topic) error {
 	// insert to db
 	err := createTopics(database, newTopics)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// PopularTopic
-
-func AddPopularTopic(newTopic PopularTopic) error {
-	// insert to db
-	err := createPopularTopic(database, newTopic)
 	if err != nil {
 		return err
 	}
@@ -157,34 +136,8 @@ func AddPopularTopics(newTopics []PopularTopic) error {
 	return nil
 }
 
-func GetPopularTopics(topicId uint64) ([]PopularTopic, error) {
-	var topics, err = getPopularTopics(database, topicId)
-	if err != nil {
-		return nil, err
-	}
-	return topics, nil
-}
-
-func GetPopularTopicsAfter(timestamp int64) ([]PopularTopic, error) {
-	var topics, err = getPopularTopicsAfter(database, timestamp)
-	if err != nil {
-		return nil, err
-	}
-	return topics, nil
-}
-
-// GetPopularTopicsSince returns all popular_topics rows with timestamp > since.
-func GetPopularTopicsSince(since int64) ([]PopularTopic, error) {
-	return getPopularTopicsSince(database, since)
-}
-
 // GetFirstPopularTimestamps returns the first recorded popular-list appearance
 // for each requested topic.
 func GetFirstPopularTimestamps(topicIDs []uint64) (map[uint64]int64, error) {
 	return getFirstPopularTimestamps(database, topicIDs)
-}
-
-// GetTopicsByIDs fetches Topic records for the given topic_id list.
-func GetTopicsByIDs(ids []uint64) ([]Topic, error) {
-	return getTopicsByIDs(database, ids)
 }
