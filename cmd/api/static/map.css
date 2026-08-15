@@ -15,8 +15,8 @@ body {
   overflow: hidden;
   color: var(--ink);
   background-color: var(--paper);
-  background-image: linear-gradient(rgba(46, 64, 54, 0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(46, 64, 54, 0.055) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-image: linear-gradient(rgba(46, 64, 54, 0.032) 1px, transparent 1px), linear-gradient(90deg, rgba(46, 64, 54, 0.032) 1px, transparent 1px);
+  background-size: 36px 36px;
   font-family: "Avenir Next", "Trebuchet MS", sans-serif;
   letter-spacing: 0;
 }
@@ -144,7 +144,7 @@ button { cursor: pointer; }
   right: 20px;
   top: 112px;
   z-index: 2;
-  width: min(230px, calc(100vw - 40px));
+  width: min(250px, calc(100vw - 40px));
   border: 1px solid #cbd2ca;
   border-radius: 5px;
   background: var(--panel);

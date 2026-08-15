@@ -116,11 +116,13 @@ function convexHull(points) {
 }
 
 function drawRegionHalos(nodes) {
+  const selected = state.nodesByID.get(state.selectedID);
   const regions = new Set();
   for (const node of nodes) {
     regions.add(node.region);
   }
   for (const region of regions) {
+    if (selected && region !== selected.region) continue;
     const hull = state.regionHulls.get(region);
     if (hull.length < 3) continue;
     context.save();
@@ -257,11 +259,11 @@ function render() {
     context.beginPath();
     context.arc(point.x, point.y, selectedNode || hovered ? radius + 2 : radius, 0, Math.PI * 2);
     context.fill();
-    if (node.degree >= state.degreeRingThreshold && (!selected || connected)) {
-      context.strokeStyle = colorForRegion(node.region, selectedNode || hovered ? 0.9 : 0.38);
-      context.lineWidth = 1;
+    if (state.transform.scale >= state.fitScale * 1.75 && node.degree >= state.degreeRingThreshold && (!selected || connected)) {
+      context.strokeStyle = colorForRegion(node.region, selectedNode || hovered ? 0.72 : 0.25);
+      context.lineWidth = 0.7;
       context.beginPath();
-      context.arc(point.x, point.y, radius + 3.2, 0, Math.PI * 2);
+      context.arc(point.x, point.y, radius + 2.8, 0, Math.PI * 2);
       context.stroke();
     }
     if (selectedNode || hovered) {

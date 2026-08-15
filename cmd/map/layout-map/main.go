@@ -329,6 +329,7 @@ func runLayout(nodes map[uint64]*layoutNode, edges []layoutEdge, iterations int)
 	for index, node := range ordered {
 		indexByID[node.ID] = index
 	}
+	regionAnchors := calculateRegionAnchors(ordered)
 	for iteration := 0; iteration < iterations; iteration++ {
 		dx := make([]float64, len(ordered))
 		dy := make([]float64, len(ordered))
@@ -339,7 +340,8 @@ func runLayout(nodes map[uint64]*layoutNode, edges []layoutEdge, iterations int)
 			for right := left + 1; right < len(ordered); right++ {
 				xDelta, yDelta := ordered[left].X-ordered[right].X, ordered[left].Y-ordered[right].Y
 				distanceSquared := xDelta*xDelta + yDelta*yDelta
-				if distanceSquared < 0.0025 {
+				minimumDistance := 0.45 + 0.12*math.Sqrt(float64(ordered[left].Degree+ordered[right].Degree+2))
+				if distanceSquared < minimumDistance*minimumDistance {
 					xDelta += 0.05
 					yDelta += 0.03
 					distanceSquared = xDelta*xDelta + yDelta*yDelta
@@ -362,8 +364,8 @@ func runLayout(nodes map[uint64]*layoutNode, edges []layoutEdge, iterations int)
 				distance = 0.05
 			}
 			strength := 0.5 + math.Sqrt(20*edge.Weight)
-			if ordered[left].Region != ordered[right].Region && (ordered[left].Degree <= 1 || ordered[right].Degree <= 1) {
-				strength *= 0.18
+			if ordered[left].Region != ordered[right].Region {
+				strength *= 0.30
 			}
 			desiredDistance := 3.2 / strength
 			force := 0.055 * strength * (distance - desiredDistance)
@@ -377,11 +379,14 @@ func runLayout(nodes map[uint64]*layoutNode, edges []layoutEdge, iterations int)
 		for index, node := range ordered {
 			center := communityCenters[node.CommunityID]
 			regionCenter := regionCenters[node.Region]
+			regionAnchor := regionAnchors[node.Region]
 			dx[index] += 0.006 * (center.X - node.X)
 			dy[index] += 0.006 * (center.Y - node.Y)
 			semanticStrength := 0.004 + 0.020/float64(node.Degree+1)
 			dx[index] += semanticStrength * (regionCenter.X - node.X)
 			dy[index] += semanticStrength * (regionCenter.Y - node.Y)
+			dx[index] += 0.0025 * (regionAnchor.X - node.X)
+			dy[index] += 0.0025 * (regionAnchor.Y - node.Y)
 			dx[index] -= 0.0012 * node.X
 			dy[index] -= 0.0012 * node.Y
 		}
@@ -397,6 +402,27 @@ func runLayout(nodes map[uint64]*layoutNode, edges []layoutEdge, iterations int)
 			node.Y += dy[index]
 		}
 	}
+}
+
+func calculateRegionAnchors(nodes []*layoutNode) map[string]layoutNode {
+	counts := make(map[string]int)
+	for _, node := range nodes {
+		counts[node.Region]++
+	}
+	regions := make([]string, 0, len(counts))
+	for region := range counts {
+		regions = append(regions, region)
+	}
+	sort.Strings(regions)
+	anchors := make(map[string]layoutNode, len(regions))
+	const goldenAngle = 2.399963229728653
+	for index, region := range regions {
+		populationRadius := 8 * math.Sqrt(float64(counts[region]))
+		radius := 22 + 9*math.Sqrt(float64(index)) + populationRadius
+		angle := float64(index) * goldenAngle
+		anchors[region] = layoutNode{X: radius * math.Cos(angle), Y: radius * math.Sin(angle)}
+	}
+	return anchors
 }
 
 func calculateCommunityCenters(nodes []*layoutNode) map[int]layoutNode {
