@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -15,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"gok/internal/mapcuration"
 	"gok/internal/model"
 )
 
@@ -95,12 +95,16 @@ func main() {
 	minSharedAuthors := flag.Int("min-shared-authors", 3, "Minimum shared writers before ranking edges")
 	maxAuthorTopics := flag.Int("max-author-topics", 60, "Ignore authors active in more eligible topics than this")
 	topNeighbors := flag.Int("top-neighbors", 8, "Retain only mutual top-N neighbors per topic")
-	profilePath := flag.String("profile", "reports/map-profile-all-history-20260731/topics.csv", "All-history topic profile CSV")
+	profilePath := flag.String("profile", "", "All-history topic profile CSV (required)")
 	outDir := flag.String("out", "", "Output directory; default: reports/map-edges-YYYYMMDD-HHMMSS")
 	flag.Parse()
 
 	if *edgeDays < 30 || *minSharedAuthors < 1 || *maxAuthorTopics < 2 || *topNeighbors < 1 {
 		fmt.Fprintln(os.Stderr, "invalid graph parameters")
+		os.Exit(2)
+	}
+	if err := mapcuration.RequirePaths(mapcuration.RequiredPath{Flag: "--profile", Value: *profilePath}); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(2)
 	}
 	if err := model.InitDb(); err != nil {
@@ -134,6 +138,8 @@ func main() {
 		slog.Error("couldn't load writer-topic pairs", "error", err)
 		os.Exit(1)
 	}
+	// Build broad candidate relationships first, then retain reciprocal local
+	// neighbors so a widely active topic cannot dominate the visible graph.
 	edges, effectiveAuthors, ignoredBroadAuthors := buildEdges(rows, nodes, *minSharedAuthors, *maxAuthorTopics)
 	applyMutualRanks(edges, *topNeighbors)
 	components, largestComponent := annotateNodes(nodes, edges)
@@ -177,16 +183,16 @@ func main() {
 		LargestCommunity:          communities[0].Size,
 		CommunityIterations:       communityIterations,
 	}
-	if err := writeJSON(filepath.Join(*outDir, "summary.json"), summary); err != nil {
+	if err := mapcuration.WriteJSON(filepath.Join(*outDir, "summary.json"), summary); err != nil {
 		slog.Error("couldn't write summary", "error", err)
 		os.Exit(1)
 	}
 	slog.Info("map edge profile complete", "nodes", len(nodes), "edges", len(edges), "mutual_edges", mutualEdges, "communities", len(communities), "out", *outDir)
 }
 
-// loadEligibleNodes keeps nodes active in the current writer-overlap window,
-// applying the durable-topic policy unless it is explicitly skipped. Reusing
-// the profile avoids recomputing an expensive all-history aggregation per run.
+// Keeps topics active in the writer-overlap window and applies the durable-topic
+// policy unless explicitly skipped. Reusing the profile avoids recomputing its
+// expensive all-history aggregation for each graph build.
 func loadEligibleNodes(profilePath string, edgeSince int64, skipDurability bool) (map[uint64]*mapNode, error) {
 	file, err := os.Open(profilePath)
 	if err != nil {
@@ -222,6 +228,8 @@ func loadEligibleNodes(profilePath string, edgeSince int64, skipDurability bool)
 }
 
 func isDurableTopic(node *mapNode) bool {
+	// A long-lived recurring topic can survive one exceptional spike; a newer
+	// concentrated topic cannot enter the map solely because it drew attention.
 	if node.DistinctAuthors < minDistinctAuthors || node.ReturningAuthors < minReturningAuthors || node.ActiveMonths < minActiveMonths {
 		return false
 	}
@@ -301,10 +309,13 @@ func buildEdges(rows []authorTopicRow, nodes map[uint64]*mapNode, minSharedAutho
 			continue
 		}
 		if len(topicIDs) > maxAuthorTopics {
+			// Broad contributors create many uninformative pairs across unrelated areas.
 			ignoredBroadAuthors++
 			continue
 		}
 		effectiveAuthors++
+		// Downweight authors who participate in many eligible topics without
+		// discarding useful specialists who bridge only a few discussions.
 		weight := 1 / math.Log1p(float64(len(topicIDs)))
 		for _, topicID := range topicIDs {
 			topicWeights[topicID] += weight
@@ -374,6 +385,8 @@ func applyMutualRanks(edges []*mapEdge, topNeighbors int) {
 		}
 	}
 	for _, edge := range edges {
+		// An edge must matter to both endpoints. This prunes one-sided links while
+		// keeping a fixed number of strongest local relationships per topic.
 		edge.MutualTopNeighbor = edge.SourceRank <= topNeighbors && edge.TargetRank <= topNeighbors
 	}
 }
@@ -392,6 +405,8 @@ func annotateNodes(nodes map[uint64]*mapNode, edges []*mapEdge) (int, int) {
 		nodes[edge.TargetID].WeightedDegree += edge.WeightedJaccard
 	}
 
+	// Connected components are calculated only after pruning, matching the graph
+	// the reader sees rather than the much denser candidate relationship set.
 	componentID := 0
 	largestComponent := 0
 	for nodeID, node := range nodes {
@@ -421,10 +436,9 @@ func annotateNodes(nodes map[uint64]*mapNode, edges []*mapEdge) (int, int) {
 	return componentID, largestComponent
 }
 
-// detectCommunities uses weighted label propagation on the pruned graph. Labels
-// move only along mutual-neighbor edges, so broad weak relationships cannot pull
-// a node across the graph. Iteration order and tie-breaking are fixed for stable
-// report output.
+// Propagates weighted labels through the pruned graph. Labels move only along
+// mutual-neighbor edges, so broad weak relationships cannot pull a topic across
+// the map. Fixed iteration order and tie-breaking keep report output stable.
 func detectCommunities(nodes map[uint64]*mapNode, edges []*mapEdge, maxIterations int) ([]communitySummary, int) {
 	type neighbor struct {
 		id     uint64
@@ -460,6 +474,8 @@ func detectCommunities(nodes map[uint64]*mapNode, edges []*mapEdge, maxIteration
 			}
 			bestLabel := labels[nodeID]
 			bestWeight := weights[bestLabel]
+			// Favor the strongest neighboring label; use the smaller ID to make ties
+			// deterministic despite Go's randomized map iteration.
 			for label, weight := range weights {
 				if weight > bestWeight || (weight == bestWeight && label < bestLabel) {
 					bestLabel, bestWeight = label, weight
@@ -618,15 +634,4 @@ func writeEdges(path string, edges []*mapEdge, nodes map[uint64]*mapNode) error 
 		}
 	}
 	return writer.Error()
-}
-
-func writeJSON(path string, value any) error {
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	return encoder.Encode(value)
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -12,6 +11,7 @@ import (
 	"sort"
 	"time"
 
+	"gok/internal/mapcuration"
 	"gok/internal/model"
 )
 
@@ -116,7 +116,7 @@ func main() {
 	}
 
 	summary := buildSummary(now, since, topics, authors, *minAuthors, *minWeeks, *minReturningAuthors, *maxPeakWeekShare)
-	if err := writeJSON(filepath.Join(*outDir, "summary.json"), summary); err != nil {
+	if err := mapcuration.WriteJSON(filepath.Join(*outDir, "summary.json"), summary); err != nil {
 		slog.Error("couldn't write summary", "error", err)
 		os.Exit(1)
 	}
@@ -124,6 +124,8 @@ func main() {
 }
 
 func loadTopicProfiles(since int64) ([]topicProfile, error) {
+	// This single all-history aggregation feeds durable-topic selection later in
+	// the pipeline; the graph stage reads its CSV instead of rerunning this query.
 	const query = `WITH scoped_entries AS (
 		SELECT topic_id, author, timestamp
 		FROM entries
@@ -136,6 +138,8 @@ func loadTopicProfiles(since int64) ([]topicProfile, error) {
 			COUNT(DISTINCT date_trunc('month', to_timestamp(timestamp))) AS active_months
 		FROM scoped_entries GROUP BY topic_id
 	), returning_authors AS (
+		-- A returning author must appear in at least two separate calendar months,
+		-- preventing a busy single-day thread from looking durable.
 		SELECT topic_id, COUNT(*) AS returning_authors
 		FROM (
 			SELECT topic_id, author FROM scoped_entries
@@ -274,15 +278,4 @@ func writeAuthorCSV(path string, profiles []authorProfile) error {
 		}
 	}
 	return writer.Error()
-}
-
-func writeJSON(path string, value any) error {
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	return encoder.Encode(value)
 }

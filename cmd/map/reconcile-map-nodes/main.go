@@ -2,42 +2,19 @@ package main
 
 import (
 	"context"
-	"encoding/csv"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
 	"gok/internal/config"
+	"gok/internal/mapcuration"
 
 	"google.golang.org/genai"
 )
-
-const regionDefinitions = `
-- football: Futbol kulüpleri, oyuncular, transferler, ligler ve milli takımlar.
-- other_sports: Futbol dışı sporlar ve sporcular.
-- turkish_politics: Türkiye siyaseti, partiler, liderler ve yerel siyaset.
-- world_politics: Uluslararası siyaset, savaşlar, ülkeler ve dış politika.
-- relationships: Romantik ilişkiler, flört, evlilik, cinsellik ve toplumsal cinsiyet.
-- daily_life: Gündelik hayat, kişisel deneyimler, alışkanlıklar, sorunsallar ve yaşam tavsiyeleri.
-- music: Müzik, şarkılar, sanatçılar ve müzik paylaşımı.
-- film_tv: Film, dizi, televizyon programları, ünlüler ve popüler eğlence.
-- games_tech: Video oyunları, teknoloji, internet ürünleri ve yapay zeka.
-- economy: Ekonomi, finans, piyasalar, tüketim ve iş hayatı.
-- culture_art: Kitaplar, şiir, tarih, sanat, felsefe ve akademi.
-- society_identity: Toplumsal kimlik, din, göç, etik, kültürel tartışmalar ve kolektif meseleler.
-- science_health: Bilim, sağlık, eğitim ve pratik bilgi.
-- local_life: Şehirler, mekanlar, seyahat, yerel yaşam ve hava durumu.
-- media: Haber kuruluşları, yayıncılar, gazeteciler ve medya kişilikleri.
-- news_events: Belirli güncel olaylar; yalnızca başka bir bölge daha açıklayıcı değilse.
-- other: Güvenli biçimde sınıflandırılamayan veya karma kümeler.
-`
 
 type mapNode struct {
 	ID          uint64
@@ -58,15 +35,6 @@ type nodeAssignment struct {
 	Reason     string  `json:"reason"`
 }
 
-type communityAssignment struct {
-	CommunityID int    `json:"community_id"`
-	Region      string `json:"region"`
-}
-
-type communityReport struct {
-	Assignments []communityAssignment `json:"assignments"`
-}
-
 type nodeModelResponse struct {
 	Assignments []nodeAssignment `json:"assignments"`
 }
@@ -80,14 +48,22 @@ type nodeReport struct {
 }
 
 func main() {
-	nodesPath := flag.String("nodes", "reports/map-clusters-final-20260731/nodes.csv", "Clustered node CSV")
-	clustersPath := flag.String("clusters", "reports/map-clusters-final-20260731/clusters.csv", "Cluster report CSV")
-	communityRegionsPath := flag.String("community-regions", "reports/map-reconciliation-20260731/semantic-regions.json", "Community semantic-region JSON")
+	nodesPath := flag.String("nodes", "", "Clustered node CSV (required)")
+	clustersPath := flag.String("clusters", "", "Cluster report CSV (required)")
+	communityRegionsPath := flag.String("community-regions", "", "Community semantic-region JSON (required)")
 	outDir := flag.String("out", "", "Output directory; default: reports/map-node-reconciliation-YYYYMMDD-HHMMSS")
 	batchSize := flag.Int("batch-size", 18, "Nodes per Gemini request")
 	flag.Parse()
 	if *batchSize < 1 || *batchSize > 24 {
 		fmt.Fprintln(os.Stderr, "batch-size must be between 1 and 24")
+		os.Exit(2)
+	}
+	if err := mapcuration.RequirePaths(
+		mapcuration.RequiredPath{Flag: "--nodes", Value: *nodesPath},
+		mapcuration.RequiredPath{Flag: "--clusters", Value: *clustersPath},
+		mapcuration.RequiredPath{Flag: "--community-regions", Value: *communityRegionsPath},
+	); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(2)
 	}
 	if config.Config.GeminiApiKey == "" {
@@ -121,8 +97,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "create Gemini client: %v\n", err)
 		os.Exit(1)
 	}
-	allowed := allowedRegions()
+	allowed := mapcuration.AllowedRegions()
 	assignments := make([]nodeAssignment, 0, len(nodes))
+	// Audit every node rather than blindly inheriting its community label: shared
+	// participants can group semantically unrelated topics in one community.
 	for start := 0; start < len(nodes); start += *batchSize {
 		end := min(start+*batchSize, len(nodes))
 		fmt.Printf("reconciling nodes %d-%d of %d\n", start+1, end, len(nodes))
@@ -134,8 +112,8 @@ func main() {
 		assignments = append(assignments, batch...)
 	}
 	sort.Slice(assignments, func(left, right int) bool { return assignments[left].NodeID < assignments[right].NodeID })
-	report := nodeReport{GeneratedAt: now, Model: config.Config.GeminiModel, Regions: sortedRegions(allowed), Assignments: assignments, TotalNodes: len(nodes)}
-	if err := writeReport(filepath.Join(*outDir, "node-regions.json"), report); err != nil {
+	report := nodeReport{GeneratedAt: now, Model: config.Config.GeminiModel, Regions: mapcuration.SortedRegionKeys(allowed), Assignments: assignments, TotalNodes: len(nodes)}
+	if err := mapcuration.WriteJSON(filepath.Join(*outDir, "node-regions.json"), report); err != nil {
 		fmt.Fprintf(os.Stderr, "write report: %v\n", err)
 		os.Exit(1)
 	}
@@ -143,92 +121,37 @@ func main() {
 }
 
 func readNodes(path string) ([]mapNode, error) {
-	file, err := os.Open(path)
+	graphNodes, err := mapcuration.ReadGraphNodes(path)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
-	reader := csv.NewReader(file)
-	header, err := reader.Read()
-	if err != nil {
-		return nil, err
+	nodes := make([]mapNode, 0, len(graphNodes))
+	for _, graphNode := range graphNodes {
+		nodes = append(nodes, mapNode{ID: graphNode.ID, Title: graphNode.Title, CommunityID: graphNode.CommunityID, Degree: graphNode.Degree})
 	}
-	index := indexes(header)
-	for _, field := range []string{"topic_id", "title", "community_id", "retained_degree"} {
-		if _, ok := index[field]; !ok {
-			return nil, fmt.Errorf("missing %q column", field)
-		}
-	}
-	nodes := make([]mapNode, 0)
-	for {
-		record, err := reader.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		id, err := strconv.ParseUint(record[index["topic_id"]], 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		communityID, err := strconv.Atoi(record[index["community_id"]])
-		if err != nil {
-			return nil, err
-		}
-		degree, err := strconv.Atoi(record[index["retained_degree"]])
-		if err != nil {
-			return nil, err
-		}
-		nodes = append(nodes, mapNode{ID: id, Title: record[index["title"]], CommunityID: communityID, Degree: degree})
-	}
-	sort.Slice(nodes, func(left, right int) bool { return nodes[left].ID < nodes[right].ID })
 	return nodes, nil
 }
 
 func readCommunities(clustersPath, assignmentsPath string) (map[int]communityInfo, error) {
-	file, err := os.Open(clustersPath)
+	graphCommunities, err := mapcuration.ReadCommunities(clustersPath)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
-	reader := csv.NewReader(file)
-	header, err := reader.Read()
+	communities := make(map[int]communityInfo, len(graphCommunities))
+	for _, community := range graphCommunities {
+		communities[community.ID] = communityInfo{Topics: community.RepresentativeTopics}
+	}
+	regions, err := mapcuration.ReadCommunityRegions(assignmentsPath)
 	if err != nil {
 		return nil, err
 	}
-	index := indexes(header)
-	communities := make(map[int]communityInfo)
-	for {
-		record, err := reader.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		id, err := strconv.Atoi(record[index["community_id"]])
-		if err != nil {
-			return nil, err
-		}
-		communities[id] = communityInfo{Topics: strings.Split(record[index["representative_topics"]], " | ")}
-	}
-	assignmentFile, err := os.Open(assignmentsPath)
-	if err != nil {
-		return nil, err
-	}
-	defer assignmentFile.Close()
-	var report communityReport
-	if err := json.NewDecoder(assignmentFile).Decode(&report); err != nil {
-		return nil, err
-	}
-	for _, assignment := range report.Assignments {
-		info, ok := communities[assignment.CommunityID]
+	for communityID, region := range regions {
+		info, ok := communities[communityID]
 		if !ok {
-			return nil, fmt.Errorf("assignment for unknown community %d", assignment.CommunityID)
+			return nil, fmt.Errorf("assignment for unknown community %d", communityID)
 		}
-		info.Region = assignment.Region
-		communities[assignment.CommunityID] = info
+		info.Region = region
+		communities[communityID] = info
 	}
 	return communities, nil
 }
@@ -236,32 +159,23 @@ func readCommunities(clustersPath, assignmentsPath string) (map[int]communityInf
 func classifyBatch(ctx context.Context, client *genai.Client, model string, nodes []mapNode, communities map[int]communityInfo, allowed map[string]struct{}) ([]nodeAssignment, error) {
 	var prompt strings.Builder
 	prompt.WriteString("Ekşi Sözlük konu haritasında HER TEK TEK BAŞLIĞI semantik bölgeye atıyorsun. Davranışsal topluluğun varsayılan bölgesi verilmiştir, ancak başlık kendi anlamı açıkça farklıysa onu düzelt. Örnek: `antalya` futbol başlıklarıyla davranışsal toplulukta olsa bile local_life; Galatasaray football; bir şehir local_life; bir oyuncu football. Belirsiz başlıklarda topluluk bağlamını kullan.\n\nİzin verilen bölgeler:\n")
-	prompt.WriteString(regionDefinitions)
+	prompt.WriteString(mapcuration.RegionDefinitions())
 	prompt.WriteString("\nSadece JSON: {\"assignments\":[{\"node_id\":1,\"region\":\"football\",\"confidence\":0.0,\"reason\":\"en fazla 10 Türkçe kelime\"}]}. Her node_id tam olarak bir kez dönmeli; region izin verilenlerden biri; confidence 0-1 arası sayı olmalı.\n\nBaşlıklar:\n")
 	for _, node := range nodes {
 		community := communities[node.CommunityID]
+		// Limit context to the strongest representative titles so a large community
+		// does not crowd the node's own title out of the request.
 		contextTopics := community.Topics
 		if len(contextTopics) > 4 {
 			contextTopics = contextTopics[:4]
 		}
 		prompt.WriteString(fmt.Sprintf("%d | başlık: %s | topluluk bölgesi: %s | topluluk bağlamı: %s\n", node.ID, node.Title, community.Region, strings.Join(contextTopics, " | ")))
 	}
-	contents := []*genai.Content{genai.NewContentFromText(prompt.String(), genai.RoleUser)}
-	response, err := client.Models.GenerateContent(ctx, model, contents, &genai.GenerateContentConfig{ResponseMIMEType: "application/json", Temperature: genai.Ptr(float32(0))})
-	if err != nil {
+	var decoded nodeModelResponse
+	if err := mapcuration.GenerateJSON(ctx, client, model, prompt.String(), &decoded); err != nil {
 		return nil, err
 	}
-	if len(response.Candidates) == 0 || response.Candidates[0].Content == nil {
-		return nil, fmt.Errorf("empty Gemini response")
-	}
-	var raw strings.Builder
-	for _, part := range response.Candidates[0].Content.Parts {
-		raw.WriteString(part.Text)
-	}
-	var decoded nodeModelResponse
-	if err := json.Unmarshal([]byte(raw.String()), &decoded); err != nil {
-		return nil, fmt.Errorf("decode response: %w", err)
-	}
+	// Require one valid decision for every requested node before persisting a batch.
 	wanted := make(map[uint64]struct{}, len(nodes))
 	for _, node := range nodes {
 		wanted[node.ID] = struct{}{}
@@ -291,54 +205,16 @@ func classifyBatch(ctx context.Context, client *genai.Client, model string, node
 }
 
 func classifyBatchWithRetry(ctx context.Context, client *genai.Client, model string, nodes []mapNode, communities map[int]communityInfo, allowed map[string]struct{}) ([]nodeAssignment, error) {
-	var lastErr error
-	for attempt := 1; attempt <= 3; attempt++ {
+	return mapcuration.Retry(3, func(attempt int) ([]nodeAssignment, error) {
 		assignments, err := classifyBatch(ctx, client, model, nodes, communities, allowed)
 		if err == nil {
 			return assignments, nil
 		}
-		lastErr = err
 		if attempt < 3 {
 			fmt.Printf("retrying malformed node batch (attempt %d): %v\n", attempt+1, err)
 		}
-	}
-	return nil, lastErr
-}
-
-func indexes(header []string) map[string]int {
-	out := make(map[string]int, len(header))
-	for i, field := range header {
-		out[field] = i
-	}
-	return out
-}
-func allowedRegions() map[string]struct{} {
-	regions := make(map[string]struct{})
-	for _, line := range strings.Split(regionDefinitions, "\n") {
-		line = strings.TrimSpace(strings.TrimPrefix(line, "- "))
-		if key, _, found := strings.Cut(line, ":"); found {
-			regions[key] = struct{}{}
-		}
-	}
-	return regions
-}
-func sortedRegions(regions map[string]struct{}) []string {
-	out := make([]string, 0, len(regions))
-	for region := range regions {
-		out = append(out, region)
-	}
-	sort.Strings(out)
-	return out
-}
-func writeReport(path string, report nodeReport) error {
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	return encoder.Encode(report)
+		return nil, err
+	})
 }
 func min(left, right int) int {
 	if left < right {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -11,8 +10,9 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
+
+	"gok/internal/mapcuration"
 )
 
 type layoutNode struct {
@@ -52,30 +52,25 @@ type bounds struct {
 	MaxY float64 `json:"max_y"`
 }
 
-type semanticAssignment struct {
-	CommunityID int    `json:"community_id"`
-	Region      string `json:"region"`
-}
-
-type semanticReport struct {
-	Assignments []semanticAssignment `json:"assignments"`
-}
-
-type nodeSemanticAssignment struct {
-	NodeID uint64 `json:"node_id"`
-	Region string `json:"region"`
-}
-
 func main() {
-	nodesPath := flag.String("nodes", "reports/map-clusters-final-20260731/nodes.csv", "Clustered node CSV")
-	edgesPath := flag.String("edges", "reports/map-clusters-final-20260731/edges.csv", "Clustered edge CSV")
-	communityRegionsPath := flag.String("community-regions", "reports/map-reconciliation-20260731/semantic-regions.json", "Community semantic-region JSON fallback")
-	nodeRegionsPath := flag.String("node-regions", "reports/map-node-reconciliation-20260731/node-regions.json", "Audited node semantic-region JSON")
+	nodesPath := flag.String("nodes", "", "Clustered node CSV (required)")
+	edgesPath := flag.String("edges", "", "Clustered edge CSV (required)")
+	communityRegionsPath := flag.String("community-regions", "", "Community semantic-region JSON fallback (required)")
+	nodeRegionsPath := flag.String("node-regions", "", "Audited node semantic-region JSON (required)")
 	iterations := flag.Int("iterations", 350, "Force-layout iterations")
 	outDir := flag.String("out", "", "Output directory; default: reports/map-layout-YYYYMMDD-HHMMSS")
 	flag.Parse()
 	if *iterations < 50 || *iterations > 2000 {
 		fmt.Fprintln(os.Stderr, "iterations must be between 50 and 2000")
+		os.Exit(2)
+	}
+	if err := mapcuration.RequirePaths(
+		mapcuration.RequiredPath{Flag: "--nodes", Value: *nodesPath},
+		mapcuration.RequiredPath{Flag: "--edges", Value: *edgesPath},
+		mapcuration.RequiredPath{Flag: "--community-regions", Value: *communityRegionsPath},
+		mapcuration.RequiredPath{Flag: "--node-regions", Value: *nodeRegionsPath},
+	); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(2)
 	}
 
@@ -93,17 +88,19 @@ func main() {
 		fmt.Fprintf(os.Stderr, "read nodes: %v\n", err)
 		os.Exit(1)
 	}
-	communityRegions, err := readRegions(*communityRegionsPath)
+	communityRegions, err := mapcuration.ReadCommunityRegions(*communityRegionsPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "read community regions: %v\n", err)
 		os.Exit(1)
 	}
-	nodeRegions, err := readNodeRegions(*nodeRegionsPath)
+	nodeRegions, err := mapcuration.ReadNodeRegions(*nodeRegionsPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "read node regions: %v\n", err)
 		os.Exit(1)
 	}
 	for _, node := range nodes {
+		// Node-level review wins; a community label remains a fallback for topics
+		// whose individual semantic audit did not supply an assignment.
 		node.Region = nodeRegions[node.ID]
 		if node.Region == "" {
 			node.Region = communityRegions[node.CommunityID]
@@ -129,7 +126,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "write layout: %v\n", err)
 		os.Exit(1)
 	}
-	if err := writeJSON(filepath.Join(*outDir, "summary.json"), summary); err != nil {
+	if err := mapcuration.WriteJSON(filepath.Join(*outDir, "summary.json"), summary); err != nil {
 		fmt.Fprintf(os.Stderr, "write summary: %v\n", err)
 		os.Exit(1)
 	}
@@ -137,42 +134,13 @@ func main() {
 }
 
 func readNodes(path string) (map[uint64]*layoutNode, error) {
-	file, err := os.Open(path)
+	graphNodes, err := mapcuration.ReadGraphNodes(path)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
-	reader := csv.NewReader(file)
-	header, err := reader.Read()
-	if err != nil {
-		return nil, err
-	}
-	indexes, err := columnIndexes(header, "topic_id", "title", "retained_degree", "community_id")
-	if err != nil {
-		return nil, err
-	}
-	nodes := make(map[uint64]*layoutNode)
-	for {
-		record, err := reader.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		id, err := strconv.ParseUint(record[indexes["topic_id"]], 10, 64)
-		if err != nil {
-			return nil, fmt.Errorf("parse topic id: %w", err)
-		}
-		degree, err := strconv.Atoi(record[indexes["retained_degree"]])
-		if err != nil {
-			return nil, fmt.Errorf("parse retained degree for %d: %w", id, err)
-		}
-		communityID, err := strconv.Atoi(record[indexes["community_id"]])
-		if err != nil {
-			return nil, fmt.Errorf("parse community id for %d: %w", id, err)
-		}
-		nodes[id] = &layoutNode{ID: id, Title: record[indexes["title"]], Degree: degree, CommunityID: communityID}
+	nodes := make(map[uint64]*layoutNode, len(graphNodes))
+	for _, graphNode := range graphNodes {
+		nodes[graphNode.ID] = &layoutNode{ID: graphNode.ID, Title: graphNode.Title, Degree: graphNode.Degree, CommunityID: graphNode.CommunityID}
 	}
 	return nodes, nil
 }
@@ -188,7 +156,7 @@ func readEdges(path string, nodes map[uint64]*layoutNode) ([]layoutEdge, error) 
 	if err != nil {
 		return nil, err
 	}
-	indexes, err := columnIndexes(header, "source_id", "target_id", "weighted_jaccard", "mutual_top_neighbor")
+	indexes, err := mapcuration.ColumnIndexes(header, "source_id", "target_id", "weighted_jaccard", "mutual_top_neighbor")
 	if err != nil {
 		return nil, err
 	}
@@ -224,68 +192,9 @@ func readEdges(path string, nodes map[uint64]*layoutNode) ([]layoutEdge, error) 
 	return edges, nil
 }
 
-func readRegions(path string) (map[int]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	var report semanticReport
-	if err := json.NewDecoder(file).Decode(&report); err != nil {
-		return nil, err
-	}
-	regions := make(map[int]string, len(report.Assignments))
-	for _, assignment := range report.Assignments {
-		if assignment.CommunityID <= 0 || strings.TrimSpace(assignment.Region) == "" {
-			return nil, fmt.Errorf("invalid semantic assignment for community %d", assignment.CommunityID)
-		}
-		if _, exists := regions[assignment.CommunityID]; exists {
-			return nil, fmt.Errorf("duplicate semantic assignment for community %d", assignment.CommunityID)
-		}
-		regions[assignment.CommunityID] = assignment.Region
-	}
-	return regions, nil
-}
-
-func readNodeRegions(path string) (map[uint64]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	var report struct {
-		Assignments []nodeSemanticAssignment `json:"assignments"`
-	}
-	if err := json.NewDecoder(file).Decode(&report); err != nil {
-		return nil, err
-	}
-	regions := make(map[uint64]string, len(report.Assignments))
-	for _, assignment := range report.Assignments {
-		if assignment.NodeID == 0 || strings.TrimSpace(assignment.Region) == "" {
-			return nil, fmt.Errorf("invalid node semantic assignment for %d", assignment.NodeID)
-		}
-		if _, exists := regions[assignment.NodeID]; exists {
-			return nil, fmt.Errorf("duplicate node semantic assignment for %d", assignment.NodeID)
-		}
-		regions[assignment.NodeID] = assignment.Region
-	}
-	return regions, nil
-}
-
-func columnIndexes(header []string, required ...string) (map[string]int, error) {
-	indexes := make(map[string]int, len(header))
-	for index, column := range header {
-		indexes[column] = index
-	}
-	for _, column := range required {
-		if _, ok := indexes[column]; !ok {
-			return nil, fmt.Errorf("missing %q column", column)
-		}
-	}
-	return indexes, nil
-}
-
 func initializePositions(nodes map[uint64]*layoutNode) {
+	// Seed by semantic region and behavioral community before physical forces run.
+	// A deterministic hash keeps repeated builds comparable without a random seed.
 	regions := make(map[string]map[int][]*layoutNode)
 	regionNames := make([]string, 0)
 	for _, node := range nodes {
@@ -336,6 +245,7 @@ func runLayout(nodes map[uint64]*layoutNode, edges []layoutEdge, iterations int)
 		communityCenters := calculateCommunityCenters(ordered)
 		regionCenters := calculateRegionCenters(ordered)
 
+		// Repulsion gives every node readable separation, scaled by its visible degree.
 		for left := 0; left < len(ordered); left++ {
 			for right := left + 1; right < len(ordered); right++ {
 				xDelta, yDelta := ordered[left].X-ordered[right].X, ordered[left].Y-ordered[right].Y
@@ -356,6 +266,8 @@ func runLayout(nodes map[uint64]*layoutNode, edges []layoutEdge, iterations int)
 			}
 		}
 
+		// Strong behavioral links pull topics together. Cross-region links remain
+		// informative but are weakened so semantic areas do not collapse together.
 		for _, edge := range edges {
 			left, right := indexByID[edge.SourceID], indexByID[edge.TargetID]
 			xDelta, yDelta := ordered[right].X-ordered[left].X, ordered[right].Y-ordered[left].Y
@@ -376,6 +288,9 @@ func runLayout(nodes map[uint64]*layoutNode, edges []layoutEdge, iterations int)
 			dy[right] -= yForce
 		}
 
+		// Community and region pulls preserve the map's two-level organization.
+		// Low-degree topics receive more semantic guidance because their graph signal
+		// is weaker than that of densely connected topics.
 		for index, node := range ordered {
 			center := communityCenters[node.CommunityID]
 			regionCenter := regionCenters[node.Region]
@@ -391,6 +306,8 @@ func runLayout(nodes map[uint64]*layoutNode, edges []layoutEdge, iterations int)
 			dy[index] -= 0.0012 * node.Y
 		}
 
+		// Cooling prevents late iterations from undoing the coarse structure formed
+		// by the earlier, larger force updates.
 		temperature := 0.45*(1-float64(iteration)/float64(iterations)) + 0.025
 		for index, node := range ordered {
 			step := math.Hypot(dx[index], dy[index])
@@ -476,6 +393,8 @@ func measureLayout(now time.Time, nodes map[uint64]*layoutNode, edges []layoutEd
 		edgeLengthTotal += edge.Weight * length
 	}
 
+	// Compare retained links with the same number of non-edge pairs. A fixed PRNG
+	// seed keeps this quality measurement reproducible between runs.
 	randomLengthTotal := 0.0
 	randomPairs := 0
 	seed := uint64(0x6a09e667f3bcc909)
@@ -572,15 +491,4 @@ func writeLayout(path string, nodes map[uint64]*layoutNode) error {
 		}
 	}
 	return writer.Error()
-}
-
-func writeJSON(path string, value any) error {
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	return encoder.Encode(value)
 }
