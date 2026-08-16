@@ -82,15 +82,16 @@ type communitySummary struct {
 
 const (
 	minDistinctAuthors         = 30
-	minReturningAuthors        = 6
+	minReturningAuthors        = 3
 	minActiveMonths            = 6
 	maxPeakWeekShare           = 0.50
-	minSpikeExceptionMonths    = 18
-	minSpikeExceptionReturners = 15
+	minSpikeExceptionMonths    = 15
+	minSpikeExceptionReturners = 12
 )
 
 func main() {
 	edgeDays := flag.Int("edge-days", 548, "Recent writer-overlap window in days")
+	skipDurability := flag.Bool("skip-durability", false, "Include every recently active topic, without applying the durable-topic policy")
 	minSharedAuthors := flag.Int("min-shared-authors", 3, "Minimum shared writers before ranking edges")
 	maxAuthorTopics := flag.Int("max-author-topics", 60, "Ignore authors active in more eligible topics than this")
 	topNeighbors := flag.Int("top-neighbors", 8, "Retain only mutual top-N neighbors per topic")
@@ -117,8 +118,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	slog.Info("loading durable, recently active topics", "edge_since", edgeSince)
-	nodes, err := loadEligibleNodes(*profilePath, edgeSince)
+	slog.Info("loading recently active topics", "edge_since", edgeSince, "skip_durability", *skipDurability)
+	nodes, err := loadEligibleNodes(*profilePath, edgeSince, *skipDurability)
 	if err != nil {
 		slog.Error("couldn't load map nodes", "error", err)
 		os.Exit(1)
@@ -183,10 +184,10 @@ func main() {
 	slog.Info("map edge profile complete", "nodes", len(nodes), "edges", len(edges), "mutual_edges", mutualEdges, "communities", len(communities), "out", *outDir)
 }
 
-// loadEligibleNodes applies the durable-topic policy from a prior all-history
-// profile, then keeps nodes active in the current writer-overlap window. Reusing
+// loadEligibleNodes keeps nodes active in the current writer-overlap window,
+// applying the durable-topic policy unless it is explicitly skipped. Reusing
 // the profile avoids recomputing an expensive all-history aggregation per run.
-func loadEligibleNodes(profilePath string, edgeSince int64) (map[uint64]*mapNode, error) {
+func loadEligibleNodes(profilePath string, edgeSince int64, skipDurability bool) (map[uint64]*mapNode, error) {
 	file, err := os.Open(profilePath)
 	if err != nil {
 		return nil, err
@@ -213,7 +214,7 @@ func loadEligibleNodes(profilePath string, edgeSince int64) (map[uint64]*mapNode
 		if err != nil {
 			return nil, err
 		}
-		if isDurableTopic(node) && node.LastEntryAt >= edgeSince {
+		if (skipDurability || isDurableTopic(node)) && node.LastEntryAt >= edgeSince {
 			nodes[node.TopicID] = node
 		}
 	}
@@ -221,13 +222,10 @@ func loadEligibleNodes(profilePath string, edgeSince int64) (map[uint64]*mapNode
 }
 
 func isDurableTopic(node *mapNode) bool {
-	if node.DistinctAuthors < minDistinctAuthors {
+	if node.DistinctAuthors < minDistinctAuthors || node.ReturningAuthors < minReturningAuthors || node.ActiveMonths < minActiveMonths {
 		return false
 	}
-	if node.ReturningAuthors >= minReturningAuthors && node.ActiveMonths >= minActiveMonths && node.PeakWeekShare <= maxPeakWeekShare {
-		return true
-	}
-	return node.ReturningAuthors >= minSpikeExceptionReturners && node.ActiveMonths >= minSpikeExceptionMonths
+	return node.PeakWeekShare <= maxPeakWeekShare || (node.ReturningAuthors >= minSpikeExceptionReturners && node.ActiveMonths >= minSpikeExceptionMonths)
 }
 
 func parseProfileNode(record []string) (*mapNode, error) {

@@ -77,6 +77,11 @@ var mapCache struct {
 	snapshot *MapSnapshot
 }
 
+var archiveMapCache struct {
+	mu       sync.RWMutex
+	snapshot *MapSnapshot
+}
+
 type rankedTopic struct {
 	topic model.Topic
 	heat  float64
@@ -262,11 +267,22 @@ func handleTopicBrief(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleMap(w http.ResponseWriter, r *http.Request) {
+	handleMapSnapshot(w, &mapCache)
+}
+
+func handleArchiveMap(w http.ResponseWriter, r *http.Request) {
+	handleMapSnapshot(w, &archiveMapCache)
+}
+
+func handleMapSnapshot(w http.ResponseWriter, cache *struct {
+	mu       sync.RWMutex
+	snapshot *MapSnapshot
+}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400")
-	mapCache.mu.RLock()
-	snapshot := mapCache.snapshot
-	mapCache.mu.RUnlock()
+	cache.mu.RLock()
+	snapshot := cache.snapshot
+	cache.mu.RUnlock()
 	if snapshot == nil {
 		_ = json.NewEncoder(w).Encode(MapSnapshot{Available: false})
 		return
@@ -311,6 +327,21 @@ func main() {
 		mapCache.snapshot = snapshot
 		slog.Info("map: snapshot loaded", "nodes", len(snapshot.Nodes), "edges", len(snapshot.Edges), "communities", len(snapshot.Clusters))
 	}
+	archiveLayoutDir := os.Getenv("GOK_ARCHIVE_MAP_LAYOUT_DIR")
+	if archiveLayoutDir == "" {
+		archiveLayoutDir = filepath.Join("reports", "maps", "archive", "current", "layout")
+	}
+	archiveGraphDir := os.Getenv("GOK_ARCHIVE_MAP_GRAPH_DIR")
+	if archiveGraphDir == "" {
+		archiveGraphDir = filepath.Join("reports", "maps", "archive", "current", "graph")
+	}
+	archiveSnapshot, err := loadMapSnapshot(archiveLayoutDir, archiveGraphDir)
+	if err != nil {
+		slog.Warn("archive map: generated reports unavailable", "layout_dir", archiveLayoutDir, "graph_dir", archiveGraphDir, "error", err)
+	} else {
+		archiveMapCache.snapshot = archiveSnapshot
+		slog.Info("archive map: snapshot loaded", "nodes", len(archiveSnapshot.Nodes), "edges", len(archiveSnapshot.Edges), "communities", len(archiveSnapshot.Clusters))
+	}
 
 	go func() {
 		ticker := time.NewTicker(refreshInterval)
@@ -322,12 +353,14 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/map", handleMap)
+	mux.HandleFunc("GET /api/archivemap", handleArchiveMap)
 	mux.HandleFunc("GET /api/topics/{topicID}/brief", handleTopicBrief)
 	mux.HandleFunc("GET /api/pulse/range", handlePulseRange)
 	mux.HandleFunc("GET /api/pulse", handlePulse)
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticFiles)))
 	mux.HandleFunc("GET /map", handleMapPage)
 	mux.HandleFunc("GET /atlas", handleMapPage)
+	mux.HandleFunc("GET /archivemap", handleMapPage)
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		data, err := staticFiles.ReadFile("static/index.html")
 		if err != nil {

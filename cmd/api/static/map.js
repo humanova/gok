@@ -47,11 +47,11 @@ const regionLabels = {
 };
 
 const regionPalette = {
-  football: [191, 56, 39], other_sports: [8, 49, 43], turkish_politics: [38, 47, 43],
-  world_politics: [186, 46, 40], relationships: [77, 40, 46], daily_life: [35, 47, 43],
-  music: [237, 42, 42], film_tv: [6, 46, 42], games_tech: [145, 48, 39], economy: [336, 43, 46],
-  culture_art: [313, 43, 43], society_identity: [347, 38, 47], science_health: [66, 37, 41],
-  local_life: [33, 42, 44], media: [334, 48, 44], news_events: [3, 42, 44], other: [97, 31, 41],
+  football: [193, 56, 39], other_sports: [276, 42, 43], turkish_politics: [39, 63, 42],
+  world_politics: [224, 48, 42], relationships: [87, 42, 44], daily_life: [27, 61, 43],
+  music: [244, 49, 45], film_tv: [2, 58, 46], games_tech: [151, 48, 38], economy: [320, 51, 45],
+  culture_art: [303, 47, 43], society_identity: [344, 53, 45], science_health: [178, 43, 37],
+  local_life: [49, 50, 39], media: [326, 39, 38], news_events: [14, 56, 42], other: [116, 34, 38],
 };
 
 function colorForRegion(region, alpha = 1) {
@@ -125,6 +125,7 @@ function drawRegionHalos(nodes) {
     if (selected && region !== selected.region) continue;
     const hull = state.regionHulls.get(region);
     if (hull.length < 3) continue;
+    const selectedRegion = selected?.region === region;
     context.save();
     context.beginPath();
     const first = screenPoint(hull[0]);
@@ -134,12 +135,12 @@ function drawRegionHalos(nodes) {
       context.lineTo(screen.x, screen.y);
     }
     context.closePath();
-    context.fillStyle = colorForRegion(region, 0.045);
-    context.strokeStyle = colorForRegion(region, 0.17);
-    context.lineWidth = 1;
+    context.fillStyle = colorForRegion(region, selectedRegion ? 0.08 : 0.045);
+    context.strokeStyle = colorForRegion(region, selectedRegion ? 0.36 : 0.17);
+    context.lineWidth = selectedRegion ? 1.35 : 1;
     context.lineJoin = 'round';
-    context.shadowColor = colorForRegion(region, 0.12);
-    context.shadowBlur = 18;
+    context.shadowColor = colorForRegion(region, selectedRegion ? 0.18 : 0.12);
+    context.shadowBlur = selectedRegion ? 20 : 18;
     context.fill();
     context.shadowBlur = 0;
     context.stroke();
@@ -158,7 +159,11 @@ function cacheRegionHulls(nodes) {
 }
 
 function radiusForNode(node) {
-  return Math.max(2.2, Math.min(9, 2 + Math.log2(node.degree + 1) * 1.35));
+  const degreeRadius = Math.max(2.2, Math.min(9, 2 + Math.log2(node.degree + 1) * 1.35));
+  const relativeZoom = state.transform.scale / state.fitScale;
+  const zoomProgress = Math.max(0, Math.min(1, Math.log2(relativeZoom) / 2));
+  const zoomFactor = 0.62 + 0.38 * zoomProgress;
+  return Math.max(1.3, degreeRadius * zoomFactor);
 }
 
 function clampScale(scale) {
@@ -419,8 +424,7 @@ function connectedNodes(node) {
     .map(edge => ({ id: edge.source === node.id ? edge.target : edge.source, weight: edge.weight }))
     .map(connection => ({ node: state.nodesByID.get(connection.id), weight: connection.weight }))
     .filter(connection => connection.node)
-    .sort((left, right) => right.weight - left.weight)
-    .slice(0, 5);
+    .sort((left, right) => right.weight - left.weight);
 }
 
 function renderConnections(node) {
@@ -463,7 +467,7 @@ function focusNode(node) {
 function updateSearch() {
   const query = searchInput.value.trim().toLocaleLowerCase('tr-TR');
   searchResults.replaceChildren();
-  if (!query) return;
+  if (!query || !state.data) return;
   const matches = state.data.nodes
     .filter(node => (state.activeRegion === 'all' || node.region === state.activeRegion) && node.title.toLocaleLowerCase('tr-TR').includes(query))
     .slice(0, 10);
@@ -483,7 +487,8 @@ function updateSearch() {
 
 async function loadMap() {
   try {
-    const response = await fetch('/api/map');
+    const endpoint = window.location.pathname === '/archivemap' ? '/api/archivemap' : '/api/map';
+    const response = await fetch(endpoint);
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
     if (!data.available) throw new Error('harita verisi bulunamadı');

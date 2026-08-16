@@ -109,7 +109,7 @@ func main() {
 	for start := 0; start < len(clusters); start += *batchSize {
 		end := min(start+*batchSize, len(clusters))
 		fmt.Printf("reconciling communities %d-%d of %d\n", start+1, end, len(clusters))
-		assignments, err := classifyBatch(ctx, client, config.Config.GeminiModel, clusters[start:end], allowed)
+		assignments, err := classifyBatchWithRetry(ctx, client, config.Config.GeminiModel, clusters[start:end], allowed)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "classify communities %d-%d: %v\n", start+1, end, err)
 			os.Exit(1)
@@ -232,6 +232,21 @@ func classifyBatch(ctx context.Context, client *genai.Client, model string, clus
 		assignment.Reason = strings.TrimSpace(assignment.Reason)
 	}
 	return decoded.Assignments, nil
+}
+
+func classifyBatchWithRetry(ctx context.Context, client *genai.Client, model string, clusters []clusterInput, allowed map[string]struct{}) ([]assignment, error) {
+	var lastErr error
+	for attempt := 1; attempt <= 3; attempt++ {
+		assignments, err := classifyBatch(ctx, client, model, clusters, allowed)
+		if err == nil {
+			return assignments, nil
+		}
+		lastErr = err
+		if attempt < 3 {
+			fmt.Printf("retrying malformed community batch (attempt %d): %v\n", attempt+1, err)
+		}
+	}
+	return nil, lastErr
 }
 
 func allowedRegions() map[string]struct{} {

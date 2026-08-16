@@ -54,6 +54,19 @@ For a plain-language explanation of which topics appear and how they are grouped
 ./scripts/build-map-pipeline.sh
 ```
 
+To include every topic with activity in the last month, without applying the
+durable-topic screen:
+
+```bash
+./scripts/build-map-pipeline.sh --skip-durability --edge-days 30
+```
+
+To publish a snapshot under a specific map name:
+
+```bash
+./scripts/build-map-pipeline.sh --map-name monthly
+```
+
 The API loads `reports/maps/current` once at startup, serves it at `/api/map`, and renders the interactive canvas at `/map`. The map response is browser-cacheable for five minutes and shared-cacheable for one hour; rebuild only when you deliberately want a new map, then restart the API.
 
 Optional environment overrides for a nonstandard snapshot location:

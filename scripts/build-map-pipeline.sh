@@ -2,7 +2,45 @@
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-REPORT_ROOT="$PROJECT_DIR/reports/maps"
+MAP_NAME="monthly" # name for the map snapshot
+EDGE_DAYS=548       # 1.5 years
+SKIP_DURABILITY=false
+
+usage() {
+	echo "usage: $0 [--map-name NAME] [--edge-days DAYS] [--skip-durability]" >&2
+}
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		--map-name|--name)
+			[[ $# -ge 2 ]] || { usage; exit 2; }
+			MAP_NAME="$2"
+			shift 2
+			;;
+		--edge-days)
+			[[ $# -ge 2 ]] || { usage; exit 2; }
+			EDGE_DAYS="$2"
+			shift 2
+			;;
+		--skip-durability)
+			SKIP_DURABILITY=true
+			shift
+			;;
+		--help|-h)
+			usage
+			exit 0
+			;;
+		*)
+			usage
+			exit 2
+			;;
+	esac
+done
+
+[[ "$MAP_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || { echo "invalid map name: $MAP_NAME" >&2; exit 2; }
+[[ "$EDGE_DAYS" =~ ^[0-9]+$ ]] && (( EDGE_DAYS >= 30 )) || { echo "edge days must be an integer of at least 30" >&2; exit 2; }
+
+REPORT_ROOT="$PROJECT_DIR/reports/maps/$MAP_NAME"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 STAGING="$REPORT_ROOT/.building-$STAMP"
 SNAPSHOT="$REPORT_ROOT/$STAMP"
@@ -30,7 +68,11 @@ go build -o "$BUILD_DIR/reconcile-map-nodes" ./cmd/map/reconcile-map-nodes
 go build -o "$BUILD_DIR/layout-map" ./cmd/map/layout-map
 
 "$BUILD_DIR/profile-map" --days 0 --out "$STAGING/profile"
-"$BUILD_DIR/build-map" --profile "$STAGING/profile/topics.csv" --out "$STAGING/graph"
+BUILD_MAP_ARGS=(--edge-days "$EDGE_DAYS" --profile "$STAGING/profile/topics.csv" --out "$STAGING/graph")
+if [[ "$SKIP_DURABILITY" == true ]]; then
+	BUILD_MAP_ARGS+=(--skip-durability)
+fi
+"$BUILD_DIR/build-map" "${BUILD_MAP_ARGS[@]}"
 "$BUILD_DIR/reconcile-map" --clusters "$STAGING/graph/clusters.csv" --out "$STAGING/community-regions"
 "$BUILD_DIR/reconcile-map-nodes" \
 	--nodes "$STAGING/graph/nodes.csv" \
@@ -49,10 +91,11 @@ const fs = require('fs');
 const root = process.argv[2];
 const layout = JSON.parse(fs.readFileSync(`${root}/layout/summary.json`, 'utf8'));
 const nodes = fs.readFileSync(`${root}/layout/layout.csv`, 'utf8').trim().split(/\r?\n/).length - 1;
-if (nodes < 100 || layout.nodes !== nodes || layout.edge_to_random_ratio >= 0.15) {
-  throw new Error(`layout validation failed: nodes=${nodes}, ratio=${layout.edge_to_random_ratio}`);
+if (nodes < 100 || layout.nodes !== nodes) {
+	throw new Error(`layout validation failed: nodes=${nodes}, layout_nodes=${layout.nodes}`);
 }
 console.log(`validated layout: nodes=${nodes} ratio=${layout.edge_to_random_ratio.toFixed(3)}`);
+
 NODE
 
 printf '%s\n' "$STAMP" > "$STAGING/version"

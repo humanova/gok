@@ -12,6 +12,7 @@ type HotTopic struct {
 	Topic
 	Appearances uint64  // how many times it appeared in popular_topics within the window
 	AvgRank     float64 // lower is hotter (rank 1 = top of the list)
+	HeatScore   float64 // higher is hotter
 	TotalNew    uint64  // peak new_entries seen in a single scrape within the window
 }
 
@@ -71,24 +72,19 @@ func GetHotTopics(hoursBack int, topK int) ([]HotTopic, error) {
 		hot = append(hot, HotTopic{
 			Topic:       t,
 			Appearances: a.appearances,
-			AvgRank:     heat, // will be restored after sort
+			AvgRank:     avgRank,
+			HeatScore:   heat,
 			TotalNew:    a.maxNew,
 		})
 	}
 
-	// Sort descending by heat (stored in AvgRank after the loop above)
+	// Sort descending by heat.
 	sort.Slice(hot, func(i, j int) bool {
-		return hot[i].AvgRank > hot[j].AvgRank
+		return hot[i].HeatScore > hot[j].HeatScore
 	})
 
 	if topK > 0 && len(hot) > topK {
 		hot = hot[:topK]
-	}
-
-	// Restore real avgRank for callers (recompute cleanly)
-	for i, h := range hot {
-		a := byTopic[h.TopicId]
-		hot[i].AvgRank = float64(a.totalRank) / float64(a.appearances)
 	}
 
 	return hot, nil

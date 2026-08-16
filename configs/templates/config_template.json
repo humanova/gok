@@ -10,7 +10,7 @@
   "EntryCollectorRandomDelay" : 100,
   "EmbedderUrl" : "http://localhost:8765",
   "GeminiApiKey" : "",
-  "GeminiModel" : "gemini-3.5-flash",
+  "GeminiModel" : "gemini-3.5-flash-lite",
   "DigestIntervalMinutes" : 720,
   "TopicBriefIntervalMinutes" : 720,
   "ApiPort" : 8080

@@ -58,7 +58,7 @@ func GenerateDigest(ctx context.Context, _ *embedder.Client, synthesizer DigestS
 	}
 	scored := make([]scoredTopic, 0, len(burstTopics))
 	for _, bt := range burstTopics {
-		burstScore := bt.AvgRank // AvgRank holds heat after GetHotTopics
+		burstScore := bt.HeatScore
 		momentumScore := momentumMap[bt.TopicId]
 		finalHeat := 0.7*burstScore + 0.3*momentumScore
 
@@ -77,7 +77,7 @@ func GenerateDigest(ctx context.Context, _ *embedder.Client, synthesizer DigestS
 	hotTopics := make([]model.HotTopic, len(scored))
 	for i, st := range scored {
 		hotTopics[i] = st.topic
-		hotTopics[i].AvgRank = st.finalHeat // store final heat in AvgRank for quota calc
+		hotTopics[i].HeatScore = st.finalHeat
 	}
 
 	slog.Info("digest: hot topics scored", "count", len(hotTopics))

@@ -1,7 +1,9 @@
 package config
 
 import (
+	"errors"
 	"log"
+	"os"
 
 	"github.com/tkanos/gonfig"
 )
@@ -12,7 +14,7 @@ var (
 
 func init() {
 	err := GetConfig("./configs/config.json", &Config)
-	if err != nil {
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		log.Panicf("couldn't get/parse the config : %v", err)
 	}
 }
@@ -27,13 +29,13 @@ type Configuration struct {
 	DbSSLMode                 string
 	EntryCollectorDelay       int64
 	EntryCollectorRandomDelay int64
-	// EkşiPulse additions
+	// EksiRadar additions
 	EmbedderUrl               string // e.g. "http://localhost:8765"
 	GeminiApiKey              string
-	GeminiModel               string // e.g. "gemini-3.5-flash"
-	DigestIntervalMinutes     int    // how often to regenerate precomputed digest (minutes)
-	TopicBriefIntervalMinutes int    // how often to regenerate topic radar briefs (minutes)
-	ApiPort                   int    // port for gok-api HTTP server
+	GeminiModel               string
+	DigestIntervalMinutes     int // how often to regenerate precomputed digest (minutes)
+	TopicBriefIntervalMinutes int // how often to regenerate topic radar briefs (minutes)
+	ApiPort                   int // port for gok-api HTTP server
 }
 
 func GetConfig(configPath string, config *Configuration) error {
