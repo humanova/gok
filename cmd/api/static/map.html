@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>gök atlas</title>
-  <link rel="stylesheet" href="/static/map.css?v=20260804-2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/map.css?v=20260816-2">
 </head>
 <body>
   <main id="map-app">
@@ -28,6 +31,7 @@
     </header>
 
     <section class="map-controls" aria-label="Harita ayarları">
+      <button id="info-toggle" type="button" aria-controls="map-info-panel" aria-expanded="false" title="Harita hakkında" aria-label="Harita hakkında">i</button>
       <button id="reset-view" type="button" title="Görünümü sıfırla" aria-label="Görünümü sıfırla">↺</button>
       <label class="label-toggle" title="Bölge etiketlerini göster">
         <input id="label-toggle" type="checkbox" checked>
@@ -35,12 +39,43 @@
       </label>
     </section>
 
+    <aside id="map-info-panel" aria-labelledby="map-info-title" hidden>
+      <header class="map-info-header">
+        <div>
+          <h1 id="map-info-title"></h1>
+          <p id="map-info-window"></p>
+        </div>
+        <div class="map-info-actions">
+          <div class="map-language-switch" role="group" aria-label="Information panel language">
+            <button type="button" data-language="tr" aria-pressed="true">TR</button>
+            <button type="button" data-language="en" aria-pressed="false">EN</button>
+          </div>
+          <button id="close-info-panel" type="button" aria-label="Harita bilgisini kapat" title="Harita bilgisini kapat">×</button>
+        </div>
+      </header>
+      <nav class="map-switcher" aria-label="Harita kapsamı">
+        <a href="/map" data-map="current"></a>
+        <a href="/long-term-map" data-map="long-term"></a>
+      </nav>
+      <dl id="map-facts" aria-label="Harita özeti"></dl>
+      <div class="map-info-copy">
+        <p id="map-info-intro"></p>
+        <h2 id="map-info-heading"></h2>
+        <p id="map-info-eligibility"></p>
+        <p id="map-info-connection"></p>
+        <p id="map-info-note"></p>
+        <p class="map-project-links"><span id="map-contact-text"></span><a href="https://x.com/humanova" target="_blank" rel="noopener noreferrer">x.com/humanova</a></p>
+        <p class="map-project-links"><span id="map-github-text"></span><a href="https://github.com/humanova/gok" target="_blank" rel="noopener noreferrer">GitHub</a><span id="map-github-suffix"></span></p>
+        <p id="map-generated-at" class="map-generated-at"></p>
+      </div>
+    </aside>
+
     <aside id="topic-panel" aria-live="polite" hidden>
       <div id="panel-detail">
         <div class="panel-summary">
           <div class="panel-heading">
-            <span id="panel-community">TOPLULUK</span>
             <h1 id="panel-title"></h1>
+            <p id="panel-region"></p>
           </div>
           <div class="panel-actions">
             <a id="panel-link" target="_blank" rel="noopener noreferrer" aria-label="Ekşi Sözlük'te aç" title="Ekşi Sözlük'te aç">↗</a>
@@ -54,6 +89,6 @@
     <div id="hover-tooltip" role="tooltip" hidden></div>
     <div id="map-status" role="status">harita yükleniyor</div>
   </main>
-  <script src="/static/map.js?v=20260804-2"></script>
+  <script src="/static/map.js?v=20260817-1"></script>
 </body>
 </html>

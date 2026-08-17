@@ -77,7 +77,7 @@ var mapCache struct {
 	snapshot *MapSnapshot
 }
 
-var archiveMapCache struct {
+var longTermMapCache struct {
 	mu       sync.RWMutex
 	snapshot *MapSnapshot
 }
@@ -270,8 +270,8 @@ func handleMap(w http.ResponseWriter, r *http.Request) {
 	handleMapSnapshot(w, &mapCache)
 }
 
-func handleArchiveMap(w http.ResponseWriter, r *http.Request) {
-	handleMapSnapshot(w, &archiveMapCache)
+func handleLongTermMap(w http.ResponseWriter, r *http.Request) {
+	handleMapSnapshot(w, &longTermMapCache)
 }
 
 func handleMapSnapshot(w http.ResponseWriter, cache *struct {
@@ -327,20 +327,26 @@ func main() {
 		mapCache.snapshot = snapshot
 		slog.Info("map: snapshot loaded", "nodes", len(snapshot.Nodes), "edges", len(snapshot.Edges), "communities", len(snapshot.Clusters))
 	}
-	archiveLayoutDir := os.Getenv("GOK_ARCHIVE_MAP_LAYOUT_DIR")
-	if archiveLayoutDir == "" {
-		archiveLayoutDir = filepath.Join("reports", "maps", "archive", "current", "layout")
+	longTermLayoutDir := os.Getenv("GOK_LONG_TERM_MAP_LAYOUT_DIR")
+	if longTermLayoutDir == "" {
+		longTermLayoutDir = os.Getenv("GOK_ARCHIVE_MAP_LAYOUT_DIR")
 	}
-	archiveGraphDir := os.Getenv("GOK_ARCHIVE_MAP_GRAPH_DIR")
-	if archiveGraphDir == "" {
-		archiveGraphDir = filepath.Join("reports", "maps", "archive", "current", "graph")
+	if longTermLayoutDir == "" {
+		longTermLayoutDir = filepath.Join("reports", "maps", "archive", "current", "layout")
 	}
-	archiveSnapshot, err := loadMapSnapshot(archiveLayoutDir, archiveGraphDir)
+	longTermGraphDir := os.Getenv("GOK_LONG_TERM_MAP_GRAPH_DIR")
+	if longTermGraphDir == "" {
+		longTermGraphDir = os.Getenv("GOK_ARCHIVE_MAP_GRAPH_DIR")
+	}
+	if longTermGraphDir == "" {
+		longTermGraphDir = filepath.Join("reports", "maps", "archive", "current", "graph")
+	}
+	longTermSnapshot, err := loadMapSnapshot(longTermLayoutDir, longTermGraphDir)
 	if err != nil {
-		slog.Warn("archive map: generated reports unavailable", "layout_dir", archiveLayoutDir, "graph_dir", archiveGraphDir, "error", err)
+		slog.Warn("long-term map: generated reports unavailable", "layout_dir", longTermLayoutDir, "graph_dir", longTermGraphDir, "error", err)
 	} else {
-		archiveMapCache.snapshot = archiveSnapshot
-		slog.Info("archive map: snapshot loaded", "nodes", len(archiveSnapshot.Nodes), "edges", len(archiveSnapshot.Edges), "communities", len(archiveSnapshot.Clusters))
+		longTermMapCache.snapshot = longTermSnapshot
+		slog.Info("long-term map: snapshot loaded", "nodes", len(longTermSnapshot.Nodes), "edges", len(longTermSnapshot.Edges), "communities", len(longTermSnapshot.Clusters))
 	}
 
 	go func() {
@@ -353,14 +359,20 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/map", handleMap)
-	mux.HandleFunc("GET /api/archivemap", handleArchiveMap)
+	mux.HandleFunc("GET /api/long-term-map", handleLongTermMap)
+	mux.HandleFunc("GET /api/archivemap", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/api/long-term-map", http.StatusMovedPermanently)
+	})
 	mux.HandleFunc("GET /api/topics/{topicID}/brief", handleTopicBrief)
 	mux.HandleFunc("GET /api/pulse/range", handlePulseRange)
 	mux.HandleFunc("GET /api/pulse", handlePulse)
 	mux.Handle("GET /static/", http.FileServer(http.FS(staticFiles)))
 	mux.HandleFunc("GET /map", handleMapPage)
 	mux.HandleFunc("GET /atlas", handleMapPage)
-	mux.HandleFunc("GET /archivemap", handleMapPage)
+	mux.HandleFunc("GET /long-term-map", handleMapPage)
+	mux.HandleFunc("GET /archivemap", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/long-term-map", http.StatusMovedPermanently)
+	})
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		data, err := staticFiles.ReadFile("static/index.html")
 		if err != nil {

@@ -7,17 +7,67 @@ const searchResults = document.getElementById('search-results');
 const regionSelect = document.getElementById('region-select');
 const labelToggle = document.getElementById('label-toggle');
 const resetButton = document.getElementById('reset-view');
+const infoToggle = document.getElementById('info-toggle');
 const status = document.getElementById('map-status');
 const topicPanel = document.getElementById('topic-panel');
 const panelTitle = document.getElementById('panel-title');
-const panelCommunity = document.getElementById('panel-community');
+const panelRegion = document.getElementById('panel-region');
 const panelConnections = document.getElementById('panel-connections');
 const panelLink = document.getElementById('panel-link');
 const closePanel = document.getElementById('close-panel');
 const hoverTooltip = document.getElementById('hover-tooltip');
+const infoPanel = document.getElementById('map-info-panel');
+const closeInfoPanel = document.getElementById('close-info-panel');
+const mapInfoTitle = document.getElementById('map-info-title');
+const mapInfoWindow = document.getElementById('map-info-window');
+const mapFacts = document.getElementById('map-facts');
+const mapGeneratedAt = document.getElementById('map-generated-at');
+const languageButtons = document.querySelectorAll('[data-language]');
+const mapInfoText = {
+  intro: document.getElementById('map-info-intro'),
+  heading: document.getElementById('map-info-heading'),
+  eligibility: document.getElementById('map-info-eligibility'),
+  connection: document.getElementById('map-info-connection'),
+  note: document.getElementById('map-info-note'),
+  contact: document.getElementById('map-contact-text'),
+  github: document.getElementById('map-github-text'),
+  githubSuffix: document.getElementById('map-github-suffix'),
+};
 
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 24;
+const INFO_PANEL_VISIBILITY_KEY = 'gok-atlas-info-panel-visible';
+
+const mapVariant = window.location.pathname === '/long-term-map' ? 'long-term' : 'current';
+const mapDetails = {
+  current: { endpoint: '/api/map' },
+  'long-term': { endpoint: '/api/long-term-map' },
+};
+
+const infoTranslations = {
+  tr: {
+    titles: { current: 'Güncel Harita', 'long-term': 'Uzun Dönem Haritası' },
+    mapLabels: { current: 'Güncel', 'long-term': 'Uzun dönem' }, facts: ['başlık', 'bağlantı', 'bölge'],
+    period: 'Seçilen dönem', ago: 'Son', days: 'gün', months: 'ay', years: 'yıl',
+    intro: "Bu harita, Ekşi Sözlük'te canlılığını koruyan başlıkları ve birbirleriyle olan bağlantılarını gösterir.",
+    heading: 'Harita nasıl oluşturuldu?',
+    eligibility: "Bir başlığın yer alabilmesi için en az 30 farklı yazarın yazmış olması, bu yazarlardan en az 3'ünün farklı aylarda tekrar yazması ve başlığın en az 6 ay boyunca aktif kalması gerekir. Böylece günlük haberler ve diğer anlık/kısa süreli başlıklar dışarıda bırakılır.",
+    connection: 'Bir bağlantı, en az 3 yazarın iki başlıkta da yazdığını gösterir. Anlamlı ilişkilerin tespit edilebilmesi için çok sayıda başlığa yazan yazarlar hesaba katılmamıştır.',
+    note: 'Bağlantılar başlıkların benzer olduğunu değil yalnızca yazarlarının kesiştiğini gösterir.',
+    contact: 'Bana ulaşmak için: ', github: 'İlginizi çektiyse yıldızlayabilirsiniz: ', githubSuffix: '', updated: 'Son güncelleme:', locale: 'tr-TR',
+  },
+  en: {
+    titles: { current: 'Current Map', 'long-term': 'Long-Term Map' },
+    mapLabels: { current: 'Current', 'long-term': 'Long term' }, facts: ['topics', 'links', 'regions'],
+    period: 'Selected period', ago: 'Last', days: 'days', months: 'months', years: 'years',
+    intro: 'This map shows the enduring Ekşi Sözlük topics and the links between them.',
+    heading: 'How is the map made?',
+    eligibility: 'A topic needs at least 30 distinct writers, 3 writers who return in different months, and activity across at least 6 months. Short-lived spikes and event-driven topics are left out.',
+    connection: 'A link means that at least 3 writers contributed to both topics. Writers active across many topics are excluded from this calculation.',
+    note: 'Links do not mean the topics are similar or share a point of view. They only show an overlap in writers.',
+    contact: 'Feel free to reach me on ', github: 'If you find it useful, star it on ', githubSuffix: '.', updated: 'Last updated:', locale: 'en-GB',
+  },
+};
 
 const state = {
   data: null,
@@ -36,6 +86,7 @@ const state = {
   regionLabels: new Map(),
   activeRegion: 'all',
   degreeRingThreshold: Infinity,
+  infoLanguage: 'tr',
 };
 
 const regionLabels = {
@@ -57,6 +108,86 @@ const regionPalette = {
 function colorForRegion(region, alpha = 1) {
   const [hue, saturation, lightness] = regionPalette[region] || [152, 35, 40];
   return `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha})`;
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat(infoTranslations[state.infoLanguage].locale).format(value);
+}
+
+function formatWindow(windowStart, generatedAt) {
+  const translation = infoTranslations[state.infoLanguage];
+  const start = new Date(windowStart);
+  const end = new Date(generatedAt);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) return translation.period;
+  let months = (end.getUTCFullYear() - start.getUTCFullYear()) * 12 + end.getUTCMonth() - start.getUTCMonth();
+  if (end.getUTCDate() < start.getUTCDate()) months--;
+  if (months < 1) return `${translation.ago} ${formatNumber(Math.round((end - start) / 86_400_000))} ${translation.days}`;
+  const years = Math.floor(months / 12);
+  months %= 12;
+  const parts = [];
+  if (years) parts.push(`${formatNumber(years)} ${translation.years}`);
+  if (months) parts.push(`${formatNumber(months)} ${translation.months}`);
+  return `${translation.ago} ${parts.join(' ')}`;
+}
+
+function getInitialInfoPanelVisibility() {
+  try {
+    return localStorage.getItem(INFO_PANEL_VISIBILITY_KEY) !== 'false';
+  } catch {
+    return true;
+  }
+}
+
+function setInfoPanelVisible(visible, persist = true) {
+  infoPanel.hidden = !visible;
+  infoToggle.setAttribute('aria-expanded', String(visible));
+  if (persist) {
+    try {
+      localStorage.setItem(INFO_PANEL_VISIBILITY_KEY, String(visible));
+    } catch {}
+  }
+}
+
+function renderMapInfo(data) {
+  const translation = infoTranslations[state.infoLanguage];
+  mapInfoTitle.textContent = translation.titles[mapVariant];
+  mapInfoWindow.textContent = formatWindow(data.window_start, data.generated_at);
+  mapInfoText.intro.textContent = translation.intro;
+  mapInfoText.heading.textContent = translation.heading;
+  mapInfoText.eligibility.textContent = translation.eligibility;
+  mapInfoText.connection.textContent = translation.connection;
+  mapInfoText.note.textContent = translation.note;
+  mapInfoText.contact.textContent = translation.contact;
+  mapInfoText.github.textContent = translation.github;
+  mapInfoText.githubSuffix.textContent = translation.githubSuffix;
+  mapFacts.replaceChildren();
+  const facts = [
+    [translation.facts[0], data.nodes.length],
+    [translation.facts[1], data.edges.length],
+    [translation.facts[2], new Set(data.nodes.map(node => node.region)).size],
+  ];
+  for (const [label, value] of facts) {
+    const term = document.createElement('dt');
+    term.textContent = label;
+    const detail = document.createElement('dd');
+    detail.textContent = formatNumber(value);
+    mapFacts.append(term, detail);
+  }
+  for (const link of document.querySelectorAll('.map-switcher a')) {
+    const active = link.dataset.map === mapVariant;
+    link.textContent = translation.mapLabels[link.dataset.map];
+    link.setAttribute('aria-current', active ? 'page' : 'false');
+  }
+  for (const button of languageButtons) {
+    button.setAttribute('aria-pressed', String(button.dataset.language === state.infoLanguage));
+  }
+  if (data.generated_at) {
+    const generatedAt = new Date(data.generated_at).toLocaleString(translation.locale, {
+      day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC',
+    });
+    mapGeneratedAt.textContent = `${translation.updated} ${generatedAt} UTC`;
+  }
+  document.title = `gök atlas · ${translation.titles[mapVariant]}`;
 }
 
 function resizeCanvas() {
@@ -412,7 +543,7 @@ function selectNode(id) {
   if (!node) return;
   topicPanel.hidden = false;
   panelTitle.textContent = node.title;
-  panelCommunity.textContent = regionLabels[node.region] || node.region.toUpperCase();
+  panelRegion.textContent = regionLabels[node.region] || node.region;
   renderConnections(node);
   panelLink.href = node.url;
   draw();
@@ -487,8 +618,7 @@ function updateSearch() {
 
 async function loadMap() {
   try {
-    const endpoint = window.location.pathname === '/archivemap' ? '/api/archivemap' : '/api/map';
-    const response = await fetch(endpoint);
+    const response = await fetch(mapDetails[mapVariant].endpoint);
     if (!response.ok) throw new Error(String(response.status));
     const data = await response.json();
     if (!data.available) throw new Error('harita verisi bulunamadı');
@@ -498,6 +628,7 @@ async function loadMap() {
     cacheRegionHulls(data.nodes);
     for (const cluster of data.clusters) state.clustersByID.set(cluster.id, cluster);
     initializeRegions(data.nodes);
+    renderMapInfo(data);
     status.textContent = '';
     resizeCanvas();
     fitView();
@@ -615,8 +746,20 @@ regionSelect.addEventListener('change', () => {
   fitView();
 });
 labelToggle.addEventListener('change', draw);
-resetButton.addEventListener('click', fitView);
+resetButton.addEventListener('click', () => {
+  clearSelection();
+  fitView();
+});
+infoToggle.addEventListener('click', () => setInfoPanelVisible(infoPanel.hidden));
+closeInfoPanel.addEventListener('click', () => setInfoPanelVisible(false));
+for (const button of languageButtons) {
+  button.addEventListener('click', () => {
+    state.infoLanguage = button.dataset.language;
+    if (state.data) renderMapInfo(state.data);
+  });
+}
 closePanel.addEventListener('click', clearSelection);
 window.addEventListener('resize', resizeCanvas);
 
+setInfoPanelVisible(getInitialInfoPanelVisibility(), false);
 loadMap();

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -37,6 +38,7 @@ type MapCluster struct {
 type MapSnapshot struct {
 	Available   bool         `json:"available"`
 	GeneratedAt time.Time    `json:"generated_at,omitempty"`
+	WindowStart time.Time    `json:"window_start,omitempty"`
 	Nodes       []MapNode    `json:"nodes,omitempty"`
 	Edges       []MapEdge    `json:"edges,omitempty"`
 	Clusters    []MapCluster `json:"clusters,omitempty"`
@@ -59,7 +61,29 @@ func loadMapSnapshot(layoutDir, graphDir string) (*MapSnapshot, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MapSnapshot{Available: true, GeneratedAt: info.ModTime().UTC(), Nodes: nodes, Edges: edges, Clusters: clusters}, nil
+	windowStart, err := loadMapWindowStart(filepath.Join(graphDir, "summary.json"))
+	if err != nil {
+		return nil, err
+	}
+	return &MapSnapshot{Available: true, GeneratedAt: info.ModTime().UTC(), WindowStart: windowStart, Nodes: nodes, Edges: edges, Clusters: clusters}, nil
+}
+
+func loadMapWindowStart(path string) (time.Time, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return time.Time{}, err
+	}
+	defer file.Close()
+	var summary struct {
+		EdgeWindowStart time.Time `json:"edge_window_start"`
+	}
+	if err := json.NewDecoder(file).Decode(&summary); err != nil {
+		return time.Time{}, fmt.Errorf("decode graph summary: %w", err)
+	}
+	if summary.EdgeWindowStart.IsZero() {
+		return time.Time{}, fmt.Errorf("graph summary is missing edge_window_start")
+	}
+	return summary.EdgeWindowStart, nil
 }
 
 func loadMapNodes(graphPath, layoutPath string) ([]MapNode, error) {

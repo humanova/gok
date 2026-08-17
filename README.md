@@ -1,78 +1,91 @@
 # gok
 
-A Go scraper that periodically collects popular topics and entries from [eksisozluk.com](https://eksisozluk.com) and persists them to PostgreSQL. It also generates a structured AI digest of the day's discourse.
+`gok` collects public Ekşi Sözlük discussion data in real-time and turns it into two ways to discover what people are talking about:
 
-## Scraper
+- **Radar**: a live view of topics gaining activity, with rank movement, timeline slider, and short AI summaries.
+- **Atlas**: 2 browsable maps of durable discussion areas, built from shared writer participation. 
 
-`gocron` calls `scraper.ScrapeAll()` every `ScrapeInterval` minutes. Two colly collectors scrape the topic list and then each topic's entry pages (paginated via `?focusto=<lastEntryId+1>`). Results flow through channels and are batch-inserted in chunks of 250.
+The scraper and PostgreSQL database are the foundation. Embeddings and the AI-generated daily digest are optional supporting features, not the project's main path.
 
-## Digest Pipeline
+## What It Does
 
-1. **Embedder service** (`embedder/main.py`): FastAPI service that loads `intfloat/multilingual-e5-small` and exposes an `/embed` endpoint. Entry texts are embedded and stored as `vector(384)` in PostgreSQL (pgvector).
+### Scraping
 
-2. **Hot topic selection** (`rag/digest.go`): fetches the top 15 hottest topics from the last 3 hours, allocates an entry budget of 250 proportional to each topic's heat score.
+The scraper periodically collects popular topics and their new entries from [eksisozluk.com](https://eksisozluk.com). It paginates from the last stored entry, deduplicates data in PostgreSQL, and retains enough history to power both live and long-term discovery.
 
-3. **Viewpoint clustering** (`rag/viewpoints.go`): for each topic, entries are clustered into 3 perspective groups by cosine similarity of their embeddings.
+### Radar
 
-4. **LLM synthesis** (`llm/gemini.go`): topic bundles (clusters of entries) are serialised into a prompt and sent to Gemini, which returns a structured `DigestPayload` JSON.
+The API serves the Radar UI at `/`. It ranks topics by recent entry activity, shows rank changes, and animates new entries as they arrive. Users can revisit any point in the last 24 hours and replay the following activity at `1x`, or `60x`.
+AI-generated briefs give readers a concise explanation of a selected topic when Gemini is configured.
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Radar |
+| `/map` or `/atlas` | Current topic map |
+| `/archivemap` | Archived topic map |
+| `/api/pulse` | Current Radar data |
+| `/api/map` | Current map snapshot |
+
+### Topic Map
+
+Atlas is an offline snapshot of durable, recently active topics. It connects topics when enough of the same writers participate in both, forms communities from those links, assigns browseable regions, computes coordinates, validates the layout, and publishes the result atomically.
+
+The map is behavior-led: a link represents shared participation, not semantic similarity or a claim that the two topics are alike. See [Map curation](docs/map-curation.md) for the selection and grouping rules.
 
 ## Setup
+
+Prerequisites: Go, PostgreSQL, and a populated [configuration file](configs/templates/config_template.json).
 
 ```bash
 # Copy and fill in config
 cp configs/templates/config_template.json configs/config.json
 
-# Create DB
+# Create the database and user (adjust credentials to match your config)
 psql -U postgres -c "CREATE USER gok WITH PASSWORD 'gok';"
 psql -U postgres -c "CREATE DATABASE gok OWNER gok;"
 
-# Install embedder deps
-pip install -r embedder/requirements.txt
-
-# Build
+# Build the scraper, Radar API, and background AI worker
 go build -o gok ./cmd/gok
-go build -o print-digest ./cmd/print-digest
+go build -o api ./cmd/api
+go build -o digen ./cmd/digen
 ```
 
 ## Run
 
-```bash
-# Start embedder sidecar
-python embedder/main.py
+Start the scraper and background worker. The worker generates Radar topic briefs when a `GeminiApiKey` is configured.
 
-# Run scraper (with auto-restart loop)
+```bash
 ./run.sh
 ```
 
-## Topic Map Pipeline
-
-The topic map is an offline, versioned snapshot. It builds behavioral writer-overlap communities, audits their semantic regions with Gemini, computes stable coordinates, validates the layout, then atomically publishes a new `reports/maps/current` snapshot.
-
-For a plain-language explanation of which topics appear and how they are grouped and labelled, see [Map curation](docs/map-curation.md).
+In another terminal, start Radar and open `http://localhost:8080` (or the configured `ApiPort`):
 
 ```bash
-./scripts/build-map-pipeline.sh
+./api
 ```
 
-To include every topic with activity in the last month, without applying the
-durable-topic screen:
+Build and publish a fresh current map snapshot, then restart the API so it loads the new snapshot:
 
 ```bash
-./scripts/build-map-pipeline.sh --skip-durability --edge-days 30
+./scripts/build-map-pipeline.sh --map-name current
 ```
 
-To publish a snapshot under a specific map name:
+The map pipeline needs Gemini to label its browseable regions. It writes timestamped artifacts under `reports/maps/current/`; the API loads that location at startup. Use `--skip-durability --edge-days 30` to include every topic active in the last month, or choose another published map with `--map-name NAME`.
+
+## Optional AI Features
+
+Semantic search and the Turkish daily digest use entry embeddings and Gemini. They are useful additions to the collected corpus, but Radar and Atlas do not require embeddings.
+
+To enable them, configure `EmbedderUrl`, install the Python dependencies, and run the embedder sidecar:
 
 ```bash
-./scripts/build-map-pipeline.sh --map-name monthly
+pip install -r embedder/requirements.txt
+python embedder/main.py
 ```
 
-The API loads `reports/maps/current` once at startup, serves it at `/api/map`, and renders the interactive canvas at `/map`. The map response is browser-cacheable for five minutes and shared-cacheable for one hour; rebuild only when you deliberately want a new map, then restart the API.
-
-Optional environment overrides for a nonstandard snapshot location:
+The `digen` worker creates both topic briefs and the periodic digest. Generate either once with:
 
 ```bash
-GOK_MAP_LAYOUT_DIR=/path/to/layout GOK_MAP_GRAPH_DIR=/path/to/graph ./api
+./digen --once
 ```
-The generated `reports/maps/current` snapshot is intentionally excluded from version control.
 
