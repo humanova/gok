@@ -37,6 +37,7 @@ const mapInfoText = {
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 24;
 const INFO_PANEL_VISIBILITY_KEY = 'gok-atlas-info-panel-visible';
+const INFO_PANEL_LANGUAGE_KEY = 'gok-atlas-info-panel-language';
 
 const mapVariant = window.location.pathname === '/long-term-map' ? 'long-term' : 'current';
 const mapDetails = {
@@ -69,6 +70,15 @@ const infoTranslations = {
   },
 };
 
+function getInitialInfoLanguage() {
+  try {
+    const language = localStorage.getItem(INFO_PANEL_LANGUAGE_KEY);
+    return language === 'en' ? 'en' : 'tr';
+  } catch {
+    return 'tr';
+  }
+}
+
 const state = {
   data: null,
   nodesByID: new Map(),
@@ -86,7 +96,7 @@ const state = {
   regionLabels: new Map(),
   activeRegion: 'all',
   degreeRingThreshold: Infinity,
-  infoLanguage: 'tr',
+  infoLanguage: getInitialInfoLanguage(),
 };
 
 const regionLabels = {
@@ -132,10 +142,12 @@ function formatWindow(windowStart, generatedAt) {
 
 function getInitialInfoPanelVisibility() {
   try {
-    return localStorage.getItem(INFO_PANEL_VISIBILITY_KEY) !== 'false';
+    const visibility = localStorage.getItem(INFO_PANEL_VISIBILITY_KEY);
+    if (visibility === 'true') return true;
+    if (visibility === 'false') return false;
   } catch {
-    return true;
   }
+  return !window.matchMedia('(max-width: 700px)').matches;
 }
 
 function setInfoPanelVisible(visible, persist = true) {
@@ -755,6 +767,9 @@ closeInfoPanel.addEventListener('click', () => setInfoPanelVisible(false));
 for (const button of languageButtons) {
   button.addEventListener('click', () => {
     state.infoLanguage = button.dataset.language;
+    try {
+      localStorage.setItem(INFO_PANEL_LANGUAGE_KEY, state.infoLanguage);
+    } catch {}
     if (state.data) renderMapInfo(state.data);
   });
 }
