@@ -80,16 +80,6 @@ func main() {
 		briefInterval = 720
 	}
 
-	// A restart must not leave the radar without topic explanations until the
-	// next 12-hour tick. Existing fresh briefs are reused without an LLM call.
-	latestBrief, err := model.LatestTopicBriefGeneratedAt()
-	if err != nil {
-		slog.Warn("couldn't check topic brief freshness", "error", err)
-	} else if latestBrief == nil || time.Since(*latestBrief) >= time.Duration(briefInterval)*time.Minute {
-		slog.Info("topic briefs are missing or stale; generating on startup")
-		runTopicBriefs()
-	}
-
 	slog.Info("starting digest cron jobs", "digest_interval_minutes", digestInterval, "topic_brief_interval_minutes", briefInterval)
 	digestCron := gocron.NewScheduler(time.UTC)
 	_, err = digestCron.Every(digestInterval).Minutes().Do(runDigest)

@@ -16,10 +16,11 @@ type TopicBriefSynthesizer interface {
 }
 
 const (
-	briefHotWindow        = 3 * time.Hour
+	// Keep these values aligned with the Radar ranking in cmd/api/main.go.
+	briefHotWindow        = time.Hour
 	briefEntryWindow      = 12 * time.Hour
-	briefHeatHalfLife     = 30 * time.Minute
-	briefTopTopics        = 12
+	briefHeatHalfLife     = 15 * time.Minute
+	briefTopTopics        = 25
 	briefMinEntries       = 8
 	briefMinEntryLength   = 100
 	briefMaxPromptEntries = 40
@@ -30,9 +31,9 @@ type scoredBriefTopic struct {
 	heat  float64
 }
 
-// GenerateTopicBriefs selects the current entry-velocity leaders, asks the LLM
-// for one constrained explanation per topic, and persists each result. It never
-// relies on popular_topics, so selection matches the radar's activity signal.
+// GenerateTopicBriefs creates a persisted brief for every topic currently
+// eligible for the Radar. It never relies on popular_topics, so selection
+// matches the Radar's activity signal.
 func GenerateTopicBriefs(ctx context.Context, synthesizer TopicBriefSynthesizer) (int, error) {
 	now := time.Now().UTC()
 	hotSince := now.Add(-briefHotWindow).Unix()
@@ -52,7 +53,12 @@ func GenerateTopicBriefs(ctx context.Context, synthesizer TopicBriefSynthesizer)
 			scored = append(scored, scoredBriefTopic{topic: topic, heat: heat})
 		}
 	}
-	sort.Slice(scored, func(i, j int) bool { return scored[i].heat > scored[j].heat })
+	sort.Slice(scored, func(i, j int) bool {
+		if scored[i].heat == scored[j].heat {
+			return scored[i].topic.TopicId < scored[j].topic.TopicId
+		}
+		return scored[i].heat > scored[j].heat
+	})
 	if len(scored) > briefTopTopics {
 		scored = scored[:briefTopTopics]
 	}
