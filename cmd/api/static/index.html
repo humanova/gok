@@ -11,21 +11,10 @@
     <header id="topbar">
       <div id="title-area">
         <span id="title">gök radar</span>
-        <span id="live-dot" class="dot" title="canlı"></span>
-        <span id="delay-status">CANLI</span>
+          <span class="dot" title="canlı"></span>
+          <a id="atlas-link" href="/map" title="Konu atlasını aç"><span aria-hidden="true">🌐</span> atlas</a>
       </div>
-      <a id="atlas-link" href="/map" title="Konu atlasını aç">atlas</a>
       <div id="stats"><span id="last-updated">güncelleniyor</span></div>
-      <div id="speed-control">
-        <button class="speed-btn active" data-speed="1">1×</button>
-        <button class="speed-btn" data-speed="20">20×</button>
-        <button class="speed-btn" data-speed="60">60×</button>
-      </div>
-      <select id="speed-select" aria-label="Oynatma hızı">
-        <option value="1">Hız 1×</option>
-        <option value="20">Hız 20×</option>
-        <option value="60">Hız 60×</option>
-      </select>
       <div id="view-toggle" role="group" aria-label="Görünüm">
         <button class="view-btn active" type="button" data-view="grid" aria-pressed="true" title="Radar görünümü">
           <span class="view-icon view-icon-grid" aria-hidden="true"></span>
@@ -70,17 +59,23 @@
     </main>
 
     <footer id="bottombar">
-      <div id="scrubber-wrap">
-        <div id="scrubber-track">
-          <input type="range" id="scrubber" min="0" max="1000" value="1000" step="1">
-          <span id="live-marker" title="6 dakika gecikmeli canlı konum"></span>
+      <div id="timeline-scrubber">
+        <div id="scrubber-wrap">
+          <div id="scrubber-track">
+            <input type="range" id="scrubber" min="0" max="1000" value="1000" step="1">
+            <span id="live-marker" title="6 dakika gecikmeli canlı konum"></span>
+          </div>
+            <div id="speed-control" role="group" aria-label="Oynatma hızı">
+              <button class="speed-btn active" type="button" data-speed="1">1×</button>
+              <button class="speed-btn" type="button" data-speed="60">60×</button>
+            </div>
+          <button id="go-live" type="button">canlıya sar</button>
         </div>
-        <button id="go-live" type="button">canlıya sar</button>
+        <div class="timeline-ticks" aria-hidden="true">
+          <span>−24 sa</span><span>−18 sa</span><span>−12 sa</span><span>−6 sa</span><span>canlı</span>
+        </div>
+        <div id="playback-time">—</div>
       </div>
-      <div class="timeline-ticks" aria-hidden="true">
-        <span>−24 sa</span><span>−18 sa</span><span>−12 sa</span><span>−6 sa</span><span>canlı</span>
-      </div>
-      <div id="playback-time">—</div>
     </footer>
     <div id="replay-notice" role="status" aria-live="polite"><span id="replay-notice-text">son 1 saat oynatılıyor</span> <span>&gt;&gt;&gt;</span></div>
   </div>

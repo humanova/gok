@@ -3,9 +3,11 @@
 `gok` collects public Ekşi Sözlük discussion data in real-time and turns it into two ways to discover what people are talking about:
 
 - **Radar**: a live view of topics gaining activity, with rank movement, timeline slider, and short AI summaries.
-- **Atlas**: 2 browsable maps of durable discussion areas, built from shared writer participation. 
+- **Atlas**: 2 browsable maps of active/durable topics, built from shared writer participation.
 
 The scraper and PostgreSQL database are the foundation. Embeddings and the AI-generated daily digest are optional supporting features, not the project's main path.
+
+Atlas snapshots and related dataset artifacts are available on [Hugging Face](https://hf.co/emir/gok-eksi-atlas).
 
 ## What It Does
 
@@ -22,9 +24,10 @@ AI-generated briefs give readers a concise explanation of a selected topic when 
 | --- | --- |
 | `/` | Radar |
 | `/map` or `/atlas` | Current topic map |
-| `/archivemap` | Archived topic map |
+| `/long-term-map` | Long-term topic map |
 | `/api/pulse` | Current Radar data |
 | `/api/map` | Current map snapshot |
+| `/api/long-term-map` | Long-term map snapshot |
 
 ### Topic Map
 

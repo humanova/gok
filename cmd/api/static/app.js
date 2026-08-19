@@ -1,7 +1,7 @@
 'use strict';
 
 // ── Constants ────────────────────────────────────────────────────────────────
-const PLAYBACK_DELAY_S  = 360;        // 6-min real-time lag
+const PLAYBACK_DELAY_S  = 300;        // 5-min real-time lag
 const LIVE_POLL_MS      = 30_000;     // poll server every 30 s in live mode
 const CATCHUP_SPREAD_MS = 10_000;     // spread catch-up pings over 10 s on load
 const SEEK_SPREAD_MS    = 3_000;      // spread catch-up pings over 3 s on seek
@@ -52,11 +52,9 @@ const debug = {
   _pending: 0,
   _autoFollow: true,
   _$list:   null,
-  _$header: null,
 
   init() {
     this._$list   = $id('debug-list');
-    this._$header = $id('debug-header');
     this._$toggle = $id('event-toggle');
     this._$count  = $id('event-toggle-count');
     this._$follow = $id('event-follow');
@@ -85,7 +83,7 @@ const debug = {
     if (!this.enabled) return;
     const li = document.createElement('li');
     li.id        = `dbg-${debugId}`;
-    li.className = 'dbg-item pending';
+    li.className = 'dbg-item';
     li.dataset.fireAt = String(fireAt);
 
     const icon  = document.createElement('span');
@@ -390,17 +388,8 @@ function buildTopicList(topics) {
   topics.forEach(topic => $topicList.appendChild(createTopicRow(topic)));
 }
 
-function updateTopicList(topics) {
-  buildTopicList(topics);
-}
-
-function decorateRankMovement(topics) {
-  return topics;
-}
-
 function applyHeat(tile, t) {
   const heat = Math.max(0.05, Math.min(1, t.heat_score));
-  tile.style.setProperty('--heat', heat.toFixed(3));
   tile.style.setProperty('--tile-hue', String(Math.round(214 - heat * 185)));
   tile.style.setProperty('--tile-saturation', `${Math.round(22 + heat * 52)}%`);
   tile.style.setProperty('--tile-lightness', `${(94 - heat * 35).toFixed(1)}%`);
@@ -698,7 +687,7 @@ function reorderGrid(newTopics) {
   });
 
   state.topics = newTopics;
-  updateTopicList(newTopics);
+  buildTopicList(newTopics);
   refreshActivityIndicators(currentPlaybackTs(), true);
 }
 
@@ -723,7 +712,6 @@ function firePing(topicId, heat, minuteCount) {
   const hue = Math.round(214 - normalizedHeat * 185);
   ping.style.setProperty('--ping-color', `hsl(${hue}, 92%, 67%)`);
   ping.style.setProperty('--ping-ink', `hsl(${hue}, 76%, 35%)`);
-  ping.style.setProperty('--ping-energy', intensity.toFixed(2));
   ping.style.setProperty('--ping-size', `${Math.round(14 + intensity * 12)}px`);
   ping.style.setProperty('--ping-spread', `${Math.round(4 + intensity * 10)}px`);
   ping.style.setProperty('--ping-glow', `${Math.round(13 + intensity * 18)}px`);
@@ -983,7 +971,6 @@ function setSpeed(s) {
   document.querySelectorAll('.speed-btn').forEach(b => {
     b.classList.toggle('active', parseFloat(b.dataset.speed) === s);
   });
-  $id('speed-select').value = String(s);
   // In scrub mode: restart replay from current position with new speed.
   if (state.mode === 'scrub') {
     seekTo(currentPlaybackTs());
@@ -1007,6 +994,10 @@ function scrubToTs(val) {
 }
 
 function initScrubber() {
+  const dismissScrubberHint = () => document.body.classList.add('scrubber-hint-dismissed');
+
+  $scrubber.addEventListener('pointerdown', dismissScrubberHint, { once: true });
+
   // While dragging: exit live mode and preview the time (no fetch yet).
   $scrubber.addEventListener('input', () => {
     if (state.mode === 'live') exitLiveMode();
@@ -1095,9 +1086,6 @@ async function init() {
   document.querySelectorAll('.speed-btn').forEach(btn => {
     btn.addEventListener('click', () => setSpeed(parseFloat(btn.dataset.speed)));
   });
-  $id('speed-select').addEventListener('change', event => {
-    setSpeed(parseFloat(event.target.value));
-  });
 
   const snap = await fetchLive();
   if (!snap) {
@@ -1105,7 +1093,6 @@ async function init() {
     return;
   }
 
-  decorateRankMovement(snap.topics);
   buildGrid(snap.topics);
   buildTopicList(snap.topics);
   state.lastSnapshotAt = snap.snapshot_at;

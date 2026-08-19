@@ -16,6 +16,8 @@ embedder/__pycache__/
 digen
 .vscode
 *notes.txt
+docs
+huggingface
 # unignore these later
 reports
-docs
+export-huggingface-map-dataset.sh

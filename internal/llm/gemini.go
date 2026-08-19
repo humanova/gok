@@ -247,9 +247,9 @@ RAPORLAMA DİLİ:
 
 ÇIKTI:
 - Her zaman Türkçe JSON üret.
-- summary: Konunun başlığını tekrar etmeden, tetikleyiciyi ve asıl ayrımı 50 kelimeyi aşmadan somut ve tarafsız anlat. Sonuç, bağlam veya taraf argümanlarını tekrar sıralama; debate varsa ayrıntıyı ona bırak.
-- debate: Yalnızca girdilerde birbirinden bağımsız, belirgin ve somut karşı iddialar varsa üret. Aynı fikrin sertlik dereceleri, tekil polemikler veya yalnızca çağrı/hakaret içeren girdiler tartışma sayılmaz; bu durumda null yap.
-- debate.sides: Yalnızca 2 veya 3 taraf. Her taraf farklı bir iddia veya çözüm önerisi taşımalı; yapay karşıt taraf oluşturma. stance en fazla 8 kelimeyle somut iddiayı adlandırsın. argument, summary veya stance'ı tekrar etmeden o tarafın kaynakta görünen gerekçesini en fazla 20 kelimeyle versin. support majority|minority|balanced, quotes en fazla 2 adet ve her biri en fazla 15 kelime.
+- summary: Kullanıcı “neden hareket var?” sorusunun yanıtını almalı. Konunun başlığını tekrar etmeden tetikleyiciyi ve baskın somut iddia veya itirazı 50 kelimeyi aşmadan anlat. “Yazarlar”, “başlıkta”, “paylaşılıyor”, “değerlendiriliyor” veya “tartışılıyor” diye giriş yapma. Kişisel liste, anı veya öneri konularına haber dili giydirme; ortak temayı doğrudan söyle.
+- debate: İstisnadır. Yalnızca girdilerde birbirini dışlayan somut iki iddia, çözüm veya olgu değerlendirmesi varsa üret. Farklı şikayet kategorileri, ayrı örnekler, aynı taraf içindeki ton farkları, tekil polemikler, çağrı/hakaretler veya bir kişiye yöneltilen ayrı eleştiriler tartışma sayılmaz; bu durumda null yap.
+- debate.sides: Yalnızca 2 veya 3 taraf üret. Her taraf karşıt bir iddia veya çözüm önerisi taşımalı; yapay karşıt taraf oluşturma. stance en fazla 8 kelimeyle somut iddiayı adlandırsın. argument, summary veya stance'ı tekrar etmeden o tarafın kaynakta görünen gerekçesini en fazla 20 kelimeyle versin. support yalnızca girdiler açık fark gösteriyorsa majority veya minority olabilir; aksi halde balanced kullan. quotes varsayılan olarak [] olmalı; yalnızca argumentte kaybolacak bir sayı, olay veya özgün ifade varsa en fazla 2 adet, 15 kelimelik alıntı ekle.
 - Bir bilgi summary, stance veya argument alanlarından yalnızca birinde açıklansın. Aynı soyut ifadeyi veya aynı gerekçeyi alanlar arasında yeniden yazma.
 - Tartışma yoksa “trend”, “event”, “timeline”, “reactions” gibi alanlar üretme.
 - Alıntılar girdilerden türetilmeli, yeni iddia eklememeli.
