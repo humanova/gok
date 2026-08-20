@@ -373,6 +373,9 @@ func main() {
 	mux.HandleFunc("GET /archivemap", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/long-term-map", http.StatusMovedPermanently)
 	})
+	mux.HandleFunc("GET /radar", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	})
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		data, err := staticFiles.ReadFile("static/index.html")
 		if err != nil {
