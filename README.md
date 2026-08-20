@@ -2,9 +2,9 @@
 
 Gök is a discovery platform for Ekşi Sözlük that turns real-time data into two unique ways to see what people are discussing:
 
-- [**Radar**](https://humanova.space/gok): a live view of topics gaining activity, with AI summaries, timeline slider for activity replay, and rank movement.
+- [**Radar**](https://humanova.space/gok): a live view of topics gaining activity with AI summaries, timeline activity replay, and rank movement.
 
-- [**Atlas**](https://humanova.space/gok/long-term-map): Browsable maps of 'durable' topics, built from shared writer participation.
+- [**Atlas**](https://humanova.space/gok/long-term-map): Browsable maps of durable topics, built from shared writer participation.
 
 <div align="center">
 <img src="docs/gok-atlas-preview.png" alt="gok atlas preview"/>
