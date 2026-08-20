@@ -25,14 +25,6 @@ The scraper periodically collects trending topics and their new entries from [ek
 The API serves the Radar UI at `/`. It ranks topics by recent entry activity, shows rank changes, and animates new entries as they arrive. Users can revisit any point in the last 24 hours and replay the following activity at `1x`, or `60x`.
 AI-generated briefs give readers a concise explanation of a selected topic when Gemini is configured.
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Radar |
-| `/map` or `/atlas` | Current topic map |
-| `/long-term-map` | Long-term topic map |
-| `/api/pulse` | Current Radar data |
-| `/api/map` | Current map snapshot |
-| `/api/long-term-map` | Long-term map snapshot |
 
 ### Topic Map
 
