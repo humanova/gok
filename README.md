@@ -1,18 +1,18 @@
 # gök
 
-A discovery platform for Ekşi Sözlük. It turns the live data into two ways to discover what people are talking about:
+Gök is a discovery platform for Ekşi Sözlük that turns real-time data into two unique ways to see what people are discussing:
 
-[**Radar**](https://humanova.space/gok): a live view of topics gaining activity, with a timeline slider for activity replay, AI summaries, and rank movement, 
+- [**Radar**](https://humanova.space/gok): a live view of topics gaining activity, with AI summaries, timeline slider for activity replay, and rank movement.
 
-[**Atlas**](https://humanova.space/gok/long-term-map): 2 browsable maps of durable topics, built from shared writer participation.
+- [**Atlas**](https://humanova.space/gok/long-term-map): Browsable maps of 'durable' topics, built from shared writer participation.
 
 <div align="center">
 <img src="docs/gok-atlas-preview.png" alt="gok atlas preview"/>
 </div>
 
-Atlas snapshots and related dataset artifacts are available on [Hugging Face](https://hf.co/emir/gok-eksi-atlas).
+- Atlas snapshots are available on [Hugging Face](https://hf.co/emir/gok-eksi-atlas).
 
-Note: Entry embeddings and the AI-generated daily digest are optional supporting features, not the project's main path.
+- Entry embeddings and the AI-generated daily digest are optional supporting features, not the project's main path.
 
 ## What It Does
 
