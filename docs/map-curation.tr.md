@@ -1,5 +1,4 @@
 # Gök Atlas Nasıl Oluşturulur?
-
 18.08.2026
 
 Atlas, yani gök başlık haritası, Ekşi Sözlük'te uzun süredir yaşayan ve yakın dönemde de etkin kalan başlıkların düzenli aralıklarla üretilen anlık görüntüsüdür. Veritabanındaki her başlığı veya o anın en popüler başlıklarını göstermeyi amaçlamaz. Amaç, kalıcı bir yazar kitlesi bulunan başlıkları ve ortak yazarları olan konu kümelerini görünür kılmaktır.
@@ -10,12 +9,12 @@ Harita çıktısı, sürümlenmiş bir snapshot olarak `reports/maps/current` al
 
 ```mermaid
 flowchart LR
-  A[Tüm kayıtlı başlıklar] --> B[profile-map: konu profili]
-  B --> C[build-map: kalıcı ve yakın dönemde etkin başlıklar]
-  C --> D[Karşılıklı güçlü ortak yazar bağlantıları]
-  D --> E[Başlık toplulukları]
-  E --> F[reconcile-map ve reconcile-map-nodes: bölgeler]
-  F --> G[layout-map: etkileşimli harita]
+  A[Tüm kayıtlı başlıklar] --> B[konu profili]
+  B --> C[kalıcı ve yakın dönemde etkin başlıklar]
+  C --> D[ortak yazar bağlantıları]
+  D --> E[başlık toplulukları]
+  E --> F[bölgeler]
+  F --> G[etkileşimli harita]
 ```
 
 ## Pipeline ve kullanılan binary'ler
@@ -36,7 +35,7 @@ Güncel haritayı üretmek için:
 ./scripts/build-map-pipeline.sh --map-name current
 ```
 
-15 Ağustos 2026'da yayımlanan anlık görünümlerdeki rakamlar:
+15 Ağustos 2026 snapshotlarındaki rakamlar:
 
 ```text
 Güncel Harita, etkinlik başlangıcı 13 Şubat 2025
@@ -99,15 +98,14 @@ LLM, bağlantıları kurmak için değil, okuyucunun kolayca gezinebileceği tut
 
 `reconcile-map`, her topluluktan en fazla **8 temsilci başlık** alır ve topluluğu önceden tanımlanmış 17 geniş bölgeden birine (siyaset, futbol vb.) atar. Her batch'te **18 topluluk** etiketlenir. Modelden her topluluk için yalnızca izin verilen etiketlerden birini seçmesi istenir. 
 
-İzin verilen bölge anahtarları şunlardır:
+İzin verilen bölgeler şunlardır:
 
 `football`, `other_sports`, `turkish_politics`, `world_politics`, `relationships`, `daily_life`, `music`, `film_tv`, `games_tech`, `economy`, `culture_art`, `society_identity`, `science_health`, `local_life`, `media`, `news_events` ve `other`.
 
-Bunlar sistemde kullanılan İngilizce bölge anahtarlarıdır. Arayüzde Türkçe adlarıyla gösterilir.
 
-### Başlık denetimi
+### LLM ile topluluk etiketi kontrolü
 
-`reconcile-map-nodes`, güncel haritadaki **1.277** başlığın her birini **18 başlık** içeren batch'lerde denetler. Gemini'ye başlığın adı, ait olduğu topluluğun bölgesi ve o topluluktan birkaç temsilci başlık verilir. Model, topluluğun bölgesini olduğu gibi bırakabilir veya açık bir uyumsuzluk varsa düzeltebilir.
+`reconcile-map-nodes`, güncel haritadaki **1.277** başlığın her birini **18 başlık** içeren batch'lerde denetler. LLM'e başlığın adı, ait olduğu topluluğun bölgesi ve o topluluktan birkaç temsilci başlık verilir. Model, topluluğun bölgesini olduğu gibi bırakabilir veya açık bir uyumsuzluk varsa düzeltebilir.
 
 Örneğin futbol tartışmalarıyla bağlantılanmış bir şehir başlığı `local_life` bölgesine taşınabilir. Futbolcu başlığı ise `football` altında kalır.
 

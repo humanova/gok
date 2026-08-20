@@ -1,6 +1,7 @@
 # How the Topic Map Is Curated
-
 18.08.2026
+
+[Turkish Version](map-curation.tr.md)
 
 The topic map is a periodically rebuilt snapshot of durable, active discussion on Ekşi Sözlük. It is not a chart of every topic in the database or a list of what is trending at one moment. Its purpose is to show subjects that have an ongoing audience and the subjects whose participants overlap.
 
@@ -10,12 +11,12 @@ The result is published as a versioned snapshot at `reports/maps/current` and di
 
 ```mermaid
 flowchart LR
-  A[All recorded topics] --> B[profile-map: topic profile]
-  B --> C[build-map: durable and recently active topics]
-  C --> D[Mutually strong shared-writer links]
-  D --> E[Topic communities]
-  E --> F[reconcile-map and reconcile-map-nodes: regions]
-  F --> G[layout-map: interactive map]
+  A[All recorded topics] --> B[topic profile]
+  B --> C[durable and recently active topics]
+  C --> D[mutually strong shared-writer links]
+  D --> E[topic communities]
+  E --> F[regions]
+  F --> G[interactive map]
 ```
 
 ## Pipeline and binaries
