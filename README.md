@@ -1,19 +1,24 @@
-# gok
+# gök
 
-`gok` collects public Ekşi Sözlük discussion data in real-time and turns it into two ways to discover what people are talking about:
+A discovery platform for Ekşi Sözlük. It turns the live data into two ways to discover what people are talking about:
 
-- **Radar**: a live view of topics gaining activity, with rank movement, timeline slider, and short AI summaries.
-- **Atlas**: 2 browsable maps of active/durable topics, built from shared writer participation.
+[**Radar**](https://humanova.space/gok): a live view of topics gaining activity, with a timeline slider for activity replay, AI summaries, and rank movement, 
 
-The scraper and PostgreSQL database are the foundation. Embeddings and the AI-generated daily digest are optional supporting features, not the project's main path.
+[**Atlas**](https://humanova.space/gok/long-term-map): 2 browsable maps of durable topics, built from shared writer participation.
+
+<div align="center">
+<img src="docs/gok-atlas-preview.png" alt="gok atlas preview"/>
+</div>
 
 Atlas snapshots and related dataset artifacts are available on [Hugging Face](https://hf.co/emir/gok-eksi-atlas).
+
+Note: Entry embeddings and the AI-generated daily digest are optional supporting features, not the project's main path.
 
 ## What It Does
 
 ### Scraping
 
-The scraper periodically collects popular topics and their new entries from [eksisozluk.com](https://eksisozluk.com). It paginates from the last stored entry, deduplicates data in PostgreSQL, and retains enough history to power both live and long-term discovery.
+The scraper periodically collects trending topics and their new entries from [eksisozluk.com](https://eksisozluk.com). It paginates from the last stored entry, deduplicates data in PostgreSQL, and retains enough history to power both live and long-term discovery.
 
 ### Radar
 
@@ -61,13 +66,13 @@ Start the scraper and background worker. The worker generates Radar topic briefs
 ./run.sh
 ```
 
-In another terminal, start Radar and open `http://localhost:8080` (or the configured `ApiPort`):
+In another terminal, start Radar and open `http://localhost:port`:
 
 ```bash
 ./api
 ```
 
-Build and publish a fresh current map snapshot, then restart the API so it loads the new snapshot:
+Build and publish a fresh map snapshot, then restart the API so it loads the new snapshot:
 
 ```bash
 ./scripts/build-map-pipeline.sh --map-name current
