@@ -525,7 +525,7 @@ function renderTopicBrief(brief) {
   if (!brief?.available || !brief.payload?.summary) {
     const unavailable = document.createElement('p');
     unavailable.className = 'brief-unavailable';
-    unavailable.textContent = 'bu konunun ozeti henuz hazir degil';
+    unavailable.textContent = 'bu konunun özeti henüz hazır değil! dilersen başlığa gidip bakabilirsin.';
     content.appendChild(unavailable);
     return;
   }
