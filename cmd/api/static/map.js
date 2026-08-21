@@ -39,7 +39,7 @@ const MAX_SCALE = 24;
 const INFO_PANEL_VISIBILITY_KEY = 'gok-atlas-info-panel-visible';
 const INFO_PANEL_LANGUAGE_KEY = 'gok-atlas-info-panel-language';
 
-const mapVariant = window.location.pathname === '/long-term-map' ? 'long-term' : 'current';
+const mapVariant = /(?:^|\/)long-term-map\/?$/.test(window.location.pathname) ? 'long-term' : 'current';
 const mapDetails = {
   current: { endpoint: '/api/map' },
   'long-term': { endpoint: '/api/long-term-map' },
