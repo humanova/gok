@@ -10,7 +10,7 @@ Gök is a discovery platform for Ekşi Sözlük that turns real-time data into t
 <img src="docs/gok-atlas-preview.png" alt="gok atlas preview"/>
 </div>
 
-- Atlas snapshots are available on [Hugging Face](https://hf.co/emir/gok-eksi-atlas).
+- Atlas snapshots are available on [Hugging Face](https://hf.co/datasets/emir/gok-eksi-atlas).
 
 - Entry embeddings and the AI-generated daily digest are optional supporting features, not the project's main path.
 
