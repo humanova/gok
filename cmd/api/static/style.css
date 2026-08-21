@@ -604,6 +604,15 @@ body.list-view #radar-wrap {
 #timeline-scrubber {
   position: relative;
   isolation: isolate;
+  display: grid;
+  grid-template-areas:
+    "track speed live"
+    "ticks . ."
+    "time time time";
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 4px;
 }
 
 body:not(.scrubber-hint-dismissed) #timeline-scrubber::after {
@@ -631,9 +640,11 @@ body:not(.scrubber-hint-dismissed) #timeline-scrubber::after {
 }
 
 .timeline-ticks {
+  grid-area: ticks;
   display: flex;
+  width: 100%;
   justify-content: space-between;
-  margin: -1px 38px 0;
+  margin: -1px 0 0;
   color: var(--text-dim);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
@@ -641,16 +652,23 @@ body:not(.scrubber-hint-dismissed) #timeline-scrubber::after {
 }
 
 #scrubber-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: contents;
 }
 
 #scrubber-track {
+  grid-area: track;
   position: relative;
   display: flex;
-  flex: 1;
   align-items: center;
+  min-width: 0;
+}
+
+#speed-control {
+  grid-area: speed;
+}
+
+#go-live {
+  grid-area: live;
 }
 
 #go-live {
@@ -732,6 +750,7 @@ body:not(.scrubber-hint-dismissed) #timeline-scrubber::after {
 }
 
 #playback-time {
+  grid-area: time;
   font-size: 12px;
   color: var(--text);
   font-weight: 650;
@@ -1153,8 +1172,7 @@ body.events-open #debug-panel {
   }
 
   #scrubber-wrap {
-    display: flex;
-    gap: 8px;
+    column-gap: 8px;
   }
 
   #scrubber-track {
@@ -1227,7 +1245,7 @@ body.events-open #debug-panel {
   }
 
   .timeline-ticks {
-    margin: 2px 104px 0 88px;
+    margin: 2px 0 0;
   }
 
   .timeline-ticks span:nth-child(2),
