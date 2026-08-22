@@ -396,6 +396,12 @@ function applyHeat(tile, t) {
   tile.classList.toggle('tile-top', t.rank <= 3);
 }
 
+/** The background color applyHeat() produces for a heat score, without reading the DOM. */
+function heatColor(score) {
+  const heat = Math.max(0.05, Math.min(1, score ?? 0));
+  return `hsl(${Math.round(214 - heat * 185)}, ${Math.round(22 + heat * 52)}%, ${(94 - heat * 35).toFixed(1)}%)`;
+}
+
 function updateTileDetails(tile, t, playbackTs = currentPlaybackTs()) {
   const rank = tile.querySelector('.tile-rank');
   if (rank) rank.textContent = String(t.rank).padStart(2, '0');
@@ -636,16 +642,19 @@ function reorderGrid(newTopics) {
   });
 
   // Step 4 — update CSS order and animate heat for surviving tiles.
+  // Colors are derived from the heat scores instead of read back from the
+  // DOM, so reordering doesn't force a style recalc per tile.
+  const prevHeatById = new Map(state.topics.map(t => [t.id, t.heat_score]));
   newTopics.forEach(t => {
     const el = $id(`tile-${t.id}`);
     if (!el || !oldIds.has(t.id)) return;
-    const previousColor = getComputedStyle(el).backgroundColor;
+    const previousColor = heatColor(prevHeatById.get(t.id));
     el.style.transition = 'none';
     el.style.order = t.rank - 1;
     el.classList.toggle('mobile-secondary', t.rank > 20);
     applyHeat(el, t);
     updateTileDetails(el, t);
-    const nextColor = getComputedStyle(el).backgroundColor;
+    const nextColor = heatColor(t.heat_score);
     if (previousColor !== nextColor) {
       el.animate(
         [{ backgroundColor: previousColor }, { backgroundColor: nextColor }],
@@ -654,9 +663,12 @@ function reorderGrid(newTopics) {
     }
   });
 
-  // Step 5 (FLIP: Last + Invert + Play) — force layout, compute deltas, animate.
-  void $grid.offsetHeight;
-
+  // Step 5 (FLIP: Last + Invert + Play).
+  // Measure all survivors first (one layout flush), then invert every mover,
+  // flush once and release them together — instead of forcing a layout per
+  // moving tile.
+  const movers = [];
+  const resets = [];
   newTopics.forEach(t => {
     const el = $id(`tile-${t.id}`);
     if (!el) return;
@@ -664,26 +676,36 @@ function reorderGrid(newTopics) {
     const before = beforeRects.get(t.id);
     const after  = el.getBoundingClientRect();
     if (!before || !hasLayoutBox(after)) {
-      el.style.transition = '';
-      el.style.transform = '';
+      resets.push({ el, clearTransform: true });
       return;
     }
     const dx = before.left - after.left;
     const dy = before.top  - after.top;
 
     if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
-      el.style.transition = 'none';
-      el.style.transform  = `translate(${dx}px, ${dy}px)`;
-      void el.offsetHeight; // force paint
-      el.style.transition = 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), background 1.2s ease';
-      el.style.transform  = '';
-      el.addEventListener('transitionend', () => {
-        el.style.transition = '';
-        el.style.transform  = '';
-      }, { once: true });
+      movers.push({ el, dx, dy });
     } else {
-      el.style.transition = '';
+      resets.push({ el, clearTransform: false });
     }
+  });
+
+  resets.forEach(({ el, clearTransform }) => {
+    el.style.transition = '';
+    if (clearTransform) el.style.transform = '';
+  });
+  movers.forEach(({ el, dx, dy }) => {
+    el.style.transition = 'none';
+    el.style.transform  = `translate(${dx}px, ${dy}px)`;
+  });
+  void $grid.offsetHeight; // single flush before releasing every mover
+
+  movers.forEach(({ el }) => {
+    el.style.transition = 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), background 1.2s ease';
+    el.style.transform  = '';
+    el.addEventListener('transitionend', () => {
+      el.style.transition = '';
+      el.style.transform  = '';
+    }, { once: true });
   });
 
   state.topics = newTopics;
@@ -723,10 +745,17 @@ function firePing(topicId, heat, minuteCount) {
   ping.style.setProperty('--oy', `${oy}%`);
 
   tile.appendChild(ping);
-  ping.addEventListener('animationend', () => {
+  // animationend never fires if the tab is hidden mid-animation (CSS
+  // animations pause), which used to leak the tile's ping slot permanently.
+  let settled = false;
+  const settle = () => {
+    if (settled) return;
+    settled = true;
     state.activePings[topicId] = Math.max(0, (state.activePings[topicId] ?? 1) - 1);
     ping.remove();
-  }, { once: true });
+  };
+  ping.addEventListener('animationend', settle, { once: true });
+  setTimeout(settle, 1_700);
 }
 
 function showAfterglow(tile, topicId, intensity) {
