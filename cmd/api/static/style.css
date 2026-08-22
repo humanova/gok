@@ -386,6 +386,7 @@ body.list-view #radar-wrap {
 /* ── Tile ─────────────────────────────────────────────────── */
 .tile {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
   border: 1px solid hsla(var(--tile-hue), 40%, 46%, 0.18);
   border-radius: var(--tile-radius);
@@ -398,6 +399,20 @@ body.list-view #radar-wrap {
   background: hsl(var(--tile-hue), var(--tile-saturation), var(--tile-lightness));
   box-shadow: inset 0 0 14px hsla(var(--tile-hue), 92%, 55%, 0.12), 0 2px 4px rgba(27, 61, 46, 0.05);
   transition: background 1.2s ease, box-shadow 0.5s ease, border-color 0.25s ease, filter 0.25s ease;
+}
+
+/* Activity glow overlay: composited opacity change instead of repainting
+   the tile's box-shadow on every burst. Sits above the tile background,
+   below its content. */
+.tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 45%, hsla(var(--tile-hue), 96%, 48%, 0.6), transparent 74%);
+  transition: opacity 0.35s ease;
 }
 
 .tile:hover,
@@ -505,12 +520,6 @@ body.list-view #radar-wrap {
   opacity: 0;
 }
 
-.tile-burst {
-  box-shadow:
-    inset 0 0 24px hsla(var(--tile-hue), 100%, 48%, 0.45),
-    0 0 16px hsla(var(--tile-hue), 80%, 40%, 0.3);
-}
-
 .tile-burst .burst-count {
   opacity: 1;
   animation: burst-pop 0.9s ease-out both;
@@ -546,12 +555,12 @@ body.list-view #radar-wrap {
 /* ── Ping ─────────────────────────────────────────────────── */
 .ping {
   position: absolute;
+  z-index: 1;
   width: var(--ping-size, 18px);
   height: var(--ping-size, 18px);
   border: 3px solid rgba(255, 255, 255, 0.94);
   border-radius: 50%;
   background: radial-gradient(circle at 38% 32%, #fff 0 10%, var(--ping-color, #f97316) 13% 55%, var(--ping-ink, #b45309) 100%);
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.34), 0 0 var(--ping-glow, 20px) var(--ping-spread, 7px) var(--ping-color, #f97316);
   /* Origin is set via --ox / --oy (percentage offsets from 50%) */
   top:  calc(50% + var(--oy, 0%));
   left: calc(50% + var(--ox, 0%));
@@ -560,13 +569,23 @@ body.list-view #radar-wrap {
   animation: ping-impact 1.45s cubic-bezier(0.15, 0, 0.85, 1) forwards;
 }
 
+/* Soft glow as a pre-rasterized gradient disc: animates via transform/opacity
+   on the compositor instead of a blurred box-shadow that repaints each frame. */
 .ping::before {
+  content: '';
+  position: absolute;
+  inset: -55%;
+  border-radius: inherit;
+  background: radial-gradient(circle, var(--ping-color, #f97316) 0%, transparent 68%);
+  animation: ping-glow 1.45s ease-out forwards;
+}
+
+.ping::after {
   content: '';
   position: absolute;
   inset: -7px;
   border-radius: inherit;
   border: 2px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 10px 2px var(--ping-color, #f97316);
   animation: ping-wave 1.45s ease-out forwards;
 }
 
@@ -583,8 +602,20 @@ body.list-view #radar-wrap {
   100% { transform: scale(2.8); opacity: 0; }
 }
 
-.tile-active {
-  box-shadow: inset 0 0 30px hsla(var(--tile-hue), 100%, 45%, var(--activity-alpha, 0.42)), 0 0 20px hsla(var(--tile-hue), 80%, 42%, var(--activity-alpha, 0.28));
+@keyframes ping-glow {
+  0%, 12% { transform: scale(0.25); opacity: 0; }
+  25%     { transform: scale(1); opacity: 0.85; }
+  100%    { transform: scale(2.6); opacity: 0; }
+}
+
+.tile-active::after {
+  opacity: var(--activity-alpha, 0.42);
+}
+
+/* Burst reuses the same overlay with a stronger flash. */
+.tile-burst::after {
+  opacity: 1;
+  background: radial-gradient(circle at 50% 45%, hsla(var(--tile-hue), 100%, 46%, 0.7), transparent 78%);
 }
 
 /* ── Bottom bar / Scrubber ────────────────────────────────── */
@@ -621,22 +652,18 @@ body:not(.scrubber-hint-dismissed) #timeline-scrubber::after {
   inset: -7px -8px -6px;
   border: 2px solid rgba(23, 132, 78, 0.76);
   border-radius: 8px;
-  box-shadow: 0 0 0 0 rgba(23, 132, 78, 0), 0 0 0 rgba(23, 132, 78, 0);
+  box-shadow: 0 0 16px rgba(23, 132, 78, 0.3);
   content: "";
   opacity: 0;
   pointer-events: none;
   animation: scrubber-halo 20s ease-out 12s infinite;
 }
 
+/* Opacity-only pulse: the static shadow is rasterized once instead of being
+   repainted on every frame. */
 @keyframes scrubber-halo {
-  0%, 100% {
-    box-shadow: 0 0 0 3px rgba(23, 132, 78, 0.22), 0 0 16px rgba(23, 132, 78, 0.3);
-    opacity: 0.92;
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(23, 132, 78, 0.04), 0 0 28px rgba(23, 132, 78, 0.12);
-    opacity: 0.38;
-  }
+  0%, 100% { opacity: 0.92; }
+  50%      { opacity: 0.38; }
 }
 
 .timeline-ticks {
@@ -1124,6 +1151,14 @@ body.events-open #debug-panel {
 }
 
 @media (max-width: 560px) {
+  /* backdrop-filter recomposites on every repaint beneath it and is a known
+     Android Chrome flicker source — use opaque bars on mobile instead. */
+  #topbar,
+  #bottombar {
+    backdrop-filter: none;
+    background: #f9fbf7;
+  }
+
   #stats {
     display: none;
   }

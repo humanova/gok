@@ -9,6 +9,8 @@ const RANGE_WINDOW_S    = 3_600;      // 1 h window fetched per seek
 const CACHE_WINDOW_S    = 24 * 3600;  // client playback window: 24 h
 const LIVE_THRESHOLD    = 0.998;      // scrubber frac ≥ this → live mode
 const MAX_VISIBLE_PINGS = 3;
+const MAX_GLOBAL_PINGS  = 12;         // cap on concurrently animating pings (mobile GPU)
+const PING_LIFETIME_MS  = 1_700;      // backstop cleanup if animationend never fires
 const METER_THRESHOLDS  = [1, 2, 4, 7, 11];
 const BRIEF_CACHE_TTL_MS = 60_000;
 
@@ -27,6 +29,7 @@ const state = {
   scrubWindowEnd: 0,     // end of last-fetched scrub window (unix s)
   fetchingNext: false,   // guard against concurrent window prefetches
   activePings: {},       // topicId → currently visible pings
+  globalPingCount: 0,    // total currently animating pings across all topics
   burstCounts: {},       // topicId → pings compressed into the visible burst marker
   burstTimers: {},       // topicId → burst marker timeout
   afterglowTimers: {},   // topicId → transient activity glow timeout
@@ -635,56 +638,66 @@ function reorderGrid(newTopics) {
     $grid.appendChild(tile);
   });
 
-  // Step 4 — update CSS order and animate heat for surviving tiles.
+  // Step 4 — update CSS order and heat for surviving tiles.
+  // Pure writes: stylesheet transitions handle color/shadow changes smoothly,
+  // so there is no per-tile style recalc or WAAPI animation here.
+  const prevRankById = new Map(state.topics.map(t => [t.id, t.rank]));
+  const smallViewport = window.matchMedia('(max-width: 560px)').matches;
   newTopics.forEach(t => {
     const el = $id(`tile-${t.id}`);
     if (!el || !oldIds.has(t.id)) return;
-    const previousColor = getComputedStyle(el).backgroundColor;
-    el.style.transition = 'none';
     el.style.order = t.rank - 1;
-    el.classList.toggle('mobile-secondary', t.rank > 20);
+    const wasHidden = (prevRankById.get(t.id) ?? t.rank) > 20;
+    const isHidden = t.rank > 20;
+    el.classList.toggle('mobile-secondary', isHidden);
+    if (!isHidden && wasHidden && smallViewport) {
+      // Re-entering the visible top-N on mobile: fade in instead of popping.
+      el.classList.add('tile-entering');
+    }
     applyHeat(el, t);
     updateTileDetails(el, t);
-    const nextColor = getComputedStyle(el).backgroundColor;
-    if (previousColor !== nextColor) {
-      el.animate(
-        [{ backgroundColor: previousColor }, { backgroundColor: nextColor }],
-        { duration: 700, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' },
-      );
-    }
   });
 
-  // Step 5 (FLIP: Last + Invert + Play) — force layout, compute deltas, animate.
-  void $grid.offsetHeight;
-
+  // Step 5 (FLIP: Last + Invert + Play).
+  // Read phase: measure every survivor in one pass — the first read flushes
+  // layout once and the rest hit a clean cache (no interleaved writes).
+  const movers = [];
   newTopics.forEach(t => {
     const el = $id(`tile-${t.id}`);
     if (!el) return;
 
     const before = beforeRects.get(t.id);
-    const after  = el.getBoundingClientRect();
-    if (!before || !hasLayoutBox(after)) {
-      el.style.transition = '';
-      el.style.transform = '';
-      return;
-    }
+    if (!before) return;
+    const after = el.getBoundingClientRect();
+    if (!hasLayoutBox(after)) return;
+
     const dx = before.left - after.left;
     const dy = before.top  - after.top;
-
     if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
-      el.style.transition = 'none';
-      el.style.transform  = `translate(${dx}px, ${dy}px)`;
-      void el.offsetHeight; // force paint
-      el.style.transition = 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), background 1.2s ease';
-      el.style.transform  = '';
-      el.addEventListener('transitionend', () => {
-        el.style.transition = '';
-        el.style.transform  = '';
-      }, { once: true });
-    } else {
-      el.style.transition = '';
+      movers.push({ el, dx, dy });
     }
   });
+
+  // Write phase: invert all movers, flush layout exactly once, then play.
+  movers.forEach(({ el, dx, dy }) => {
+    el.style.transition = 'none';
+    el.style.transform  = `translate(${dx}px, ${dy}px)`;
+  });
+  if (movers.length > 0) {
+    void $grid.offsetHeight;
+    movers.forEach(({ el }) => {
+      el.style.transition = 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), background 1.2s ease';
+      el.style.transform  = '';
+      const cleanup = event => {
+        if (event.target !== el || event.propertyName !== 'transform') return;
+        el.style.transition = '';
+        el.style.transform  = '';
+        el.removeEventListener('transitionend', cleanup);
+      };
+      el.addEventListener('transitionend', cleanup);
+    });
+  }
+
 
   state.topics = newTopics;
   buildTopicList(newTopics);
@@ -697,11 +710,12 @@ function firePing(topicId, heat, minuteCount) {
   if (!tile) return;
   const intensity = Math.min(1, Math.log1p(minuteCount) / Math.log(11));
   const active = state.activePings[topicId] ?? 0;
-  if (active >= MAX_VISIBLE_PINGS) {
+  if (active >= MAX_VISIBLE_PINGS || state.globalPingCount >= MAX_GLOBAL_PINGS) {
     showBurst(tile, topicId, minuteCount);
     return;
   }
   state.activePings[topicId] = active + 1;
+  state.globalPingCount++;
   showAfterglow(tile, topicId, intensity);
 
   const ping = document.createElement('div');
@@ -713,8 +727,6 @@ function firePing(topicId, heat, minuteCount) {
   ping.style.setProperty('--ping-color', `hsl(${hue}, 92%, 67%)`);
   ping.style.setProperty('--ping-ink', `hsl(${hue}, 76%, 35%)`);
   ping.style.setProperty('--ping-size', `${Math.round(14 + intensity * 12)}px`);
-  ping.style.setProperty('--ping-spread', `${Math.round(4 + intensity * 10)}px`);
-  ping.style.setProperty('--ping-glow', `${Math.round(13 + intensity * 18)}px`);
   ping.style.setProperty('--ping-final-scale', (3.1 + intensity * 2.2).toFixed(2));
 
   const ox = ((Math.random() - 0.5) * 34).toFixed(1);
@@ -723,10 +735,19 @@ function firePing(topicId, heat, minuteCount) {
   ping.style.setProperty('--oy', `${oy}%`);
 
   tile.appendChild(ping);
-  ping.addEventListener('animationend', () => {
+
+  // animationend is the happy path; the timeout is a backstop for cases where
+  // animations never complete (e.g. the tab was hidden mid-animation).
+  let settled = false;
+  const settle = () => {
+    if (settled) return;
+    settled = true;
+    state.globalPingCount = Math.max(0, state.globalPingCount - 1);
     state.activePings[topicId] = Math.max(0, (state.activePings[topicId] ?? 1) - 1);
     ping.remove();
-  }, { once: true });
+  };
+  ping.addEventListener('animationend', settle, { once: true });
+  setTimeout(settle, PING_LIFETIME_MS);
 }
 
 function showAfterglow(tile, topicId, intensity) {
@@ -825,6 +846,8 @@ function cancelAllTimers() {
   state.pendingTimers = [];
   Object.values(state.burstTimers).forEach(id => clearTimeout(id));
   Object.values(state.afterglowTimers).forEach(id => clearTimeout(id));
+  // In-flight pings are left alone: each one settles exactly once via
+  // animationend or its backstop timeout, keeping the counters accurate.
   state.activePings = {};
   state.burstCounts = {};
   state.burstTimers = {};
