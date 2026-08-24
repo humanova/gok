@@ -12,6 +12,11 @@ const MAX_VISIBLE_PINGS = 3;
 const METER_THRESHOLDS  = [1, 2, 4, 7, 11];
 const BRIEF_CACHE_TTL_MS = 60_000;
 
+// Constrain animation work in social-app WebViews
+const IS_SOCIAL_IN_APP_BROWSER = /\b(?:Twitter|TwitterAndroid|X\/|LinkedInApp|LinkedIn|Instagram)/i.test(navigator.userAgent);
+const REPLAY_RENDER_INTERVAL_MS = IS_SOCIAL_IN_APP_BROWSER ? 75 : 0;
+const PING_MIN_GAP_MS = IS_SOCIAL_IN_APP_BROWSER ? 125 : 0;
+
 // ── State ────────────────────────────────────────────────────────────────────
 const state = {
   mode: 'live',          // 'live' | 'scrub'
@@ -37,9 +42,11 @@ const state = {
   previewPlaybackTs: null,
   lastActivitySecond: -1,
   transitioningLive: false,
+  nextPingAt: 0,
 };
 
 let _rafId = null;
+let _lastReplayRenderAt = 0;
 
 // DOM refs (populated in init())
 let $grid, $topicList, $scrubber, $lastUpdated, $playbackTime;
@@ -719,7 +726,8 @@ function firePing(topicId, heat, minuteCount) {
   if (!tile) return;
   const intensity = Math.min(1, Math.log1p(minuteCount) / Math.log(11));
   const active = state.activePings[topicId] ?? 0;
-  if (active >= MAX_VISIBLE_PINGS) {
+  const maxVisiblePings = IS_SOCIAL_IN_APP_BROWSER ? 1 : MAX_VISIBLE_PINGS;
+  if (active >= maxVisiblePings) {
     showBurst(tile, topicId, minuteCount);
     return;
   }
@@ -828,10 +836,10 @@ function schedulePings(topics, originTs, catchupSpreadMs, maxCatchup) {
     capped.forEach(p => {
       const frac    = (p.playTs - minTs) / span;
       const delay   = catchupSpreadMs > 0 ? frac * catchupSpreadMs : 0;
-      const fireAt  = Date.now() + delay;
+      const fireAt  = nextPingFireAt(delay);
       const debugId = debug._nextId++;
       debug.add(debugId, p.title, p.ts, fireAt, p.minuteCount);
-      const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.heat, p.minuteCount); }, delay);
+      const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.heat, p.minuteCount); }, fireAt - Date.now());
       state.pendingTimers.push(timerId);
     });
   }
@@ -840,13 +848,20 @@ function schedulePings(topics, originTs, catchupSpreadMs, maxCatchup) {
   futurePings.forEach(p => {
     const delay = (p.playTs - originTs) * 1000 / spd;
     if (delay > 0 && delay < 86_400_000) {
-      const fireAt  = Date.now() + delay;
+      const fireAt  = nextPingFireAt(delay);
       const debugId = debug._nextId++;
       debug.add(debugId, p.title, p.ts, fireAt, p.minuteCount);
-      const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.heat, p.minuteCount); }, delay);
+      const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.heat, p.minuteCount); }, fireAt - Date.now());
       state.pendingTimers.push(timerId);
     }
   });
+}
+
+function nextPingFireAt(delay) {
+  const requestedAt = Date.now() + delay;
+  const fireAt = Math.max(requestedAt, state.nextPingAt);
+  state.nextPingAt = fireAt + PING_MIN_GAP_MS;
+  return fireAt;
 }
 
 function cancelAllTimers() {
@@ -858,6 +873,7 @@ function cancelAllTimers() {
   state.burstCounts = {};
   state.burstTimers = {};
   state.afterglowTimers = {};
+  state.nextPingAt = 0;
   document.querySelectorAll('.tile-burst').forEach(tile => {
     tile.classList.remove('tile-burst');
     const label = tile.querySelector('.burst-count');
@@ -869,7 +885,14 @@ function cancelAllTimers() {
 // ── Replay animation (RAF scrubber advance) ───────────────────────────────────
 function startReplayAnimation() {
   cancelReplayAnimation();
+  _lastReplayRenderAt = 0;
   function tick() {
+    const frameNow = performance.now();
+    if (frameNow - _lastReplayRenderAt < REPLAY_RENDER_INTERVAL_MS) {
+      _rafId = requestAnimationFrame(tick);
+      return;
+    }
+    _lastReplayRenderAt = frameNow;
     const playTs = currentPlaybackTs();
     const minTs  = Date.now() / 1000 - CACHE_WINDOW_S;
     const maxTs  = Date.now() / 1000 - PLAYBACK_DELAY_S;
