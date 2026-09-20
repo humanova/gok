@@ -273,8 +273,8 @@ JSON şeması:
 const (
 	briefSummaryMaxWords  = 50
 	briefStanceMaxWords   = 8
-	briefArgumentMaxWords = 20
-	briefQuoteMaxWords    = 15
+	briefArgumentMaxWords = 25
+	briefQuoteMaxWords    = 20
 	briefMaxSides         = 3
 	briefMaxQuotes        = 2
 )
