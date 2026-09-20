@@ -33,7 +33,7 @@ type Configuration struct {
 	EmbedderUrl               string // e.g. "http://localhost:8765"
 	GeminiApiKey              string
 	GeminiModel               string
-	DigestIntervalMinutes     int // how often to regenerate precomputed digest (minutes)
+	DigestIntervalMinutes     int // how often to regenerate precomputed digest (minutes); 0 disables it
 	TopicBriefIntervalMinutes int // how often to regenerate topic radar briefs (minutes)
 	ApiPort                   int // port for gok-api HTTP server
 }

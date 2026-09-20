@@ -71,21 +71,22 @@ func main() {
 		return
 	}
 
-	digestInterval := config.Config.DigestIntervalMinutes
-	if digestInterval <= 0 {
-		digestInterval = 240
-	}
 	briefInterval := config.Config.TopicBriefIntervalMinutes
 	if briefInterval <= 0 {
 		briefInterval = 720
 	}
 
-	slog.Info("starting digest cron jobs", "digest_interval_minutes", digestInterval, "topic_brief_interval_minutes", briefInterval)
 	digestCron := gocron.NewScheduler(time.UTC)
-	_, err = digestCron.Every(digestInterval).Minutes().Do(runDigest)
-	if err != nil {
-		slog.Error("couldn't create digest cron job", "error", err)
-		os.Exit(1)
+	digestInterval := config.Config.DigestIntervalMinutes
+	slog.Info("starting digest cron jobs", "digest_interval_minutes", digestInterval, "topic_brief_interval_minutes", briefInterval)
+	if digestInterval > 0 {
+		_, err = digestCron.Every(digestInterval).Minutes().Do(runDigest)
+		if err != nil {
+			slog.Error("couldn't create digest cron job", "error", err)
+			os.Exit(1)
+		}
+	} else {
+		slog.Info("digest generation disabled")
 	}
 	_, err = digestCron.Every(briefInterval).Minutes().Do(runTopicBriefs)
 	if err != nil {
