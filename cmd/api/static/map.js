@@ -36,6 +36,7 @@ const mapInfoText = {
 
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 24;
+const SELECTION_LABEL_MIN_ZOOM = 2; // × fit scale; below this the map is too crowded to name neighbours
 const INFO_PANEL_VISIBILITY_KEY = 'gok-atlas-info-panel-visible';
 const INFO_PANEL_LANGUAGE_KEY = 'gok-atlas-info-panel-language';
 
@@ -422,11 +423,17 @@ function render() {
     }
   }
 
-  if (atMaximumZoom) {
-    drawTopicLabels();
-    hideRegionLabels();
-  } else {
-    updateRegionLabels(nodes);
+  // With a selection everything else is dimmed, so name just the topic and its
+  // neighbours; otherwise keep the existing labelling at maximum zoom.
+  const nameSelection = selectedNode && state.transform.scale >= state.fitScale * SELECTION_LABEL_MIN_ZOOM;
+  const nameOthers = atMaximumZoom && labelToggle.checked;
+  if (atMaximumZoom) hideRegionLabels();
+  else updateRegionLabels(nodes);
+  if (nameSelection) {
+    const neighbours = state.nodesByDegree.filter(node => connectedIDs.has(node.id) && node.id !== selected);
+    drawTopicLabels({ priority: [selectedNode, ...neighbours], emphasisID: selected, others: nameOthers });
+  } else if (nameOthers) {
+    drawTopicLabels({ others: true });
   }
 
   const hover = state.nodesByID.get(state.hoverID);
@@ -434,36 +441,60 @@ function render() {
   else hoverTooltip.hidden = true;
 }
 
-function drawTopicLabels() {
-  if (!labelToggle.checked) return;
+/**
+ * Place topic names, skipping any label that would collide or leave the screen.
+ * `priority` nodes are placed first, with a white halo and extra above/below
+ * positions, so they always win space. With `others`, every remaining on-screen
+ * topic is then labelled in the plain style. `emphasisID` is drawn slightly bolder.
+ */
+function drawTopicLabels({ priority = [], emphasisID = null, others = false } = {}) {
   const placed = [];
   const margin = 8;
   context.save();
-  context.font = '650 11px "Avenir Next", "Trebuchet MS", sans-serif';
   context.textBaseline = 'middle';
+  context.lineJoin = 'round';
+  context.lineWidth = 3;
+  context.strokeStyle = 'rgba(255, 255, 255, 0.88)';
   context.fillStyle = 'rgba(23, 37, 30, 0.9)';
-  for (const node of state.nodesByDegree) {
-    const point = state.rendered.get(node.id);
-    if (!point) continue;
-    const radius = radiusForNode(node);
-    const width = context.measureText(node.title).width;
-    const height = 14;
-    const candidates = [
-      { x: point.x + radius + 5, y: point.y, align: 'left' },
-      { x: point.x - radius - 5, y: point.y, align: 'right' },
-    ];
-    const position = candidates.find(candidate => {
-      const left = candidate.align === 'left' ? candidate.x : candidate.x - width;
-      const bounds = { left, top: candidate.y - height / 2, right: left + width, bottom: candidate.y + height / 2 };
-      const inView = bounds.left >= margin && bounds.right <= window.innerWidth - margin && bounds.top >= margin && bounds.bottom <= window.innerHeight - margin;
-      const overlaps = placed.some(other => bounds.left < other.right + 4 && bounds.right > other.left - 4 && bounds.top < other.bottom + 3 && bounds.bottom > other.top - 3);
-      if (inView && !overlaps) candidate.bounds = bounds;
-      return inView && !overlaps;
-    });
-    if (!position) continue;
-    context.textAlign = position.align;
-    context.fillText(node.title, position.x, position.y);
-    placed.push(position.bounds);
+
+  const place = (nodes, halo) => {
+    for (const node of nodes) {
+      const point = state.rendered.get(node.id);
+      if (!point) continue;
+      const radius = radiusForNode(node);
+      context.font = `${node.id === emphasisID ? 700 : 650} 11px "Avenir Next", "Trebuchet MS", sans-serif`;
+      const width = context.measureText(node.title).width;
+      const height = 14;
+      const candidates = [
+        { x: point.x + radius + 5, y: point.y, align: 'left' },
+        { x: point.x - radius - 5, y: point.y, align: 'right' },
+      ];
+      if (halo) {
+        candidates.push(
+          { x: point.x, y: point.y - radius - 9, align: 'center' },
+          { x: point.x, y: point.y + radius + 9, align: 'center' },
+        );
+      }
+      const position = candidates.find(candidate => {
+        const left = candidate.align === 'left' ? candidate.x : candidate.align === 'center' ? candidate.x - width / 2 : candidate.x - width;
+        const bounds = { left, top: candidate.y - height / 2, right: left + width, bottom: candidate.y + height / 2 };
+        const inView = bounds.left >= margin && bounds.right <= window.innerWidth - margin && bounds.top >= margin && bounds.bottom <= window.innerHeight - margin;
+        const overlaps = placed.some(other => bounds.left < other.right + 4 && bounds.right > other.left - 4 && bounds.top < other.bottom + 3 && bounds.bottom > other.top - 3);
+        if (inView && !overlaps) candidate.bounds = bounds;
+        return inView && !overlaps;
+      });
+      if (!position) continue;
+      context.textAlign = position.align;
+      if (halo) context.strokeText(node.title, position.x, position.y);
+      context.fillText(node.title, position.x, position.y);
+      placed.push(position.bounds);
+    }
+  };
+
+  place(priority, true);
+  if (others) {
+    const prioritised = new Set(priority.map(node => node.id));
+    place(state.nodesByDegree.filter(node => !prioritised.has(node.id)), false);
   }
   context.restore();
 }
