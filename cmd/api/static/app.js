@@ -45,6 +45,7 @@ const state = {
   timelineRequestID: 0,  // guards seekTo/goLive/prefetch against out-of-order responses
   consecutivePollFailures: 0,
   stale: false,
+  goingLive: false,
   previewPlaybackTs: null,
   lastActivitySecond: -1,
   transitioningLive: false,
@@ -54,6 +55,7 @@ const state = {
 let _rafId = null;
 let _lastReplayRenderAt = 0;
 let _seekDebounce = null;
+let _hiddenResume = null;  // what to restore when the tab becomes visible again
 
 // DOM refs (populated in init())
 let $grid, $topicList, $scrubber, $lastUpdated, $playbackTime;
@@ -1174,6 +1176,7 @@ async function seekTo(targetTs) {
   state.previewPlaybackTs = null;
   state.lastActivitySecond = -1;
   state.fetchingNext = false;
+  state.goingLive = false;
   exitLiveMode();
 
   state.replayOriginTs = targetTs;
@@ -1204,6 +1207,7 @@ async function goLive(showNotice = false) {
   // is triggered while already live (e.g. user clicks the rightmost scrubber
   // position without dragging, so no 'input' event fires beforehand).
   exitLiveMode();
+  state.goingLive = true;
   cancelAllTimers();
   cancelReplayAnimation();
   state.seenTimestampCounts = {};
@@ -1211,6 +1215,7 @@ async function goLive(showNotice = false) {
   state.lastActivitySecond = -1;
   const snap = await fetchLive();
   if (requestID !== state.timelineRequestID) return;
+  state.goingLive = false;
   if (!snap) {
     // Stay in live mode so polling keeps retrying, but say plainly that the
     // data is stale. lastSnapshotAt = 0 makes the next good poll rebuild the grid.
@@ -1226,6 +1231,38 @@ async function goLive(showNotice = false) {
   setLastUpdated(snap.snapshot_at);
   enterLiveMode();
   if (showNotice) showReplayNotice();
+}
+
+// ── Tab visibility ────────────────────────────────────────────────────────────
+// A hidden tab shouldn't keep polling or stack up ping timers; coming back
+// re-syncs with a fresh fetch and catch-up replay.
+function initVisibility() {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (!state.topics.length) return;
+      if (state.mode === 'live' || state.goingLive) {
+        _hiddenResume = { live: true };
+      } else {
+        _hiddenResume = { ts: currentPlaybackTs() };
+        cancelReplayAnimation();
+      }
+      state.timelineRequestID++;   // drop any fetch still in flight
+      state.goingLive = false;
+      clearInterval(state.pollTimer);     state.pollTimer = null;
+      clearInterval(state.scrubInterval); state.scrubInterval = null;
+      cancelAllTimers();
+      return;
+    }
+    const resume = _hiddenResume;
+    _hiddenResume = null;
+    if (!resume) return;
+    if (resume.live) {
+      goLive();
+    } else {
+      const earliest = Date.now() / 1000 - CACHE_WINDOW_S + 120;
+      seekTo(Math.max(resume.ts, earliest));
+    }
+  });
 }
 
 // ── Speed control ─────────────────────────────────────────────────────────────
@@ -1358,6 +1395,7 @@ async function init() {
   });
 
   initKeyboard();
+  initVisibility();
 
   const snap = await fetchLive();
   if (!snap) {
