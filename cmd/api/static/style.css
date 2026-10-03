@@ -524,6 +524,7 @@ body.list-view #radar-wrap {
 
 .tile-label {
   position: absolute;
+  z-index: 2; /* keep titles above the pings */
   top: 45%;
   right: 9px;
   bottom: 9px;
@@ -531,6 +532,7 @@ body.list-view #radar-wrap {
   display: -webkit-box;
   overflow: hidden;
   color: rgba(13, 39, 29, 0.88);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.45);
   font-size: 12px;
   font-weight: 650;
   line-height: 1.32;
