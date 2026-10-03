@@ -91,6 +91,7 @@ const state = {
   pinch: null,
   hoverID: null,
   selectedID: null,
+  viewAnimation: null,
   rendered: new Map(),
   regionLabels: new Map(),
   activeRegion: 'all',
@@ -212,6 +213,7 @@ function resizeCanvas() {
 }
 
 function fitView() {
+  cancelViewAnimation();
   const nodes = visibleNodes();
   if (!nodes.length) return;
   const minX = Math.min(...nodes.map(node => node.x));
@@ -622,14 +624,87 @@ function clearSelection() {
   draw();
 }
 
-function focusNode(node) {
+function focusNode(node, { zoom = false } = {}) {
   if (state.activeRegion !== 'all' && node.region !== state.activeRegion) {
     state.activeRegion = 'all';
     regionSelect.value = 'all';
   }
+  if (zoom) {
+    selectNode(node.id);
+    animateViewTo(framingForNode(node));
+    return;
+  }
+  cancelViewAnimation();
   state.transform.x = window.innerWidth / 2 - node.x * state.transform.scale;
   state.transform.y = window.innerHeight / 2 - node.y * state.transform.scale;
   selectNode(node.id);
+}
+
+/**
+ * The view that shows a topic and its direct neighbours. On desktop the topic is
+ * centred on the screen; on phones the topic panel is a bottom sheet, so it is
+ * centred in the space above it.
+ */
+function framingForNode(node) {
+  const compact = window.innerWidth <= 700;
+  const freeLeft = 0;
+  const freeRight = window.innerWidth;
+  const freeTop = compact ? 54 : 0;
+  const freeBottom = compact ? window.innerHeight - 220 : window.innerHeight;
+  const centerX = (freeLeft + freeRight) / 2;
+  const centerY = (freeTop + freeBottom) / 2;
+
+  let reach = 0;
+  for (const { node: neighbour } of connectedNodes(node)) {
+    reach = Math.max(reach, Math.hypot(neighbour.x - node.x, neighbour.y - node.y));
+  }
+  const minScale = state.fitScale * 3;
+  const maxScale = Math.min(MAX_SCALE, state.fitScale * 10);
+  const wanted = reach > 0
+    ? 0.4 * Math.min(freeRight - freeLeft, freeBottom - freeTop) / reach
+    : state.fitScale * 6;
+  return { scale: Math.max(minScale, Math.min(maxScale, wanted)), worldX: node.x, worldY: node.y, centerX, centerY };
+}
+
+function cancelViewAnimation() {
+  if (state.viewAnimation !== null) {
+    cancelAnimationFrame(state.viewAnimation);
+    state.viewAnimation = null;
+  }
+}
+
+/** Ease the view so that (worldX, worldY) ends up at (centerX, centerY) at the target scale. */
+function animateViewTo(target) {
+  cancelViewAnimation();
+  const place = (scale, worldX, worldY) => {
+    state.transform.scale = scale;
+    state.transform.x = target.centerX - worldX * scale;
+    state.transform.y = target.centerY - worldY * scale;
+  };
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    place(target.scale, target.worldX, target.worldY);
+    draw();
+    return;
+  }
+  const from = {
+    scale: state.transform.scale,
+    worldX: (target.centerX - state.transform.x) / state.transform.scale,
+    worldY: (target.centerY - state.transform.y) / state.transform.scale,
+  };
+  const startedAt = performance.now();
+  const duration = 480;
+  const step = now => {
+    const progress = Math.min(1, (now - startedAt) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    place(
+      from.scale * Math.pow(target.scale / from.scale, eased),
+      from.worldX + (target.worldX - from.worldX) * eased,
+      from.worldY + (target.worldY - from.worldY) * eased,
+    );
+    draw();
+    state.viewAnimation = progress < 1 ? requestAnimationFrame(step) : null;
+  };
+  state.viewAnimation = requestAnimationFrame(step);
 }
 
 function updateSearch() {
@@ -708,6 +783,7 @@ function initializeRegions(nodes) {
 }
 
 canvas.addEventListener('pointerdown', event => {
+  cancelViewAnimation();
   state.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
   state.drag = { x: event.clientX, y: event.clientY, moved: false };
   canvas.setPointerCapture(event.pointerId);
@@ -769,6 +845,7 @@ canvas.addEventListener('pointercancel', event => {
 
 canvas.addEventListener('wheel', event => {
   event.preventDefault();
+  cancelViewAnimation();
   const factor = event.deltaY < 0 ? 1.12 : 0.89;
   const nextScale = clampScale(state.transform.scale * factor);
   const worldX = (event.clientX - state.transform.x) / state.transform.scale;
