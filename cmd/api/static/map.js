@@ -557,7 +557,32 @@ function selectNode(id) {
   panelRegion.textContent = regionLabels[node.region] || node.region;
   renderConnections(node);
   panelLink.href = node.url;
+  setTopicHash(id);
   draw();
+}
+
+function setTopicHash(id) {
+  const base = window.location.pathname + window.location.search;
+  try {
+    history.replaceState(null, '', id == null ? base : `${base}#topic=${id}`);
+  } catch {}
+}
+
+function topicIDFromHash() {
+  const id = Number(new URLSearchParams(window.location.hash.slice(1)).get('topic'));
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
+function applyHashSelection() {
+  if (!state.data) return;
+  const id = topicIDFromHash();
+  if (id === state.selectedID) return;
+  const node = id === null ? null : state.nodesByID.get(id);
+  if (node) {
+    focusNode(node, { zoom: true });
+  } else if (id === null) {
+    clearSelection();
+  }
 }
 
 function connectedNodes(node) {
@@ -593,6 +618,7 @@ function renderConnections(node) {
 function clearSelection() {
   state.selectedID = null;
   topicPanel.hidden = true;
+  setTopicHash(null);
   draw();
 }
 
@@ -654,6 +680,7 @@ async function loadMap() {
     status.textContent = '';
     resizeCanvas();
     fitView();
+    applyHashSelection();
   } catch (error) {
     console.error('[atlas] loadMap:', error);
     showMapError();
@@ -760,6 +787,11 @@ searchInput.addEventListener('keydown', event => {
     searchInput.blur();
   }
 });
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape' || event.target === searchInput) return;
+  if (state.selectedID !== null) clearSelection();
+});
+window.addEventListener('hashchange', applyHashSelection);
 regionSelect.addEventListener('change', () => {
   state.activeRegion = regionSelect.value;
   const selected = state.nodesByID.get(state.selectedID);
