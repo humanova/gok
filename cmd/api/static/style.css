@@ -269,6 +269,7 @@ body.is-stale .dot {
 
 /* ── Main / Grid ─────────────────────────────────────────── */
 #main {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -1114,6 +1115,49 @@ body.events-open #debug-panel {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   padding: 2px 4px;
+}
+
+/* ── Load error ──────────────────────────────────────────── */
+#load-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transform: translate(-50%, -50%);
+  padding: 20px 28px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 28px rgba(26, 58, 43, 0.12);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 650;
+  text-align: center;
+}
+
+#load-error button {
+  border: 1px solid #b8d8c2;
+  border-radius: 999px;
+  background: #e6f5eb;
+  color: var(--live-green);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 7px 12px;
+}
+
+#load-error button:hover,
+#load-error button:focus-visible {
+  border-color: var(--live-green);
+  background: var(--live-green);
+  color: #fff;
+  outline: none;
 }
 
 #replay-notice {

@@ -14,6 +14,7 @@ const BRIEF_CACHE_TTL_MS = 60_000;
 const STALE_AFTER_S     = 180;        // live snapshot older than this → stale
 const STALE_FAILURES    = 2;          // consecutive failed polls → stale
 const SEEK_DEBOUNCE_MS  = 250;        // keyboard steps on the scrubber settle before fetching
+const INIT_RETRY_DELAYS_MS = [5_000, 10_000, 20_000, 30_000];
 
 // Constrain animation work in social-app WebViews
 const IS_SOCIAL_IN_APP_BROWSER = /\b(?:Twitter|TwitterAndroid|X\/|LinkedInApp|LinkedIn|Instagram)/i.test(navigator.userAgent);
@@ -1194,6 +1195,7 @@ async function seekTo(targetTs) {
   schedulePings(snap.topics, targetTs, SEEK_SPREAD_MS, Infinity);
   refreshActivityIndicators(targetTs, true);
   setPlaybackTime(targetTs);
+  updateURLParam('t', Math.floor(targetTs));
   showReplayNotice(`${fmtTs(targetTs)}'den itibaren oynatılıyor`);
   startReplayAnimation();
   return true;
@@ -1216,6 +1218,7 @@ async function goLive(showNotice = false) {
   const snap = await fetchLive();
   if (requestID !== state.timelineRequestID) return;
   state.goingLive = false;
+  updateURLParam('t', null);
   if (!snap) {
     // Stay in live mode so polling keeps retrying, but say plainly that the
     // data is stale. lastSnapshotAt = 0 makes the next good poll rebuild the grid.
@@ -1396,13 +1399,34 @@ async function init() {
 
   initKeyboard();
   initVisibility();
+  await loadInitialData();
+}
 
-  const snap = await fetchLive();
-  if (!snap) {
-    $playbackTime.textContent = 'veri alınamadı';
-    return;
+// ── Initial load (with retry) ─────────────────────────────────────────────────
+let _initLoading = false;
+let _initAttempts = 0;
+let _initRetryTimer = null;
+
+/** A shared ?t= is honoured only while it is inside the replayable window. */
+function deepLinkSeekTarget() {
+  const raw = new URLSearchParams(window.location.search).get('t');
+  const ts = Number(raw);
+  if (raw === null || !Number.isFinite(ts)) return null;
+  const now = Date.now() / 1000;
+  return ts >= now - CACHE_WINDOW_S + 120 && ts <= playbackNow() ? ts : null;
+}
+
+/** Fetch the first snapshot and start playback. Resolves false when no data could be loaded. */
+async function startFromNetwork() {
+  const seekTarget = deepLinkSeekTarget();
+  if (seekTarget !== null && await seekTo(seekTarget)) {
+    $lastUpdated.textContent = 'geçmiş oynatılıyor';
+    return true;
   }
 
+  const snap = await fetchLive();
+  if (!snap) return false;
+  updateURLParam('t', null);
   buildGrid(snap.topics);
   buildTopicList(snap.topics);
   state.lastSnapshotAt = snap.snapshot_at;
@@ -1411,6 +1435,56 @@ async function init() {
   schedulePings(snap.topics, playbackNow(), CATCHUP_SPREAD_MS, Infinity);
   enterLiveMode();
   showReplayNotice();
+  return true;
+}
+
+function openDeepLinkedTopic() {
+  const id = Number(new URLSearchParams(window.location.search).get('topic'));
+  if (!Number.isSafeInteger(id) || id <= 0) return;
+  const topic = state.topics.find(candidate => candidate.id === id);
+  if (topic) openTopicBrief(topic);
+  else updateURLParam('topic', null);
+}
+
+async function loadInitialData() {
+  if (_initLoading) return;
+  _initLoading = true;
+  clearTimeout(_initRetryTimer);
+  let ok = false;
+  try {
+    ok = await startFromNetwork();
+  } finally {
+    _initLoading = false;
+  }
+  if (ok) {
+    hideLoadError();
+    openDeepLinkedTopic();
+    return;
+  }
+  showLoadError();
+  const delay = INIT_RETRY_DELAYS_MS[Math.min(_initAttempts, INIT_RETRY_DELAYS_MS.length - 1)];
+  _initAttempts++;
+  _initRetryTimer = setTimeout(loadInitialData, delay);
+}
+
+function showLoadError() {
+  $lastUpdated.textContent = 'bağlantı yok';
+  if ($id('load-error')) return;
+  const card = document.createElement('div');
+  card.id = 'load-error';
+  card.setAttribute('role', 'alert');
+  const message = document.createElement('p');
+  message.textContent = 'veriler alınamadı';
+  const retry = document.createElement('button');
+  retry.type = 'button';
+  retry.textContent = 'tekrar dene';
+  retry.addEventListener('click', loadInitialData);
+  card.append(message, retry);
+  $id('main').appendChild(card);
+}
+
+function hideLoadError() {
+  $id('load-error')?.remove();
 }
 
 document.addEventListener('DOMContentLoaded', init);
