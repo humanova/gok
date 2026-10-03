@@ -627,12 +627,24 @@ function updateSearch() {
   }
 }
 
+function showMapError() {
+  const message = document.createElement('span');
+  message.textContent = 'harita yüklenemedi';
+  const retry = document.createElement('button');
+  retry.type = 'button';
+  retry.className = 'map-status-retry';
+  retry.textContent = 'tekrar dene';
+  retry.addEventListener('click', loadMap);
+  status.replaceChildren(message, retry);
+}
+
 async function loadMap() {
+  status.textContent = 'harita yükleniyor';
   try {
     const response = await fetch(mapDetails[mapVariant].endpoint);
-    if (!response.ok) throw new Error(String(response.status));
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    if (!data.available) throw new Error('harita verisi bulunamadı');
+    if (!data.available) throw new Error('map snapshot unavailable');
     state.data = data;
     for (const node of data.nodes) state.nodesByID.set(node.id, node);
     state.nodesByDegree = [...data.nodes].sort((left, right) => right.degree - left.degree);
@@ -643,7 +655,8 @@ async function loadMap() {
     resizeCanvas();
     fitView();
   } catch (error) {
-    status.textContent = error.message || 'harita yüklenemedi';
+    console.error('[atlas] loadMap:', error);
+    showMapError();
   }
 }
 

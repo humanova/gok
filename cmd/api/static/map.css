@@ -229,13 +229,34 @@ button { cursor: pointer; }
   bottom: 22px;
   z-index: 3;
   transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: min(220px, calc(100vw - 24px));
+  padding: 8px 12px;
   color: var(--muted);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(167, 180, 169, 0.5);
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 #map-status:empty { display: none; }
+
+.map-status-retry {
+  padding: 4px 8px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: #edf7ef;
+  color: var(--accent);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
 
 #hover-tooltip {
   position: fixed;
@@ -297,5 +318,14 @@ button { cursor: pointer; }
   .search-result { min-height: 32px; padding: 6px 7px; font-size: 12px; }
   #close-panel, #panel-link { width: 28px; height: 28px; font-size: 18px; }
   .connection-chip { min-height: 26px; padding: 4px 6px; font-size: 11px; }
-  #map-status { display: none; }
+  #map-status {
+    display: flex;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    min-width: min(200px, calc(100vw - 16px));
+    white-space: nowrap;
+  }
 }
