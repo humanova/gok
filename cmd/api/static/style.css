@@ -81,6 +81,20 @@ body {
   animation: dot-pulse 2.4s ease-in-out infinite;
 }
 
+/* Stale: the "live" feed stopped updating. */
+body.is-stale .dot {
+  background: #c47a12;
+  animation: none;
+}
+
+#stale-badge {
+  display: none;
+  color: #c47a12;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 @keyframes dot-pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.3; }
@@ -1152,6 +1166,20 @@ body.events-open #debug-panel {
     display: none;
   }
 
+  /* #stats is hidden here, so surface the stale state next to the title. */
+  body.is-stale #stale-badge {
+    display: inline;
+    font-size: 10px;
+  }
+
+  #title-area {
+    gap: 6px;
+  }
+
+  #title {
+    white-space: nowrap;
+  }
+
   #title {
     font-size: 12px;
   }
@@ -1291,5 +1319,12 @@ body.events-open #debug-panel {
 
   body.events-open #debug-panel {
     display: flex;
+  }
+}
+
+/* On very narrow phones the stale badge needs the atlas link's icon width. */
+@media (max-width: 380px) {
+  body.is-stale #atlas-link span {
+    display: none;
   }
 }

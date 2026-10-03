@@ -11,6 +11,8 @@ const LIVE_THRESHOLD    = 0.998;      // scrubber frac ≥ this → live mode
 const MAX_VISIBLE_PINGS = 3;
 const METER_THRESHOLDS  = [1, 2, 4, 7, 11];
 const BRIEF_CACHE_TTL_MS = 60_000;
+const STALE_AFTER_S     = 180;        // live snapshot older than this → stale
+const STALE_FAILURES    = 2;          // consecutive failed polls → stale
 const SEEK_DEBOUNCE_MS  = 250;        // keyboard steps on the scrubber settle before fetching
 
 // Constrain animation work in social-app WebViews
@@ -41,6 +43,8 @@ const state = {
   briefCache: new Map(), // topicId → { brief, expiresAt }
   briefRequestID: 0,
   timelineRequestID: 0,  // guards seekTo/goLive/prefetch against out-of-order responses
+  consecutivePollFailures: 0,
+  stale: false,
   previewPlaybackTs: null,
   lastActivitySecond: -1,
   transitioningLive: false,
@@ -1107,20 +1111,45 @@ function enterLiveMode() {
   document.body.classList.add('is-live');
   state.mode = 'live';
 
-  state.pollTimer = setInterval(async () => {
-    const snap = await fetchLive();
-    if (!snap) return;
+  state.pollTimer = setInterval(pollLive, LIVE_POLL_MS);
+  state.scrubInterval = setInterval(syncScrubberToLive, 15_000);
+  syncScrubberToLive();
+}
+
+async function pollLive() {
+  const wasStale = state.stale;
+  const snap = await fetchLive();
+  if (state.mode !== 'live') return;   // the user left live mode mid-request
+  if (snap) {
+    state.consecutivePollFailures = 0;
     if (snap.snapshot_at !== state.lastSnapshotAt) {
       state.lastSnapshotAt = snap.snapshot_at;
       reorderGrid(snap.topics);
-      // New entries from the latest scrape are near playbackNow; no spread needed.
-      schedulePings(snap.topics, playbackNow(), 0, Infinity);
+      // New entries from the latest scrape are near playbackNow; no spread is
+      // needed unless we are catching up after an outage.
+      schedulePings(snap.topics, playbackNow(), wasStale ? CATCHUP_SPREAD_MS : 0, Infinity);
       setLastUpdated(snap.snapshot_at);
     }
-  }, LIVE_POLL_MS);
+  } else {
+    state.consecutivePollFailures++;
+  }
+  refreshStaleState();
+}
 
-  state.scrubInterval = setInterval(syncScrubberToLive, 15_000);
-  syncScrubberToLive();
+/** Stale = the "live" view is no longer being fed: repeated failures or an old snapshot. */
+function refreshStaleState() {
+  const age = Date.now() / 1000 - state.lastSnapshotAt;
+  setStale(state.consecutivePollFailures >= STALE_FAILURES || age > STALE_AFTER_S);
+}
+
+function setStale(stale) {
+  if (stale === state.stale) return;
+  state.stale = stale;
+  document.body.classList.toggle('is-stale', stale);
+  const dot = document.querySelector('#title-area .dot');
+  if (dot) dot.title = stale ? 'bağlantı koptu · yeniden deneniyor' : 'canlı';
+  if (stale) $lastUpdated.textContent = 'bağlantı koptu · yeniden deneniyor';
+  else if (state.lastSnapshotAt) setLastUpdated(state.lastSnapshotAt);
 }
 
 function exitLiveMode() {
@@ -1128,6 +1157,8 @@ function exitLiveMode() {
   state.mode = 'scrub';
   clearInterval(state.pollTimer);     state.pollTimer = null;
   clearInterval(state.scrubInterval); state.scrubInterval = null;
+  state.consecutivePollFailures = 0;
+  setStale(false);
 }
 
 /**
@@ -1143,7 +1174,7 @@ async function seekTo(targetTs) {
   state.previewPlaybackTs = null;
   state.lastActivitySecond = -1;
   state.fetchingNext = false;
-  state.mode = 'scrub';
+  exitLiveMode();
 
   state.replayOriginTs = targetTs;
   state.replayWallMs   = Date.now();
@@ -1181,11 +1212,12 @@ async function goLive(showNotice = false) {
   const snap = await fetchLive();
   if (requestID !== state.timelineRequestID) return;
   if (!snap) {
-    // Restore live appearance so the indicator stays green and the user
-    // can retry by interacting with the scrubber.
-    document.body.classList.add('is-live');
-    state.mode = 'live';
-    $playbackTime.textContent = 'bağlantı hatası';
+    // Stay in live mode so polling keeps retrying, but say plainly that the
+    // data is stale. lastSnapshotAt = 0 makes the next good poll rebuild the grid.
+    state.lastSnapshotAt = 0;
+    state.consecutivePollFailures = STALE_FAILURES;
+    enterLiveMode();
+    setStale(true);
     return;
   }
   reorderGrid(snap.topics);
@@ -1270,6 +1302,7 @@ function setPlaybackTime(ts) {
 }
 
 function setLastUpdated(snapshotAt) {
+  if (state.stale) return;   // the stale message owns this label until the feed recovers
   $lastUpdated.textContent = 'son güncelleme ' + new Date(snapshotAt * 1000)
     .toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
 }
