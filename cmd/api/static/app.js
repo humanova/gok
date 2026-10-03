@@ -319,7 +319,9 @@ function buildGrid(topics) {
   state.topics.forEach(t => $grid.appendChild(createTile(t)));
 }
 
-function formatRankMovement(delta) {
+function formatRankMovement(topic) {
+  if (topic.rank_new) return { label: '↑ yeni', direction: 'up' };
+  const delta = topic.rank_delta;
   if (!Number.isFinite(delta) || delta === 0) return { label: '→', direction: 'steady' };
   return delta > 0
     ? { label: `↑ ${delta}`, direction: 'up' }
@@ -373,7 +375,7 @@ function updateTopicRowDetails(row, topic, playbackTs = currentPlaybackTs()) {
   const trend = row.querySelector('.topic-row-trend');
   const activity = row.querySelector('.topic-row-activity');
   if (state.mode === 'live') {
-    const movement = formatRankMovement(topic.rank_delta);
+    const movement = formatRankMovement(topic);
     trend.textContent = movement.label;
     trend.className = `topic-row-trend ${movement.direction}`;
     const entryCount = countRecentEntries(topic.timestamps, playbackTs);
