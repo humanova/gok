@@ -28,6 +28,7 @@ type TopicMeta struct {
 	URL            string  `json:"url"`
 	Rank           int     `json:"rank"`
 	RankDelta      int     `json:"rank_delta"`
+	RankNew        bool    `json:"rank_new"`
 	HeatScore      float64 `json:"heat_score"`
 	FirstPopularAt int64   `json:"first_popular_at"`
 }
@@ -178,12 +179,20 @@ func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64) Puls
 		lo := sort.Search(len(timestamps), func(index int) bool { return timestamps[index] >= from })
 		hi := sort.Search(len(timestamps), func(index int) bool { return timestamps[index] > to })
 		copied := append([]int64(nil), timestamps[lo:hi]...)
+		// A topic with no entries in the previous window has no prior rank;
+		// reporting that as rank 0 would read as a fall for a brand-new #1.
+		previousRank, hadPreviousRank := previousRanks[hotTopic.topic.TopicId]
+		rankDelta := 0
+		if hadPreviousRank {
+			rankDelta = previousRank - (rank + 1)
+		}
 		topics = append(topics, TopicPulse{TopicMeta: TopicMeta{
 			ID:             hotTopic.topic.TopicId,
 			Title:          hotTopic.topic.Text,
 			URL:            hotTopic.topic.Url,
 			Rank:           rank + 1,
-			RankDelta:      previousRanks[hotTopic.topic.TopicId] - (rank + 1),
+			RankDelta:      rankDelta,
+			RankNew:        !hadPreviousRank,
 			HeatScore:      normalizedHeat,
 			FirstPopularAt: cache.firstPopularAt[hotTopic.topic.TopicId],
 		}, Timestamps: copied})
