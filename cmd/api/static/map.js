@@ -427,14 +427,17 @@ function render() {
   // neighbours; otherwise keep the existing labelling at maximum zoom.
   const nameSelection = selectedNode && state.transform.scale >= state.fitScale * SELECTION_LABEL_MIN_ZOOM;
   const nameOthers = atMaximumZoom && labelToggle.checked;
-  if (atMaximumZoom) hideRegionLabels();
-  else updateRegionLabels(nodes);
+  // Topic names go down first; region chips are DOM overlays that would
+  // otherwise sit on top of them, so they are placed around the names.
+  let labelBounds = [];
   if (nameSelection) {
     const neighbours = state.nodesByDegree.filter(node => connectedIDs.has(node.id) && node.id !== selected);
-    drawTopicLabels({ priority: [selectedNode, ...neighbours], emphasisID: selected, others: nameOthers });
+    labelBounds = drawTopicLabels({ priority: [selectedNode, ...neighbours], emphasisID: selected, others: nameOthers });
   } else if (nameOthers) {
-    drawTopicLabels({ others: true });
+    labelBounds = drawTopicLabels({ others: true });
   }
+  if (atMaximumZoom) hideRegionLabels();
+  else updateRegionLabels(nodes, labelBounds);
 
   const hover = state.nodesByID.get(state.hoverID);
   if (hover && !state.drag) updateHoverTooltip(hover);
@@ -446,6 +449,7 @@ function render() {
  * `priority` nodes are placed first, with a white halo and extra above/below
  * positions, so they always win space. With `others`, every remaining on-screen
  * topic is then labelled in the plain style. `emphasisID` is drawn slightly bolder.
+ * Returns the screen rectangles of the labels that were placed.
  */
 function drawTopicLabels({ priority = [], emphasisID = null, others = false } = {}) {
   const placed = [];
@@ -497,13 +501,14 @@ function drawTopicLabels({ priority = [], emphasisID = null, others = false } = 
     place(state.nodesByDegree.filter(node => !prioritised.has(node.id)), false);
   }
   context.restore();
+  return placed;
 }
 
 function hideRegionLabels() {
   for (const element of state.regionLabels.values()) element.hidden = true;
 }
 
-function updateRegionLabels(nodes) {
+function updateRegionLabels(nodes, avoid = []) {
   const centers = new Map();
   for (const node of nodes) {
     const entry = centers.get(node.region) || { x: 0, y: 0, count: 0 };
@@ -516,7 +521,7 @@ function updateRegionLabels(nodes) {
     [0, 0], [0, -28], [0, 28], [44, 0], [-44, 0],
     [44, -28], [-44, -28], [44, 28], [-44, 28],
   ];
-  const placed = [];
+  const placed = [...avoid];
   const entries = [...state.regionLabels].sort(([left], [right]) => {
     return (centers.get(right)?.count || 0) - (centers.get(left)?.count || 0);
   });
