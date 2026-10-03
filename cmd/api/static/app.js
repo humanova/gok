@@ -396,6 +396,8 @@ function createTile(t) {
   tile.classList.toggle('mobile-secondary', t.rank > 20);
   tile.tabIndex = 0;
   tile.setAttribute('role', 'button');
+  tile.setAttribute('aria-controls', 'brief-panel');
+  tile.setAttribute('aria-expanded', 'false');
   applyHeat(tile, t);
 
   const rank = document.createElement('span');
@@ -432,6 +434,7 @@ function buildGrid(topics) {
   $grid.innerHTML = '';
   state.topics = topics;
   state.topics.forEach(t => $grid.appendChild(createTile(t)));
+  applySelection();
 }
 
 function formatRankMovement(topic) {
@@ -459,6 +462,8 @@ function createTopicRow(topic, playbackTs = currentPlaybackTs()) {
   row.id = `topic-row-${topic.id}`;
   row.tabIndex = 0;
   row.setAttribute('role', 'button');
+  row.setAttribute('aria-controls', 'brief-panel');
+  row.setAttribute('aria-expanded', 'false');
 
   const title = document.createElement('span');
   title.className = 'topic-row-title';
@@ -510,6 +515,7 @@ function updateTopicRowDetails(row, topic, playbackTs = currentPlaybackTs()) {
 function buildTopicList(topics) {
   $topicList.innerHTML = '';
   topics.forEach(topic => $topicList.appendChild(createTopicRow(topic)));
+  applySelection();
 }
 
 function applyHeat(tile, t) {
@@ -557,6 +563,8 @@ function openTopicBrief(topic) {
   }
 
   state.selectedTopic = topic;
+  applySelection();
+  updateURLParam('topic', topic.id);
   const requestID = ++state.briefRequestID;
   $id('brief-topic').textContent = topic.title;
   $id('brief-search').href = `https://www.google.com/search?q=${encodeURIComponent(topic.title)}`;
@@ -594,6 +602,45 @@ function closeTopicBrief() {
   document.body.classList.remove('brief-open');
   state.selectedTopic = null;
   state.briefRequestID++;
+  applySelection();
+  updateURLParam('topic', null);
+}
+
+/** Mirror state.selectedTopic onto its tile and list row; also used after the list is rebuilt. */
+function applySelection() {
+  const id = state.selectedTopic?.id ?? null;
+  document.querySelectorAll('.tile, .topic-row').forEach(el => {
+    const selected = id !== null && (el.id === `tile-${id}` || el.id === `topic-row-${id}`);
+    if (el.classList.contains('is-selected') !== selected) el.classList.toggle('is-selected', selected);
+    const expanded = String(selected);
+    if (el.getAttribute('aria-expanded') !== expanded) el.setAttribute('aria-expanded', expanded);
+  });
+}
+
+/** Keep the address bar shareable without adding history entries. */
+function updateURLParam(name, value) {
+  try {
+    const url = new URL(window.location.href);
+    if (value === null) url.searchParams.delete(name);
+    else url.searchParams.set(name, String(value));
+    if (url.href !== window.location.href) history.replaceState(null, '', url);
+  } catch (error) {
+    console.warn('[pulse] could not update URL:', error);
+  }
+}
+
+function initKeyboard() {
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    if (document.body.classList.contains('brief-open')) {
+      const id = state.selectedTopic?.id;
+      closeTopicBrief();
+      const target = $id(document.body.classList.contains('list-view') ? `topic-row-${id}` : `tile-${id}`);
+      if (target) target.focus();
+    } else if (debug.isOpen()) {
+      debug.close();
+    }
+  });
 }
 
 function initBriefGestures() {
@@ -834,6 +881,7 @@ function reorderGrid(newTopics) {
 
   state.topics = newTopics;
   buildTopicList(newTopics);
+  applySelection();
   refreshActivityIndicators(currentPlaybackTs(), true);
 }
 
@@ -1275,6 +1323,8 @@ async function init() {
   document.querySelectorAll('.speed-btn').forEach(btn => {
     btn.addEventListener('click', () => setSpeed(parseFloat(btn.dataset.speed)));
   });
+
+  initKeyboard();
 
   const snap = await fetchLive();
   if (!snap) {

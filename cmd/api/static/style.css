@@ -335,6 +335,12 @@ body.list-view #radar-wrap {
   outline: none;
 }
 
+.topic-row.is-selected {
+  background: #edf7ef;
+  outline: 2px solid var(--live-green);
+  outline-offset: -2px;
+}
+
 .topic-row-trend,
 .topic-row-activity,
 .topic-row-status {
@@ -406,6 +412,12 @@ body.list-view #radar-wrap {
   filter: saturate(1.1) brightness(1.02);
   box-shadow: inset 0 0 18px hsla(var(--tile-hue), 92%, 48%, 0.2), 0 10px 22px rgba(27, 61, 46, 0.16);
   outline: none;
+}
+
+.tile.is-selected {
+  z-index: 3;
+  outline: 2px solid var(--live-green);
+  outline-offset: 2px;
 }
 
 .tile-top {
