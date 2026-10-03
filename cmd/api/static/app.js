@@ -11,6 +11,7 @@ const LIVE_THRESHOLD    = 0.998;      // scrubber frac ≥ this → live mode
 const MAX_VISIBLE_PINGS = 3;
 const METER_THRESHOLDS  = [1, 2, 4, 7, 11];
 const BRIEF_CACHE_TTL_MS = 60_000;
+const SEEK_DEBOUNCE_MS  = 250;        // keyboard steps on the scrubber settle before fetching
 
 // Constrain animation work in social-app WebViews
 const IS_SOCIAL_IN_APP_BROWSER = /\b(?:Twitter|TwitterAndroid|X\/|LinkedInApp|LinkedIn|Instagram)/i.test(navigator.userAgent);
@@ -39,6 +40,7 @@ const state = {
   view: 'grid',          // 'grid' | 'list'
   briefCache: new Map(), // topicId → { brief, expiresAt }
   briefRequestID: 0,
+  timelineRequestID: 0,  // guards seekTo/goLive/prefetch against out-of-order responses
   previewPlaybackTs: null,
   lastActivitySecond: -1,
   transitioningLive: false,
@@ -47,6 +49,7 @@ const state = {
 
 let _rafId = null;
 let _lastReplayRenderAt = 0;
+let _seekDebounce = null;
 
 // DOM refs (populated in init())
 let $grid, $topicList, $scrubber, $lastUpdated, $playbackTime;
@@ -1023,6 +1026,7 @@ function startReplayAnimation() {
     // so scrub playback continues seamlessly at any speed.
     if (!state.fetchingNext && state.scrubWindowEnd > 0 && playTs > state.scrubWindowEnd - 30) {
       state.fetchingNext = true;
+      const requestID = state.timelineRequestID;
       const nextFrom = state.scrubWindowEnd;
       const nextUntil = Math.min(nextFrom + RANGE_WINDOW_S, maxTs);
       if (nextUntil <= nextFrom) {
@@ -1031,7 +1035,7 @@ function startReplayAnimation() {
       }
       fetchRange(nextFrom, nextUntil).then(snap => {
         state.fetchingNext = false;
-        if (!snap || state.mode !== 'scrub') return;
+        if (!snap || state.mode !== 'scrub' || requestID !== state.timelineRequestID) return;
         reorderGrid(snap.topics);
         schedulePings(snap.topics, nextFrom, 0, Infinity);
         state.scrubWindowEnd = snap.window_to;
@@ -1078,8 +1082,13 @@ function exitLiveMode() {
   clearInterval(state.scrubInterval); state.scrubInterval = null;
 }
 
-/** Seek to a historical point: cancel everything, fetch a 1 h window, replay. */
+/**
+ * Seek to a historical point: cancel everything, fetch a 1 h window, replay.
+ * Resolves false only when the fetch failed; a superseded request is not a failure.
+ */
 async function seekTo(targetTs) {
+  clearTimeout(_seekDebounce);
+  const requestID = ++state.timelineRequestID;
   cancelAllTimers();
   cancelReplayAnimation();
   state.seenTimestampCounts = {};
@@ -1092,7 +1101,11 @@ async function seekTo(targetTs) {
   state.replayWallMs   = Date.now();
 
   const snap = await fetchRange(targetTs, targetTs + RANGE_WINDOW_S);
-  if (!snap) return;
+  if (requestID !== state.timelineRequestID) return true;
+  if (!snap) {
+    showReplayNotice('veri alınamadı');
+    return false;
+  }
 
   state.scrubWindowEnd = snap.window_to;
   reorderGrid(snap.topics);
@@ -1101,10 +1114,13 @@ async function seekTo(targetTs) {
   setPlaybackTime(targetTs);
   showReplayNotice(`${fmtTs(targetTs)}'den itibaren oynatılıyor`);
   startReplayAnimation();
+  return true;
 }
 
 /** Re-enter live mode: fresh fetch, clear dedup state, re-schedule. */
 async function goLive(showNotice = false) {
+  clearTimeout(_seekDebounce);
+  const requestID = ++state.timelineRequestID;
   // exitLiveMode first so we never leak a second pair of intervals if goLive
   // is triggered while already live (e.g. user clicks the rightmost scrubber
   // position without dragging, so no 'input' event fires beforehand).
@@ -1115,6 +1131,7 @@ async function goLive(showNotice = false) {
   state.previewPlaybackTs = null;
   state.lastActivitySecond = -1;
   const snap = await fetchLive();
+  if (requestID !== state.timelineRequestID) return;
   if (!snap) {
     // Restore live appearance so the indicator stays green and the user
     // can retry by interacting with the scrubber.
@@ -1174,14 +1191,20 @@ function initScrubber() {
   });
 
   // On release: fetch data for the chosen position.
-  $scrubber.addEventListener('change', async () => {
-    const frac = $scrubber.value / 1000;
-    state.previewPlaybackTs = null;
-    if (frac >= LIVE_THRESHOLD) {
-      await goLive();
-    } else {
-      await seekTo(scrubToTs($scrubber.value));
-    }
+  // Holding an arrow key fires 'change' per step, so let keyboard steps settle
+  // before fetching. Pointer releases are deliberate and seek immediately.
+  let pointerDriven = false;
+  $scrubber.addEventListener('pointerdown', () => { pointerDriven = true; });
+  $scrubber.addEventListener('change', () => {
+    clearTimeout(_seekDebounce);
+    const delay = pointerDriven ? 0 : SEEK_DEBOUNCE_MS;
+    pointerDriven = false;
+    _seekDebounce = setTimeout(() => {
+      const frac = $scrubber.value / 1000;
+      state.previewPlaybackTs = null;
+      if (frac >= LIVE_THRESHOLD) goLive();
+      else seekTo(scrubToTs($scrubber.value));
+    }, delay);
   });
 }
 
