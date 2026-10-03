@@ -84,7 +84,6 @@ const state = {
   nodesByID: new Map(),
   nodesByDegree: [],
   regionHulls: new Map(),
-  clustersByID: new Map(),
   transform: { scale: 1, x: 0, y: 0 },
   fitScale: 1,
   drag: null,
@@ -638,7 +637,6 @@ async function loadMap() {
     for (const node of data.nodes) state.nodesByID.set(node.id, node);
     state.nodesByDegree = [...data.nodes].sort((left, right) => right.degree - left.degree);
     cacheRegionHulls(data.nodes);
-    for (const cluster of data.clusters) state.clustersByID.set(cluster.id, cluster);
     initializeRegions(data.nodes);
     renderMapInfo(data);
     status.textContent = '';

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,7 +17,7 @@ type MapNode struct {
 	ID          uint64  `json:"id"`
 	Title       string  `json:"title"`
 	URL         string  `json:"url"`
-	CommunityID int     `json:"community_id"`
+	CommunityID int     `json:"-"`
 	Region      string  `json:"region"`
 	Degree      int     `json:"degree"`
 	X           float64 `json:"x"`
@@ -41,7 +42,7 @@ type MapSnapshot struct {
 	WindowStart time.Time    `json:"window_start,omitempty"`
 	Nodes       []MapNode    `json:"nodes,omitempty"`
 	Edges       []MapEdge    `json:"edges,omitempty"`
-	Clusters    []MapCluster `json:"clusters,omitempty"`
+	Clusters    []MapCluster `json:"-"`
 }
 
 func loadMapSnapshot(layoutDir, graphDir string) (*MapSnapshot, error) {
@@ -135,7 +136,8 @@ func loadMapNodes(graphPath, layoutPath string) ([]MapNode, error) {
 		if err != nil {
 			return err
 		}
-		nodes = append(nodes, MapNode{ID: id, Title: meta.title, URL: meta.url, CommunityID: meta.communityID, Region: record[region], Degree: meta.degree, X: x, Y: y})
+		// 0.01 units is far below a pixel even at maximum zoom.
+		nodes = append(nodes, MapNode{ID: id, Title: meta.title, URL: meta.url, CommunityID: meta.communityID, Region: record[region], Degree: meta.degree, X: math.Round(x*100) / 100, Y: math.Round(y*100) / 100})
 		return nil
 	}); err != nil {
 		return nil, err
