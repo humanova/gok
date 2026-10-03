@@ -52,24 +52,34 @@ let _lastReplayRenderAt = 0;
 let $grid, $topicList, $scrubber, $lastUpdated, $playbackTime;
 
 // ── Debug Panel ──────────────────────────────────────────────────────────────
+// Events live in a plain array sorted by fireAt. The DOM is only built while the
+// panel is open, so scheduling ~1,000 pings with the panel closed stays cheap.
 const debug = {
   enabled:  true,
-  _items:   new Map(),
+  MAX_EVENTS:   300,  // soft cap on the array; only fired events are dropped
+  TRIM_SLACK:   64,   // let the array overshoot so trimming is amortised
+  RENDER_COUNT: 100,  // events rendered when the panel opens
+  MAX_NODES:    300,  // DOM cap while the panel is open
+  _events:  [],       // { id, topic, title, entryTs, fireAt, minuteCount, fired }
+  _byId:    new Map(),
+  _nodes:   new Map(), // id → <li>, valid only while the panel is open
   _nextId:  0,
   _pending: 0,
+  _fired:   0,
+  _open:    false,
   _autoFollow: true,
+  _headerKey: '',
+  _headerQueued: false,
   _$list:   null,
+  _timeFormat: new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit' }),
 
   init() {
     this._$list   = $id('debug-list');
     this._$toggle = $id('event-toggle');
     this._$count  = $id('event-toggle-count');
     this._$follow = $id('event-follow');
-    this._$toggle.addEventListener('click', () => {
-      const isOpen = document.body.classList.toggle('events-open');
-      this._$toggle.setAttribute('aria-expanded', String(isOpen));
-      if (isOpen && this._autoFollow) this.scrollToLatest();
-    });
+    this._$title  = $id('debug-title');
+    this._$toggle.addEventListener('click', () => (this._open ? this.close() : this.open()));
     this._$follow.addEventListener('click', () => {
       this._autoFollow = true;
       this._updateHeader();
@@ -78,95 +88,195 @@ const debug = {
     this._$list.addEventListener('wheel', () => this.pauseFollowing(), { passive: true });
     this._$list.addEventListener('touchstart', () => this.pauseFollowing(), { passive: true });
     this._$list.addEventListener('pointerdown', () => this.pauseFollowing());
-    this._$list.addEventListener('keydown', () => this.pauseFollowing());
+    this._$list.addEventListener('keydown', event => {
+      this.pauseFollowing();
+      if (event.key === 'Enter' || event.key === ' ') this._activate(event);
+    });
+    this._$list.addEventListener('click', event => this._activate(event));
+  },
+
+  isOpen() { return this._open; },
+
+  open() {
+    this._open = true;
+    document.body.classList.add('events-open');
+    this._$toggle.setAttribute('aria-expanded', 'true');
+    this._renderWindow();
+    if (this._autoFollow) this.scrollToLatest();
   },
 
   close() {
+    this._open = false;
     document.body.classList.remove('events-open');
     this._$toggle.setAttribute('aria-expanded', 'false');
   },
 
-  add(debugId, topicTitle, entryTs, fireAt, minuteCount) {
+  add(debugId, topic, entryTs, fireAt, minuteCount) {
     if (!this.enabled) return;
-    const li = document.createElement('li');
-    li.id        = `dbg-${debugId}`;
-    li.className = 'dbg-item';
-    li.dataset.fireAt = String(fireAt);
-
-    const icon  = document.createElement('span');
-    icon.className   = 'dbg-icon';
-    icon.textContent = '·';
-
-    const time  = document.createElement('span');
-    time.className   = 'dbg-time';
-    time.textContent = new Date(entryTs * 1000)
-      .toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-    const title = document.createElement('span');
-    title.className   = 'dbg-title';
-    title.textContent = topicTitle;
-    title.title       = topicTitle;
-
-    li.append(icon, time, title);
-    if (minuteCount > 1) {
-      const burst = document.createElement('span');
-      burst.className = 'dbg-burst';
-      burst.textContent = `×${minuteCount}`;
-      burst.title = `Bu dakika ${minuteCount} girdi`;
-      li.appendChild(burst);
-    }
-
-    let inserted = false;
-    for (const child of this._$list.children) {
-      if (parseFloat(child.dataset.fireAt) > fireAt) {
-        this._$list.insertBefore(li, child);
-        inserted = true;
-        break;
+    const event = { id: debugId, topic, title: topic.title, entryTs, fireAt, minuteCount, fired: false };
+    const events = this._events;
+    const last = events[events.length - 1];
+    if (!last || fireAt >= last.fireAt) {
+      events.push(event);
+    } else {
+      // Binary search for the first event that fires after this one.
+      let lo = 0, hi = events.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (events[mid].fireAt > fireAt) hi = mid; else lo = mid + 1;
       }
+      events.splice(lo, 0, event);
     }
-    if (!inserted) this._$list.appendChild(li);
-
-    this._items.set(debugId, li);
+    this._byId.set(debugId, event);
     this._pending++;
+    if (events.length > this.MAX_EVENTS + this.TRIM_SLACK) this._trim();
+    if (this._open) this._insertNode(event);
     this._updateHeader();
-
-    if (this._$list.children.length > 300) {
-      for (const child of [...this._$list.children]) {
-        if (this._$list.children.length <= 300) break;
-        if (child.classList.contains('fired')) {
-          this._items.delete(parseInt(child.id.replace('dbg-', ''), 10));
-          child.remove();
-        }
-      }
-    }
   },
 
   tick(debugId) {
     if (!this.enabled) return;
-    const li = this._items.get(debugId);
-    if (!li) return;
-    li.classList.remove('pending');
-    li.classList.add('fired');
-    li.querySelector('.dbg-icon').textContent = '✓';
+    const event = this._byId.get(debugId);
+    if (!event || event.fired) return;
+    event.fired = true;
+    this._fired++;
     if (this._pending > 0) this._pending--;
     this._updateHeader();
-    if (this._autoFollow) this.scrollToItem(li);
+    if (!this._open) return;
+    const node = this._nodes.get(debugId);
+    if (node) this._markFired(node);
+    else this._insertNode(event);
+    if (this._autoFollow) this.scrollToItem(this._nodes.get(debugId));
   },
 
   clear() {
     if (!this.enabled) return;
-    this._$list.innerHTML = '';
-    this._items.clear();
+    this._events = [];
+    this._byId.clear();
+    this._nodes.clear();
     this._pending = 0;
+    this._fired = 0;
+    if (this._open) this._$list.replaceChildren();
     this._updateHeader();
   },
 
+  /** Drop the oldest fired events until the array is back at MAX_EVENTS. */
+  _trim() {
+    let excess = Math.min(this._events.length - this.MAX_EVENTS, this._fired);
+    if (excess <= 0) return;
+    const kept = [];
+    for (const event of this._events) {
+      if (excess > 0 && event.fired) {
+        excess--;
+        this._fired--;
+        this._byId.delete(event.id);
+        if (this._open) {
+          this._nodes.get(event.id)?.remove();
+          this._nodes.delete(event.id);
+        }
+      } else {
+        kept.push(event);
+      }
+    }
+    this._events = kept;
+  },
+
+  /** Build the DOM for the events around the fire frontier. */
+  _renderWindow() {
+    const events = this._events;
+    let anchor = -1;
+    for (let index = events.length - 1; index >= 0; index--) {
+      if (events[index].fired) { anchor = index; break; }
+    }
+    const end = Math.min(events.length, anchor + 1 + 30);
+    const start = Math.max(0, end - this.RENDER_COUNT);
+    this._nodes.clear();
+    const fragment = document.createDocumentFragment();
+    for (let index = start; index < end; index++) {
+      const node = this._createNode(events[index]);
+      this._nodes.set(events[index].id, node);
+      fragment.appendChild(node);
+    }
+    this._$list.replaceChildren(fragment);
+  },
+
+  _createNode(event) {
+    const li = document.createElement('li');
+    li.className = event.fired ? 'dbg-item fired' : 'dbg-item';
+    li.dataset.id = String(event.id);
+    li.dataset.fireAt = String(event.fireAt);
+    li.tabIndex = 0;
+    li.setAttribute('role', 'button');
+
+    const icon  = document.createElement('span');
+    icon.className   = 'dbg-icon';
+    icon.textContent = event.fired ? '✓' : '·';
+
+    const time  = document.createElement('span');
+    time.className   = 'dbg-time';
+    time.textContent = this._timeFormat.format(new Date(event.entryTs * 1000));
+
+    const title = document.createElement('span');
+    title.className   = 'dbg-title';
+    title.textContent = event.title;
+    title.title       = event.title;
+
+    li.append(icon, time, title);
+    if (event.minuteCount > 1) {
+      const burst = document.createElement('span');
+      burst.className = 'dbg-burst';
+      burst.textContent = `×${event.minuteCount}`;
+      burst.title = `Bu dakika ${event.minuteCount} girdi`;
+      li.appendChild(burst);
+    }
+    return li;
+  },
+
+  /** Insert one event's node in fireAt order, scanning back from the end. */
+  _insertNode(event) {
+    if (this._nodes.has(event.id)) return;
+    const list = this._$list;
+    const node = this._createNode(event);
+    let after = list.lastElementChild;
+    while (after && parseFloat(after.dataset.fireAt) > event.fireAt) after = after.previousElementSibling;
+    list.insertBefore(node, after ? after.nextElementSibling : list.firstElementChild);
+    this._nodes.set(event.id, node);
+    while (list.children.length > this.MAX_NODES) {
+      const oldest = list.firstElementChild;
+      this._nodes.delete(parseInt(oldest.dataset.id, 10));
+      oldest.remove();
+    }
+  },
+
+  _markFired(node) {
+    node.classList.add('fired');
+    node.querySelector('.dbg-icon').textContent = '✓';
+  },
+
+  _activate(event) {
+    const li = event.target.closest('.dbg-item');
+    const entry = li && this._byId.get(parseInt(li.dataset.id, 10));
+    if (!entry) return;
+    event.preventDefault();
+    // Prefer the live topic object; the one stored here belongs to an older snapshot.
+    openTopicBrief(state.topics.find(topic => topic.id === entry.topic.id) ?? entry.topic);
+    if (window.matchMedia('(max-width: 560px)').matches) this.close();
+  },
+
+  /** Header writes are coalesced to one per frame; add() can run ~1,000 times in a row. */
   _updateHeader() {
-    if (!this.enabled) return;
-    $id('debug-title').textContent = `olaylar · ${this._pending} sırada`;
-    this._$count.textContent = String(this._pending);
-    this._$follow.textContent = this._autoFollow ? 'takipte' : 'takibi aç';
-    this._$follow.classList.toggle('is-paused', !this._autoFollow);
+    if (!this.enabled || this._headerQueued) return;
+    this._headerQueued = true;
+    requestAnimationFrame(() => {
+      this._headerQueued = false;
+      const key = `${this._pending}|${this._autoFollow}`;
+      if (key === this._headerKey) return;
+      this._headerKey = key;
+      this._$title.textContent = `olaylar · ${this._pending} sırada`;
+      this._$count.textContent = String(this._pending);
+      this._$follow.textContent = this._autoFollow ? 'takipte' : 'takibi aç';
+      this._$follow.classList.toggle('is-paused', !this._autoFollow);
+    });
   },
 
   pauseFollowing() {
@@ -176,13 +286,15 @@ const debug = {
   },
 
   scrollToLatest() {
-    const latest = this._$list.querySelector('.dbg-item.fired:last-of-type')
-      ?? this._$list.lastElementChild;
+    if (!this._open) return;
+    let latest = this._$list.lastElementChild;
+    while (latest && !latest.classList.contains('fired')) latest = latest.previousElementSibling;
+    if (!latest) latest = this._$list.lastElementChild;
     if (latest) this.scrollToItem(latest);
   },
 
   scrollToItem(item) {
-    item.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (item) item.scrollIntoView({ block: 'center', behavior: 'smooth' });
   },
 };
 
@@ -816,7 +928,7 @@ function schedulePings(topics, originTs, catchupSpreadMs, maxCatchup) {
       const key = String(event.ts);
       observed[key] = (observed[key] ?? 0) + 1;
       if (observed[key] <= (seen[key] ?? 0)) continue;
-      const entry = { topicId: t.id, heat: t.heat_score, title: t.title, ...event };
+      const entry = { topicId: t.id, topic: t, heat: t.heat_score, ...event };
       if (entry.playTs <= originTs) pastPings.push(entry);
       else                          futurePings.push(entry);
     }
@@ -840,7 +952,7 @@ function schedulePings(topics, originTs, catchupSpreadMs, maxCatchup) {
       const delay   = catchupSpreadMs > 0 ? frac * catchupSpreadMs : 0;
       const fireAt  = nextPingFireAt(delay);
       const debugId = debug._nextId++;
-      debug.add(debugId, p.title, p.ts, fireAt, p.minuteCount);
+      debug.add(debugId, p.topic, p.ts, fireAt, p.minuteCount);
       const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.heat, p.minuteCount); }, fireAt - Date.now());
       state.pendingTimers.push(timerId);
     });
@@ -852,7 +964,7 @@ function schedulePings(topics, originTs, catchupSpreadMs, maxCatchup) {
     if (delay > 0 && delay < 86_400_000) {
       const fireAt  = nextPingFireAt(delay);
       const debugId = debug._nextId++;
-      debug.add(debugId, p.title, p.ts, fireAt, p.minuteCount);
+      debug.add(debugId, p.topic, p.ts, fireAt, p.minuteCount);
       const timerId = setTimeout(() => { debug.tick(debugId); firePing(p.topicId, p.heat, p.minuteCount); }, fireAt - Date.now());
       state.pendingTimers.push(timerId);
     }

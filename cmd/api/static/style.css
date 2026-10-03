@@ -1037,6 +1037,16 @@ body.events-open #debug-panel {
   transition: opacity 0.4s;
 }
 
+.dbg-item {
+  cursor: pointer;
+}
+
+.dbg-item:hover,
+.dbg-item:focus-visible {
+  background: #edf7ef;
+  outline: none;
+}
+
 .dbg-item.fired {
   opacity: 0.5;
 }
