@@ -11,6 +11,7 @@ const LIVE_THRESHOLD    = 0.998;      // scrubber frac ≥ this → live mode
 const MAX_VISIBLE_PINGS = 3;
 const METER_THRESHOLDS  = [1, 2, 4, 7, 11];
 const BRIEF_CACHE_TTL_MS = 60_000;
+const SUPPORT_ORDER     = { majority: 0, balanced: 1, minority: 2 };
 const STALE_AFTER_S     = 180;        // live snapshot older than this → stale
 const STALE_FAILURES    = 2;          // consecutive failed polls → stale
 const SEEK_DEBOUNCE_MS  = 250;        // keyboard steps on the scrubber settle before fetching
@@ -701,12 +702,41 @@ function renderBriefLoading() {
   loading.className = 'brief-loading';
   loading.textContent = 'Özet yükleniyor…';
   content.appendChild(loading);
+  renderBriefMeta(null);
+}
+
+/** Show when the brief was generated and from how many entries, under the topic title. */
+function renderBriefMeta(brief) {
+  const meta = $id('brief-meta');
+  if (!brief?.generated_at) {
+    meta.hidden = true;
+    meta.textContent = '';
+    meta.removeAttribute('title');
+    return;
+  }
+  const generatedAt = new Date(brief.generated_at);
+  meta.textContent = `${fmtAgo(generatedAt)} · ${brief.entry_count} girdi`;
+  meta.title = generatedAt.toLocaleString('tr-TR', {
+    day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+  });
+  meta.hidden = false;
+}
+
+/** Format a past date as a short Turkish relative time, e.g. "2 sa önce". */
+function fmtAgo(date) {
+  const minutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60_000));
+  if (minutes < 1) return 'az önce';
+  if (minutes < 60) return `${minutes} dk önce`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} sa önce`;
+  return `${Math.floor(hours / 24)} gün önce`;
 }
 
 function renderTopicBrief(brief) {
   const content = $id('brief-content');
   content.innerHTML = '';
   if (!brief?.available || !brief.payload?.summary) {
+    renderBriefMeta(null);
     const unavailable = document.createElement('p');
     unavailable.className = 'brief-unavailable';
     unavailable.textContent = 'bu konunun özeti henüz hazır değil! dilersen başlığa gidip bakabilirsin.';
@@ -714,23 +744,15 @@ function renderTopicBrief(brief) {
     return;
   }
 
-  if (brief.generated_at) {
-    const meta = document.createElement('p');
-    meta.className = 'brief-meta';
-    meta.textContent = `${new Date(brief.generated_at).toLocaleString('tr-TR', {
-      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
-    })} · ${brief.entry_count} girdi`;
-    content.appendChild(meta);
-  }
-
-  const summaryHeading = document.createElement('h3');
-  summaryHeading.textContent = 'Ne konuşuluyor?';
+  renderBriefMeta(brief);
   const summary = document.createElement('p');
   summary.className = 'brief-summary';
   summary.textContent = brief.payload.summary;
-  content.append(summaryHeading, summary);
+  content.appendChild(summary);
 
-  const sides = brief.payload.debate?.sides ?? [];
+  // Majority first regardless of the order the LLM returned; sort is stable.
+  const sides = [...(brief.payload.debate?.sides ?? [])].sort((a, b) =>
+    (SUPPORT_ORDER[a.support] ?? SUPPORT_ORDER.balanced) - (SUPPORT_ORDER[b.support] ?? SUPPORT_ORDER.balanced));
   if (sides.length === 0) return;
 
   const debateHeading = document.createElement('h3');
