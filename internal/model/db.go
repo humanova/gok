@@ -17,7 +17,7 @@ import (
 
 var database *gorm.DB
 
-func prepareDb() (*gorm.DB, error) {
+func openDb() (*gorm.DB, error) {
 	dbLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
@@ -39,6 +39,14 @@ func prepareDb() (*gorm.DB, error) {
 		slog.Error("couldn't connect to db", "error", err)
 		return nil, err
 	}
+	return database, nil
+}
+
+func prepareDb() (*gorm.DB, error) {
+	database, err := openDb()
+	if err != nil {
+		return nil, err
+	}
 
 	// Enable pgvector extension
 	if err := database.Exec("CREATE EXTENSION IF NOT EXISTS vector").Error; err != nil {
@@ -55,7 +63,7 @@ func prepareDb() (*gorm.DB, error) {
 
 	// AutoMigrate digest tables. Existing scrape tables managed by the scraper binary
 	// are left untouched to avoid constraint-name conflicts across GORM versions.
-	if err = database.AutoMigrate(&Digest{}, &TopicBrief{}); err != nil {
+	if err = database.AutoMigrate(&Digest{}, &TopicBrief{}, &TopicStory{}); err != nil {
 		slog.Error("couldn't migrate digest tables", "error", err)
 		return nil, err
 	}
