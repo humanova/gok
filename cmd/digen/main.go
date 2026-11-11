@@ -14,6 +14,7 @@ import (
 	"gok/internal/llm"
 	"gok/internal/model"
 	"gok/internal/rag"
+	"gok/internal/stories"
 
 	"github.com/go-co-op/gocron"
 )
@@ -64,10 +65,32 @@ func main() {
 		}
 	}
 
+	storyModel, storyEmbeddingModel := config.Config.StoryModels()
+	storyJudge := llmClient.StoryJudge(storyModel)
+	storyEmbedder := llmClient.StoryEmbedder(storyEmbeddingModel)
+	runStories := func() {
+		release, ok, err := stories.TryLock()
+		if err != nil || !ok {
+			slog.Warn("story links skipped: another stories run holds the lock", "error", err)
+			return
+		}
+		defer release()
+		decided, err := stories.Run(ctx, stories.DBStore{}, storyEmbedder, storyJudge, stories.Options{
+			Since: time.Now().UTC().Add(-stories.PoolWindow),
+			Save:  true,
+		})
+		if err != nil {
+			slog.Error("story links failed", "error", err, "decided", decided)
+			return
+		}
+		slog.Info("story links decided", "count", decided)
+	}
+
 	if *once {
-		slog.Info("running digest and topic briefs once")
+		slog.Info("running digest, topic briefs and story links once")
 		runDigest()
 		runTopicBriefs()
+		runStories()
 		return
 	}
 
@@ -92,6 +115,16 @@ func main() {
 	if err != nil {
 		slog.Error("couldn't create topic brief cron job", "error", err)
 		os.Exit(1)
+	}
+	if storyInterval := config.Config.StoryIntervalMinutes; storyInterval > 0 {
+		slog.Info("starting story link job", "interval_minutes", storyInterval, "model", storyModel, "embedding_model", storyEmbeddingModel)
+		_, err = digestCron.Every(storyInterval).Minutes().Do(runStories)
+		if err != nil {
+			slog.Error("couldn't create story link cron job", "error", err)
+			os.Exit(1)
+		}
+	} else {
+		slog.Info("story links disabled")
 	}
 
 	digestCron.StartBlocking()
