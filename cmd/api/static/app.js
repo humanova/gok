@@ -422,6 +422,11 @@ function createTile(t) {
   burst.className = 'burst-count';
   tile.appendChild(burst);
 
+  const story = document.createElement('span');
+  story.className = 'tile-story';
+  story.hidden = true;
+  tile.appendChild(story);
+
   const label = document.createElement('div');
   label.className = 'tile-label';
   label.textContent = t.title;
@@ -518,6 +523,8 @@ function updateTopicRowDetails(row, topic, playbackTs = currentPlaybackTs()) {
   const label = firstPopularLabel(topic.first_popular_at, playbackTs);
   status.textContent = label;
   status.classList.toggle('is-new', label === 'yeni');
+  applyStoryMark(row, topic);
+  row.querySelector('.topic-row-title').title = topic.story ? `${topic.title}\n${storyLabel(topic.story)}` : topic.title;
 }
 
 function buildTopicList(topics) {
@@ -550,6 +557,28 @@ function updateTileDetails(tile, t, playbackTs = currentPlaybackTs()) {
     bar.classList.toggle('active', recentCount >= METER_THRESHOLDS[index]);
   });
   tile.classList.toggle('meter-overflow', recentCount > METER_THRESHOLDS.at(-1));
+  applyStoryMark(tile, t);
+}
+
+/** Topics of one story share a colour; the hue comes from the story's root topic id. */
+function storyHue(storyID) {
+  return Math.round((Number(storyID) * 137.508) % 360);
+}
+
+function storyLabel(story) {
+  return `hikaye: ${story.title} · ${story.size} başlık`;
+}
+
+function applyStoryMark(el, topic) {
+  const story = topic.story;
+  el.classList.toggle('in-story', Boolean(story));
+  if (story) el.style.setProperty('--story-hue', storyHue(story.id));
+  else el.style.removeProperty('--story-hue');
+  const mark = el.querySelector('.tile-story');
+  if (mark) {
+    mark.hidden = !story;
+    mark.title = story ? storyLabel(story) : '';
+  }
 }
 
 function refreshActivityIndicators(playbackTs, force = false) {
@@ -741,6 +770,7 @@ function renderTopicBrief(brief) {
     unavailable.className = 'brief-unavailable';
     unavailable.textContent = 'bu konunun özeti henüz hazır değil! dilersen başlığa gidip bakabilirsin.';
     content.appendChild(unavailable);
+    renderStory(content, brief?.story);
     return;
   }
 
@@ -753,7 +783,10 @@ function renderTopicBrief(brief) {
   // Majority first regardless of the order the LLM returned; sort is stable.
   const sides = [...(brief.payload.debate?.sides ?? [])].sort((a, b) =>
     (SUPPORT_ORDER[a.support] ?? SUPPORT_ORDER.balanced) - (SUPPORT_ORDER[b.support] ?? SUPPORT_ORDER.balanced));
-  if (sides.length === 0) return;
+  if (sides.length === 0) {
+    renderStory(content, brief.story);
+    return;
+  }
 
   const debateHeading = document.createElement('h3');
   debateHeading.textContent = 'Tartışma';
@@ -778,6 +811,69 @@ function renderTopicBrief(brief) {
     debate.appendChild(card);
   });
   content.append(debateHeading, debate);
+  renderStory(content, brief.story);
+}
+
+const STORY_LIST_HEAD = 3;
+const STORY_LIST_TAIL = 12;
+
+/** List the other topics of the selected topic's story, oldest first. */
+function renderStory(container, story) {
+  if (!story?.topics?.length) return;
+  const heading = document.createElement('h3');
+  heading.textContent = 'Hikaye';
+
+  const section = document.createElement('section');
+  section.className = 'brief-story';
+  section.style.setProperty('--story-hue', storyHue(story.id));
+
+  const name = document.createElement('p');
+  name.className = 'brief-story-name';
+  name.textContent = `${story.title} · ${story.size} başlık`;
+
+  const list = document.createElement('ol');
+  list.className = 'brief-story-topics';
+  let topics = story.topics;
+  let hidden = 0;
+  if (topics.length > STORY_LIST_HEAD + STORY_LIST_TAIL) {
+    hidden = topics.length - STORY_LIST_HEAD - STORY_LIST_TAIL;
+    topics = [...topics.slice(0, STORY_LIST_HEAD), null, ...topics.slice(-STORY_LIST_TAIL)];
+  }
+  const currentID = state.selectedTopic?.id;
+  topics.forEach(topic => {
+    const item = document.createElement('li');
+    if (topic === null) {
+      item.className = 'brief-story-more';
+      item.textContent = `… ${hidden} başlık daha`;
+      list.appendChild(item);
+      return;
+    }
+    const onRadar = state.topics.find(t => t.id === topic.id);
+    let label;
+    if (topic.id === currentID) {
+      label = document.createElement('span');
+      item.classList.add('is-current');
+    } else if (onRadar) {
+      label = document.createElement('button');
+      label.type = 'button';
+      label.addEventListener('click', () => openTopicBrief(onRadar));
+    } else {
+      label = document.createElement('a');
+      label.href = topicPopularURL(topic);
+      label.target = '_blank';
+      label.rel = 'noopener noreferrer';
+    }
+    label.className = 'brief-story-title';
+    label.textContent = topic.title;
+    const when = document.createElement('span');
+    when.className = 'brief-story-when';
+    when.textContent = fmtAgo(new Date(topic.ready_at * 1000));
+    item.append(label, when);
+    list.appendChild(item);
+  });
+
+  section.append(name, list);
+  container.append(heading, section);
 }
 
 function supportLabel(support) {

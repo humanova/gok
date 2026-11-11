@@ -29,3 +29,26 @@ func TestSnapshotMarksTopicsMissingFromPreviousWindowAsNew(t *testing.T) {
 		t.Errorf("topic 2 = %+v, want rank_new with zero delta", byID[2])
 	}
 }
+
+func TestBuildStoriesNamesStoriesAfterTheirBusiestTopic(t *testing.T) {
+	root := uint64(10)
+	members := []model.StoryMember{
+		{TopicID: 10, Title: "fon tasfiyeleri", RootTopicID: 10, EntryCount: 40},
+		{TopicID: 11, Title: "fon açıklaması", RootTopicID: 10, ParentTopicID: &root, EntryCount: 90},
+		{TopicID: 20, Title: "tek başlık", RootTopicID: 20, EntryCount: 500},
+	}
+	byTopic := buildStories(members)
+	if byTopic[20] != nil {
+		t.Errorf("a single-topic story should be left out, got %+v", byTopic[20])
+	}
+	story := byTopic[10]
+	if story == nil || byTopic[11] != story {
+		t.Fatalf("topics 10 and 11 should share one story, got %+v and %+v", story, byTopic[11])
+	}
+	if story.ID != 10 || story.Size != 2 || story.Title != "fon açıklaması" {
+		t.Errorf("story = %+v, want id 10, size 2, titled after the busiest topic", story.StoryRef)
+	}
+	if story.Topics[1].ParentID == nil || *story.Topics[1].ParentID != 10 {
+		t.Errorf("second topic should keep its parent, got %+v", story.Topics[1])
+	}
+}

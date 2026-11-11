@@ -350,6 +350,10 @@ body.list-view #radar-wrap {
   outline: none;
 }
 
+.topic-row.in-story {
+  box-shadow: inset 4px 0 0 hsl(var(--story-hue), 62%, 42%);
+}
+
 .topic-row.is-selected {
   background: #edf7ef;
   outline: 2px solid var(--live-green);
@@ -570,6 +574,18 @@ body.list-view #radar-wrap {
   line-clamp: 3;
   pointer-events: none;
   user-select: none;
+}
+
+/* Topics of one story share a stripe colour (--story-hue, set per story). */
+.tile-story {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 4px;
+  border-radius: 0 3px 3px 0;
+  background: hsl(var(--story-hue), 62%, 42%);
 }
 
 /* ── Ping ─────────────────────────────────────────────────── */
@@ -977,6 +993,71 @@ body.brief-open #brief-panel {
   font-style: italic;
   line-height: 1.5;
   padding-left: 8px;
+}
+
+.brief-story {
+  border-left: 3px solid hsl(var(--story-hue), 62%, 42%);
+  padding-left: 10px;
+}
+
+.brief-story-name {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.brief-story-topics {
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+  list-style: none;
+}
+
+.brief-story-topics li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.brief-story-title {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  background: none;
+  color: #2f5f49;
+  cursor: pointer;
+  font: inherit;
+  padding: 2px 0;
+  text-align: left;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brief-story-title:hover,
+.brief-story-title:focus-visible {
+  color: var(--live-green);
+  outline: none;
+  text-decoration: underline;
+}
+
+.brief-story-topics li.is-current .brief-story-title {
+  color: var(--text);
+  cursor: default;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.brief-story-when,
+.brief-story-more {
+  flex-shrink: 0;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Debug Panel ─────────────────────────────────────────── */
