@@ -61,10 +61,10 @@ func prepareDb() (*gorm.DB, error) {
 		slog.Warn("could not create pg_trgm extension", "error", err)
 	}
 
-	// AutoMigrate digest tables. Existing scrape tables managed by the scraper binary
+	// AutoMigrate the generated tables. Existing scrape tables managed by the scraper binary
 	// are left untouched to avoid constraint-name conflicts across GORM versions.
-	if err = database.AutoMigrate(&Digest{}, &TopicBrief{}, &TopicStory{}, &TopicAgenda{}, &TopicMove{}); err != nil {
-		slog.Error("couldn't migrate digest tables", "error", err)
+	if err = database.AutoMigrate(&TopicBrief{}, &TopicStory{}, &TopicAgenda{}, &TopicMove{}); err != nil {
+		slog.Error("couldn't migrate generated tables", "error", err)
 		return nil, err
 	}
 

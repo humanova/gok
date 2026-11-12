@@ -10,14 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type Digest struct {
-	ID          uint64 `gorm:"primarykey;autoIncrement"`
-	CreatedAt   time.Time
-	WindowStart time.Time `gorm:"index:idx_digests_window_start"`
-	WindowEnd   time.Time
-	Payload     datatypes.JSON
-}
-
 // TopicBrief is a pre-generated, topic-specific explanation for the radar UI.
 // It deliberately stores only generated JSON and source-window metadata; the
 // browser never needs the underlying entry text to display it.
@@ -43,34 +35,6 @@ type TopicDebate struct {
 	Sides []DebateSide `json:"sides"`
 }
 
-// DigestPayload is the structured output of the daily digest generation.
-type DigestPayload struct {
-	Headline   string               `json:"headline"`   // 10-word max mood/theme line
-	Stories    []Story              `json:"stories"`    // Compact stories with expandable detail
-	QuickHits  []string             `json:"quick_hits"` // Brief mentions of other topics
-	Mood       string               `json:"mood"`       // 5-word emotional snapshot
-	Expansions map[string]Expansion `json:"expansions"` // Full context for each story
-}
-
-// Story is the compact view of a digest entry
-type Story struct {
-	ID         string `json:"id"`             // story_1, story_2, etc.
-	Topic      string `json:"topic"`          // Topic title (5-8 words)
-	Line       string `json:"line"`           // What happened in one sentence (25 words max)
-	Hook       string `json:"hook,omitempty"` // Optional quote/data/twist (15 words max)
-	Type       string `json:"type"`           // debate | event | trend
-	Expandable bool   `json:"expandable"`     // Has expansion data
-}
-
-// Expansion provides full context for a story
-type Expansion struct {
-	Type      string       `json:"type"`                // debate | event | trend
-	Context   string       `json:"context"`             // 50-word background
-	Sides     []DebateSide `json:"sides,omitempty"`     // For debates
-	Timeline  []string     `json:"timeline,omitempty"`  // For events
-	Reactions []string     `json:"reactions,omitempty"` // Key quotes
-}
-
 // DebateSide represents one position in a debate
 type DebateSide struct {
 	Stance   string   `json:"stance"`   // Descriptive label (not "görüş 1")
@@ -79,41 +43,11 @@ type DebateSide struct {
 	Support  string   `json:"support"`  // majority | minority | balanced
 }
 
-// TopicBundle is a structured per-topic package fed to the LLM for digest synthesis.
+// TopicBundle is a structured per-topic package fed to the LLM for a topic brief.
 // Each bundle contains the topic title and its entries (no pre-clustering).
 type TopicBundle struct {
 	TopicTitle string  `json:"topic_title"`
 	Entries    []Entry `json:"entries"`
-}
-
-func AddDigest(windowStart, windowEnd time.Time, payload DigestPayload) error {
-	b, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-	d := Digest{
-		WindowStart: windowStart,
-		WindowEnd:   windowEnd,
-		Payload:     datatypes.JSON(b),
-	}
-	tx := database.Create(&d)
-	if tx.Error != nil {
-		slog.Error("couldn't insert digest", "error", tx.Error)
-		return tx.Error
-	}
-	return nil
-}
-
-func GetLatestDigest() (*Digest, error) {
-	var d Digest
-	tx := database.Order("created_at desc").Limit(1).Find(&d)
-	if tx.Error != nil {
-		return nil, tx.Error
-	}
-	if d.ID == 0 {
-		return nil, nil
-	}
-	return &d, nil
 }
 
 func AddTopicBrief(topicID uint64, windowStart, windowEnd time.Time, entryCount int, payload TopicBriefPayload) error {
