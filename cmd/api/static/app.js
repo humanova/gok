@@ -40,11 +40,9 @@ const state = {
   scrubWindowEnd: 0,     // end of last-fetched scrub window (unix s)
   fetchingNext: false,   // guard against concurrent window prefetches
   activePings: {},       // topicId → currently visible pings
-  burstCounts: {},       // topicId → pings compressed into the visible burst marker
   burstTimers: {},       // topicId → burst marker timeout
   afterglowTimers: {},   // topicId → transient activity glow timeout
   selectedTopic: null,
-  view: 'grid',          // 'grid' | 'list'
   briefCache: new Map(), // topicId → { brief, expiresAt }
   briefRequestID: 0,
   timelineRequestID: 0,  // guards seekTo/goLive/prefetch against out-of-order responses
@@ -1163,7 +1161,6 @@ function showAfterglow(tile, topicId, intensity) {
 }
 
 function showBurst(tile, topicId, minuteCount) {
-  state.burstCounts[topicId] = (state.burstCounts[topicId] ?? 0) + 1;
   tile.classList.add('tile-burst');
   const label = tile.querySelector('.burst-count');
   if (label) label.textContent = `${minuteCount}/dk`;
@@ -1171,7 +1168,6 @@ function showBurst(tile, topicId, minuteCount) {
   state.burstTimers[topicId] = setTimeout(() => {
     tile.classList.remove('tile-burst');
     if (label) label.textContent = '';
-    delete state.burstCounts[topicId];
     delete state.burstTimers[topicId];
   }, 900);
 }
@@ -1256,7 +1252,6 @@ function cancelAllTimers() {
   Object.values(state.burstTimers).forEach(id => clearTimeout(id));
   Object.values(state.afterglowTimers).forEach(id => clearTimeout(id));
   state.activePings = {};
-  state.burstCounts = {};
   state.burstTimers = {};
   state.afterglowTimers = {};
   state.nextPingAt = 0;
@@ -1562,7 +1557,6 @@ function setLastUpdated(snapshotAt) {
 }
 
 function setView(view) {
-  state.view = view;
   document.body.classList.toggle('list-view', view === 'list');
   document.querySelectorAll('.view-btn').forEach(button => {
     const selected = button.dataset.view === view;

@@ -86,14 +86,6 @@ type TopicBundle struct {
 	Entries    []Entry `json:"entries"`
 }
 
-// Viewpoint is used by the query/chat path for embedding-based clustering.
-type Viewpoint struct {
-	Stance              string `json:"stance"`
-	RepresentativeQuote string `json:"representative_quote"`
-	Author              string `json:"author"`
-	EntryCount          int    `json:"entry_count"`
-}
-
 func AddDigest(windowStart, windowEnd time.Time, payload DigestPayload) error {
 	b, err := json.Marshal(payload)
 	if err != nil {

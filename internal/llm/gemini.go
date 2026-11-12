@@ -64,41 +64,6 @@ func (c *Client) SynthesizeTopicBrief(ctx context.Context, bundle model.TopicBun
 	return &payload, nil
 }
 
-// StreamAnswer streams a focused Q&A answer (non-digest, no JSON, cites authors).
-func (c *Client) StreamAnswer(ctx context.Context, question string, entries []model.Entry, viewpoints []model.Viewpoint) (<-chan string, <-chan error) {
-	tokenCh := make(chan string, 64)
-	errCh := make(chan error, 1)
-
-	go func() {
-		defer close(tokenCh)
-		defer close(errCh)
-
-		prompt := buildAnswerPrompt(question, entries, viewpoints)
-		fullPrompt := qaSystemPrompt() + "\n\n" + prompt
-
-		contents := []*genai.Content{genai.NewContentFromText(fullPrompt, genai.RoleUser)}
-		iter := c.client.Models.GenerateContentStream(ctx, c.modelName, contents, nil)
-
-		for resp, err := range iter {
-			if err != nil {
-				errCh <- err
-				return
-			}
-			for _, cand := range resp.Candidates {
-				if cand.Content == nil {
-					continue
-				}
-				for _, part := range cand.Content.Parts {
-					if part.Text != "" {
-						tokenCh <- part.Text
-					}
-				}
-			}
-		}
-	}()
-
-	return tokenCh, errCh
-}
 func (c *Client) callStructured(ctx context.Context, prompt string) (*model.DigestPayload, error) {
 	fullPrompt := systemPrompt() + "\n\n" + prompt
 
@@ -333,40 +298,6 @@ func buildTopicBriefPrompt(bundle model.TopicBundle) string {
 		timestamp := time.Unix(entry.Timestamp, 0).Format("02.01 15:04")
 		sb.WriteString(fmt.Sprintf("[%s, %s] %s\n---\n", entry.Author, timestamp, truncate(entry.Text, 500)))
 	}
-	return sb.String()
-}
-
-func qaSystemPrompt() string {
-	return `Sen Ekşi Sözlük girdilerine dayalı çalışan bir soru-cevap asistanısın.
-
-KURALLAR:
-- Soruyu doğrudan ve net yanıtla; günlük Türkçe kullan
-- Cevabını girdi yazarlarından alıntılarla destekle; alıntıyı "yazar_adı: '...'" formatında göster
-- Farklı görüşler varsa hepsini dengeli biçimde aktar, kendi yorumunu katma
-- Yeterli bilgi yoksa bunu açıkça söyle
-- Uzun cevaplar için paragraf kullan; liste/başlık yalnızca gerçekten gerekiyorsa
-- JSON çıktısı üretme; düz metin yaz`
-}
-
-func buildAnswerPrompt(question string, entries []model.Entry, viewpoints []model.Viewpoint) string {
-	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("## Soru\n%s\n\n", question))
-	sb.WriteString(fmt.Sprintf("## Girdiler (%d adet)\n", len(entries)))
-	for i, e := range entries {
-		if i >= 60 {
-			sb.WriteString(fmt.Sprintf("...ve %d girdi daha\n", len(entries)-60))
-			break
-		}
-		ts := time.Unix(e.Timestamp, 0).Format("02.01.2006 15:04")
-		sb.WriteString(fmt.Sprintf("[%s, %s]: %s\n---\n", e.Author, ts, truncate(e.Text, 500)))
-	}
-	if len(viewpoints) > 0 {
-		sb.WriteString("\n## Öne Çıkan Görüşler\n")
-		for _, v := range viewpoints {
-			sb.WriteString(fmt.Sprintf("- %s: \"%s\" — %s\n", v.Stance, v.RepresentativeQuote, v.Author))
-		}
-	}
-	sb.WriteString("\nYukarıdaki girdilere dayanarak soruyu yanıtla.")
 	return sb.String()
 }
 

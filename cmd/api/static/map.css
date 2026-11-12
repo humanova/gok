@@ -189,7 +189,6 @@ button { cursor: pointer; }
 .map-language-switch button[aria-pressed="true"] { color: #ffffff; background: var(--accent); }
 .map-language-switch button:hover, .map-language-switch button:focus-visible { color: var(--accent); background: #e8f3eb; outline: none; }
 .map-language-switch button[aria-pressed="true"]:hover { color: #ffffff; background: var(--accent); }
-.panel-kicker { display: block; color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: 0.07em; }
 #map-info-title { margin: 4px 0 2px; font-family: "IBM Plex Serif", Georgia, serif; font-size: 21px; line-height: 1.1; }
 #map-info-window { margin: 0; color: var(--muted); font-size: 12px; font-weight: 650; }
 #close-info-panel { display: inline-grid; width: 25px; height: 25px; flex: 0 0 auto; place-items: center; border: 0; border-radius: 3px; color: var(--muted); background: transparent; font-size: 18px; line-height: 1; }
