@@ -63,7 +63,7 @@ func prepareDb() (*gorm.DB, error) {
 
 	// AutoMigrate digest tables. Existing scrape tables managed by the scraper binary
 	// are left untouched to avoid constraint-name conflicts across GORM versions.
-	if err = database.AutoMigrate(&Digest{}, &TopicBrief{}, &TopicStory{}); err != nil {
+	if err = database.AutoMigrate(&Digest{}, &TopicBrief{}, &TopicStory{}, &TopicAgenda{}, &TopicMove{}); err != nil {
 		slog.Error("couldn't migrate digest tables", "error", err)
 		return nil, err
 	}
@@ -112,7 +112,16 @@ func createEntries(database *gorm.DB, entries []Entry) error {
 	if len(entries) == 0 {
 		return nil
 	}
-	tx := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&entries)
+	entries = uniqueEntries(entries)
+	if err := recordTopicMoves(database, entries); err != nil {
+		slog.Warn("couldn't check for moved entries", "error", err)
+	}
+	// An entry already stored under another topic was moved there on Ekşi: follow it.
+	tx := database.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "entry_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"topic_id"}),
+		Where:     clause.Where{Exprs: []clause.Expression{clause.Expr{SQL: "entries.topic_id <> excluded.topic_id AND excluded.topic_id <> 0"}}},
+	}).Create(&entries)
 
 	if tx.Error != nil {
 		slog.Error("couldn't insert entries", "error", tx.Error)
@@ -120,6 +129,19 @@ func createEntries(database *gorm.DB, entries []Entry) error {
 	}
 
 	return nil
+}
+
+// uniqueEntries drops repeated entry ids: one upsert can't touch a row twice.
+func uniqueEntries(entries []Entry) []Entry {
+	seen := make(map[uint64]bool, len(entries))
+	out := entries[:0:0]
+	for _, entry := range entries {
+		if !seen[entry.EntryId] {
+			seen[entry.EntryId] = true
+			out = append(out, entry)
+		}
+	}
+	return out
 }
 
 func getLastTopicEntry(database *gorm.DB, topicId uint64) (Entry, error) {

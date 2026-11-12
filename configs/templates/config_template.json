@@ -16,5 +16,6 @@
   "ApiPort" : 8080,
   "StoryIntervalMinutes" : 10,
   "StoryModel" : "gemini-decision-1",
-  "StoryEmbeddingModel" : "gemini-embedding-2"
+  "StoryEmbeddingModel" : "gemini-embedding-2",
+  "AgendaIntervalMinutes" : 10
 }

@@ -109,6 +109,8 @@ func GetStoryMembersForTopics(topicIDs []uint64) ([]StoryMember, error) {
 		FROM topic_stories s
 		LEFT JOIN topics t ON t.topic_id = s.topic_id
 		WHERE s.root_topic_id IN (SELECT root_topic_id FROM topic_stories WHERE topic_id IN ?)
+			AND NOT (s.topic_id IN (SELECT from_topic_id FROM topic_moves)
+				AND NOT EXISTS (SELECT 1 FROM entries e WHERE e.topic_id = s.topic_id AND e.deleted_at IS NULL))
 		ORDER BY s.root_topic_id, s.ready_at`, topicIDs).Scan(&members).Error
 	return members, err
 }

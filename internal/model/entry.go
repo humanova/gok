@@ -30,13 +30,13 @@ func InitDb() error {
 }
 
 // InitStoryDb connects without the startup DDL that InitDb runs on the large
-// tables and only creates the topic_stories table. Used by the stories command.
+// tables and only creates the story tables. Used by the stories command.
 func InitStoryDb() error {
 	db, err := openDb()
 	if err != nil {
 		return err
 	}
-	if err := db.AutoMigrate(&TopicStory{}); err != nil {
+	if err := db.AutoMigrate(&TopicStory{}, &TopicStoryDay{}); err != nil {
 		return err
 	}
 	database = db

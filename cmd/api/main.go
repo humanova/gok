@@ -119,7 +119,8 @@ func refreshCache() {
 	slog.Info("pulse: cache refreshed", "topics", len(topics))
 }
 
-func rankTopicsForWindowLocked(from, to int64, limit int) []rankedTopic {
+// rankTopicsForWindowLocked ranks topics by heat; a non-nil only keeps just those topics.
+func rankTopicsForWindowLocked(from, to int64, limit int, only map[uint64]bool) []rankedTopic {
 	if to <= from {
 		return nil
 	}
@@ -131,7 +132,7 @@ func rankTopicsForWindowLocked(from, to int64, limit int) []rankedTopic {
 	ranked := make([]rankedTopic, 0, len(cache.timestamps))
 	for topicID, timestamps := range cache.timestamps {
 		topic, ok := cache.topicMeta[topicID]
-		if !ok {
+		if !ok || only != nil && !only[topicID] {
 			continue
 		}
 		lo := sort.Search(len(timestamps), func(index int) bool { return timestamps[index] >= from })
@@ -161,8 +162,8 @@ func rankTopicsForWindowLocked(from, to int64, limit int) []rankedTopic {
 	return ranked
 }
 
-func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64) PulseSnapshot {
-	previousTopics := rankTopicsForWindowLocked(from-int64(rankComparison/time.Second), to-int64(rankComparison/time.Second), 0)
+func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64, only map[uint64]bool) PulseSnapshot {
+	previousTopics := rankTopicsForWindowLocked(from-int64(rankComparison/time.Second), to-int64(rankComparison/time.Second), 0, only)
 	previousRanks := make(map[uint64]int, len(previousTopics))
 	for rank, topic := range previousTopics {
 		previousRanks[topic.topic.TopicId] = rank + 1
@@ -203,17 +204,17 @@ func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64) Puls
 	return PulseSnapshot{SnapshotAt: cache.updatedAt, WindowFrom: from, WindowTo: to, Topics: topics}
 }
 
-func buildSnapshot(from, to int64) PulseSnapshot {
+func buildSnapshot(from, to int64, only map[uint64]bool) PulseSnapshot {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
-	return buildSnapshotFromTopicsLocked(rankTopicsForWindowLocked(from, to, gridSize), from, to)
+	return buildSnapshotFromTopicsLocked(rankTopicsForWindowLocked(from, to, gridSize, only), from, to, only)
 }
 
 func handlePulse(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().UTC().Unix()
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-cache")
-	if err := json.NewEncoder(w).Encode(buildSnapshot(now-liveWindowSecs, now)); err != nil {
+	if err := json.NewEncoder(w).Encode(buildSnapshot(now-liveWindowSecs, now, agendaFilter(r))); err != nil {
 		slog.Error("pulse: encode /api/pulse failed", "error", err)
 	}
 }
@@ -243,7 +244,7 @@ func handlePulseRange(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-cache")
-	if err := json.NewEncoder(w).Encode(buildSnapshot(since, until)); err != nil {
+	if err := json.NewEncoder(w).Encode(buildSnapshot(since, until, agendaFilter(r))); err != nil {
 		slog.Error("pulse: encode /api/pulse/range failed", "error", err)
 	}
 }
@@ -326,6 +327,7 @@ func main() {
 	slog.Info("pulse: initial cache refresh...")
 	refreshCache()
 	refreshStories()
+	refreshAgenda()
 	layoutDir := os.Getenv("GOK_MAP_LAYOUT_DIR")
 	if layoutDir == "" {
 		layoutDir = filepath.Join("reports", "maps", "current", "layout")
@@ -375,6 +377,7 @@ func main() {
 		defer ticker.Stop()
 		for range ticker.C {
 			refreshStories()
+			refreshAgenda()
 		}
 	}()
 

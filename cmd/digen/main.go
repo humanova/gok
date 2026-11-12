@@ -59,14 +59,18 @@ func main() {
 			slog.Error("digest generation failed", "error", err)
 		}
 	}
+	storyModel, storyEmbeddingModel := config.Config.StoryModels()
+	storyJudge := llm.NewDecider(config.Config.GeminiApiKey, storyModel)
 	runTopicBriefs := func() {
-		if _, err := rag.GenerateTopicBriefs(ctx, llmClient); err != nil {
+		if _, err := rag.GenerateTopicBriefs(ctx, llmClient, storyJudge); err != nil {
 			slog.Error("topic brief generation failed", "error", err)
 		}
 	}
-
-	storyModel, storyEmbeddingModel := config.Config.StoryModels()
-	storyJudge := llm.NewDecider(config.Config.GeminiApiKey, storyModel)
+	runAgenda := func() {
+		if _, err := rag.ScoreAgenda(ctx, storyJudge); err != nil {
+			slog.Error("agenda scoring failed", "error", err)
+		}
+	}
 	storyEmbedder := llmClient.StoryEmbedder(storyEmbeddingModel)
 	runStories := func() {
 		release, ok, err := stories.TryLock()
@@ -87,9 +91,10 @@ func main() {
 	}
 
 	if *once {
-		slog.Info("running digest, topic briefs and story links once")
+		slog.Info("running digest, topic briefs, agenda scores and story links once")
 		runDigest()
 		runTopicBriefs()
+		runAgenda()
 		runStories()
 		return
 	}
@@ -125,6 +130,17 @@ func main() {
 		}
 	} else {
 		slog.Info("story links disabled")
+	}
+
+	if agendaInterval := config.Config.AgendaIntervalMinutes; agendaInterval > 0 {
+		slog.Info("starting agenda job", "interval_minutes", agendaInterval)
+		_, err = digestCron.Every(agendaInterval).Minutes().Do(runAgenda)
+		if err != nil {
+			slog.Error("couldn't create agenda cron job", "error", err)
+			os.Exit(1)
+		}
+	} else {
+		slog.Info("agenda scores disabled")
 	}
 
 	digestCron.StartBlocking()
