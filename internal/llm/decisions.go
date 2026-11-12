@@ -33,7 +33,28 @@ type decisionQuestion struct {
 	Instructions string `json:"instructions"`
 }
 
+// YesNo retries rate limits, server errors and network failures twice.
 func (d *Decider) YesNo(ctx context.Context, input string, questions []string) ([]float64, error) {
+	var probs []float64
+	var err error
+	for attempt := 0; attempt < 3; attempt++ {
+		if attempt > 0 {
+			select {
+			case <-time.After(time.Duration(attempt*attempt) * 2 * time.Second):
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			}
+		}
+		var retry bool
+		probs, retry, err = d.yesNo(ctx, input, questions)
+		if !retry {
+			break
+		}
+	}
+	return probs, err
+}
+
+func (d *Decider) yesNo(ctx context.Context, input string, questions []string) ([]float64, bool, error) {
 	body := struct {
 		Model     string                      `json:"model"`
 		Input     string                      `json:"input"`
@@ -44,22 +65,22 @@ func (d *Decider) YesNo(ctx context.Context, input string, questions []string) (
 	}
 	payload, err := json.Marshal(body)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, decisionsURL, bytes.NewReader(payload))
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-goog-api-key", d.apiKey)
 	resp, err := d.http.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("decisions call failed: %w", err)
+		return nil, true, fmt.Errorf("decisions call failed: %w", err)
 	}
 	defer resp.Body.Close()
 	raw, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, true, err
 	}
 
 	var answer struct {
@@ -72,22 +93,23 @@ func (d *Decider) YesNo(ctx context.Context, input string, questions []string) (
 			Message string `json:"message"`
 		} `json:"error"`
 	}
+	retry := resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500
 	if err := json.Unmarshal(raw, &answer); err != nil {
-		return nil, fmt.Errorf("decisions: %s: %.200s", resp.Status, raw)
+		return nil, retry, fmt.Errorf("decisions: %s: %.200s", resp.Status, raw)
 	}
 	if resp.StatusCode != http.StatusOK {
 		if answer.Error.Code == "prohibited_content" {
-			return nil, stories.ErrBlocked
+			return nil, false, stories.ErrBlocked
 		}
-		return nil, fmt.Errorf("decisions: %s: %s", resp.Status, answer.Error.Message)
+		return nil, retry, fmt.Errorf("decisions: %s: %s", resp.Status, answer.Error.Message)
 	}
 	out := make([]float64, len(questions))
 	for i := range questions {
 		a, ok := answer.Answers[fmt.Sprintf("q%d", i+1)]
 		if !ok {
-			return nil, fmt.Errorf("decisions: no answer for question %d", i+1)
+			return nil, false, fmt.Errorf("decisions: no answer for question %d", i+1)
 		}
 		out[i] = a.Noul
 	}
-	return out, nil
+	return out, false, nil
 }

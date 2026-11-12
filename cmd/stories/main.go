@@ -1,6 +1,8 @@
 // Command stories links new topics into story threads over a past period, the
 // same way the digen job does live. Topics are decided in the order they got
 // their third entry, so a historical run sees what the live job would have seen.
+// With -old it instead attaches old topics to the stories they were about on
+// each day (topic_story_days); run it after the new topics are linked.
 package main
 
 import (
@@ -22,10 +24,12 @@ func main() {
 	until := flag.String("until", "", "last day to cover, YYYY-MM-DD (UTC): topics that got their third entry later are left out; default now")
 	limit := flag.Int("limit", 0, "stop after this many decisions (0 = no limit)")
 	dryRun := flag.Bool("dry-run", false, "print decisions without saving them")
+	old := flag.Bool("old", false, "attach old topics to each day's stories instead, up to yesterday (always saves; resumable)")
+	workers := flag.Int("workers", 6, "parallel requests for -old")
 	flag.Parse()
 
-	if *since == "" {
-		fmt.Fprintln(os.Stderr, "usage: stories -since YYYY-MM-DD [-until YYYY-MM-DD] [-limit N] [-dry-run]")
+	if *since == "" || (*old && *dryRun) {
+		fmt.Fprintln(os.Stderr, "usage: stories -since YYYY-MM-DD [-until YYYY-MM-DD] [-limit N] [-dry-run | -old [-workers N]]")
 		os.Exit(2)
 	}
 	opts := stories.Options{Limit: *limit, Save: !*dryRun}
@@ -65,6 +69,27 @@ func main() {
 		os.Exit(1)
 	}
 	judgeModel, embeddingModel := config.Config.StoryModels()
+
+	if *old {
+		until := time.Now().In(time.FixedZone("TRT", 3*3600)).AddDate(0, 0, -1) // finished days only
+		if !opts.Until.IsZero() {
+			until = opts.Until
+		}
+		decided, err := stories.RunOldDays(ctx, llm.NewDecider(config.Config.GeminiApiKey, judgeModel), stories.OldDayOptions{
+			Since: opts.Since, Until: until, Workers: *workers,
+			OnDecision: func(row model.TopicStoryDay, title, storyTitle string) {
+				if row.Score >= stories.OldDayThreshold {
+					fmt.Printf("%s  %d %s  ->  %s  | p=%.2f\n", row.Day, row.TopicID, title, storyTitle, row.Score)
+				}
+			},
+		})
+		if err != nil {
+			slog.Error("old topics run stopped", "error", err, "decided", decided)
+			os.Exit(1)
+		}
+		slog.Info("old topics run done", "decided", decided, "model", judgeModel)
+		return
+	}
 
 	opts.OnDecision = func(node model.TopicStory, parentTitle string) {
 		ready := time.Unix(node.ReadyAt, 0).UTC().Format("2006-01-02 15:04")
