@@ -811,7 +811,7 @@ function renderTopicBrief(brief) {
     renderBriefMeta(null);
     const unavailable = document.createElement('p');
     unavailable.className = 'brief-unavailable';
-    unavailable.textContent = 'bu konunun özeti henüz hazır değil! dilersen başlığa gidip bakabilirsin.';
+    unavailable.textContent = 'bu konunun özeti henüz hazır değil! dilersen başlığa gidip okuyabilirsin.';
     content.appendChild(unavailable);
     renderStory(content, brief?.story);
     return;

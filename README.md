@@ -6,9 +6,10 @@ Gök is a discovery platform for Ekşi Sözlük that turns real-time data into t
 
 - [**Atlas**](https://humanova.space/gok/long-term-map): browsable maps of durable topics, built from shared writer participation.
 
-<div align="center">
-<img src="docs/gok-atlas-preview.png" alt="gok atlas preview"/>
-</div>
+<p align="center">
+  <img src="docs/gok-radar-preview.png" alt="gök radar on 7 July 2026" width="430"/>
+  <img src="docs/gok-atlas-preview.png" alt="gök atlas" width="430"/>
+</p>
 
 Atlas snapshots are available on [Hugging Face](https://hf.co/datasets/emir/gok-eksi-atlas).
 
@@ -28,13 +29,17 @@ With Gemini configured, `digen` adds three things:
 - **Stories:** new topics about the same event are linked into a thread. Radar shows them in a strip above the grid and as a timeline in the topic panel.
 - **Gündem:** each hot topic gets a score for "is this about something happening now?". The gündem switch hides football and everyday chat.
 
-Stories, gündem scores and the brief check are yes/no questions to the [Gemini Decisions API](https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/), which returns a probability.
+Stories, gündem scores and the brief check are yes/no questions to the [Gemini Decisions API](https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/), which returns a probability. See [how digen works](docs/digen.md) for the jobs, their settings and the running cost.
 
 ### Atlas
 
 Atlas is an offline snapshot of durable, recently active topics. It links topics when enough of the same writers post in both, groups them into communities and regions, lays them out, and publishes the result atomically.
 
 A link means shared participation, not that the topics are alike. See [Map curation](docs/map-curation.md) for the selection and grouping rules.
+
+<div align="center">
+<img src="docs/gok-overview.drawio.png" alt="how gok works"/>
+</div>
 
 ## Setup
 
