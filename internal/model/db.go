@@ -63,7 +63,7 @@ func prepareDb() (*gorm.DB, error) {
 
 	// AutoMigrate digest tables. Existing scrape tables managed by the scraper binary
 	// are left untouched to avoid constraint-name conflicts across GORM versions.
-	if err = database.AutoMigrate(&Digest{}, &TopicBrief{}, &TopicStory{}); err != nil {
+	if err = database.AutoMigrate(&Digest{}, &TopicBrief{}, &TopicStory{}, &TopicAgenda{}); err != nil {
 		slog.Error("couldn't migrate digest tables", "error", err)
 		return nil, err
 	}

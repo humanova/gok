@@ -202,7 +202,7 @@ func decideOldDay(ctx context.Context, judge Judge, job oldDayJob, day string, f
 func oldDayInput(title, created, day string, entries []model.Entry) string {
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "Ekşi Sözlük topic: %s (an old page, created %s). A sample of entries posted in it on %s:", title, created, day)
-	for _, text := range cleanEntries(entries, oldDayEntryChars) {
+	for _, text := range CleanEntries(entries, oldDayEntryChars) {
 		sb.WriteString("\n- ")
 		sb.WriteString(text)
 	}

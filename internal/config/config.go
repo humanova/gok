@@ -39,6 +39,7 @@ type Configuration struct {
 	StoryIntervalMinutes      int    // how often to link new topics into story threads (minutes); 0 disables it
 	StoryModel                string // Decisions API model for story links, default gemini-decision-1
 	StoryEmbeddingModel       string // embedding model for story candidates, default gemini-embedding-2
+	AgendaIntervalMinutes     int    // how often to score hot topics for the Radar's gündem view (minutes); 0 disables it
 }
 
 // StoryModels returns the configured story judge and embedding models, with defaults.

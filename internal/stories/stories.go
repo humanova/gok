@@ -154,7 +154,7 @@ func readyTopics(topics []model.StoryTopicEntries, since, until int64) []model.T
 		if bornAt < since || readyAt > until {
 			continue
 		}
-		entries := cleanEntries(topic.Entries[:ReadyEntries], embedEntryChars)
+		entries := CleanEntries(topic.Entries[:ReadyEntries], embedEntryChars)
 		first := ""
 		if len(entries) > 0 {
 			first = truncateRunes(entries[0], candidateEntryChars)
@@ -294,9 +294,9 @@ var (
 	spacePattern = regexp.MustCompile(`\s+`)
 )
 
-// cleanEntries collapses whitespace, drops links, cuts each entry to max runes
+// CleanEntries collapses whitespace, drops links, cuts each entry to max runes
 // and skips entries left with three characters or fewer.
-func cleanEntries(entries []model.Entry, max int) []string {
+func CleanEntries(entries []model.Entry, max int) []string {
 	out := make([]string, 0, len(entries))
 	for _, entry := range entries {
 		text := spacePattern.ReplaceAllString(entry.Text, " ")
