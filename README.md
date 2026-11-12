@@ -7,8 +7,8 @@ Gök is a discovery platform for Ekşi Sözlük that turns real-time data into t
 - [**Atlas**](https://humanova.space/gok/long-term-map): browsable maps of durable topics, built from shared writer participation.
 
 <p align="center">
-  <img src="docs/gok-radar-preview.png" alt="gök radar on 7 July 2026" width="430"/>
-  <img src="docs/gok-atlas-preview.png" alt="gök atlas" width="430"/>
+  <img src="docs/gok-radar-preview.png" alt="gök radar on 7 July 2026" width="48%"/>
+  <img src="docs/gok-atlas-map.png" alt="gök atlas" width="48%"/>
 </p>
 
 Atlas snapshots are available on [Hugging Face](https://hf.co/datasets/emir/gok-eksi-atlas).
@@ -21,7 +21,7 @@ The scraper collects trending topics and their new entries from [eksisozluk.com]
 
 ### Radar
 
-The API serves the Radar UI at `/`. It ranks topics by recent entry activity, shows rank changes, and animates new entries as they arrive. You can go back to any point in the last 24 hours and replay from there at `1x` or `60x`.
+The Radar ranks topics by recent entry activity, shows rank changes, and animates new entries as they arrive. You can go back to any point in the last 24 hours and replay from there at `1x` or `60x`.
 
 With Gemini configured, `digen` adds three things:
 
@@ -66,16 +66,7 @@ Start the scraper and `digen`, then the API, and open `http://localhost:port`:
 ./api
 ```
 
-`digen` needs `GeminiApiKey`. Each job has its own interval: `TopicBriefIntervalMinutes`, `StoryIntervalMinutes` and `AgendaIntervalMinutes` (0 disables stories and gündem scores). Run all of them once with `./digen --once`.
-
-To link stories for an earlier period:
-
-```bash
-go build -o stories ./cmd/stories
-./stories -since 2026-08-01 -dry-run   # print the links without saving
-./stories -since 2026-08-01
-./stories -old -since 2026-08-01       # attach old topics to each day's stories
-```
+`digen` needs `GeminiApiKey`. Each job has its own interval: `TopicBriefIntervalMinutes`, `StoryIntervalMinutes` and `AgendaIntervalMinutes`.
 
 To build and publish a fresh Atlas snapshot (restart the API afterwards):
 
