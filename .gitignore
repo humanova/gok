@@ -9,6 +9,7 @@ gok
 print-digest
 digen
 /api
+/stories
 embedder/__pycache__/
 .venv/
 .venv/log.txt

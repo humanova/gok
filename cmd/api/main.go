@@ -23,14 +23,15 @@ import (
 var staticFiles embed.FS
 
 type TopicMeta struct {
-	ID             uint64  `json:"id"`
-	Title          string  `json:"title"`
-	URL            string  `json:"url"`
-	Rank           int     `json:"rank"`
-	RankDelta      int     `json:"rank_delta"`
-	RankNew        bool    `json:"rank_new"`
-	HeatScore      float64 `json:"heat_score"`
-	FirstPopularAt int64   `json:"first_popular_at"`
+	ID             uint64    `json:"id"`
+	Title          string    `json:"title"`
+	URL            string    `json:"url"`
+	Rank           int       `json:"rank"`
+	RankDelta      int       `json:"rank_delta"`
+	RankNew        bool      `json:"rank_new"`
+	HeatScore      float64   `json:"heat_score"`
+	FirstPopularAt int64     `json:"first_popular_at"`
+	Story          *StoryRef `json:"story,omitempty"`
 }
 
 type TopicPulse struct {
@@ -52,6 +53,7 @@ type TopicBriefResponse struct {
 	WindowEnd   *time.Time               `json:"window_end,omitempty"`
 	EntryCount  int                      `json:"entry_count,omitempty"`
 	Payload     *model.TopicBriefPayload `json:"payload,omitempty"`
+	Story       *StoryDetail             `json:"story,omitempty"`
 }
 
 const (
@@ -195,6 +197,7 @@ func buildSnapshotFromTopicsLocked(hotTopics []rankedTopic, from, to int64) Puls
 			RankNew:        !hadPreviousRank,
 			HeatScore:      normalizedHeat,
 			FirstPopularAt: cache.firstPopularAt[hotTopic.topic.TopicId],
+			Story:          storyRefForTopic(hotTopic.topic.TopicId),
 		}, Timestamps: copied})
 	}
 	return PulseSnapshot{SnapshotAt: cache.updatedAt, WindowFrom: from, WindowTo: to, Topics: topics}
@@ -259,8 +262,9 @@ func handleTopicBrief(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=3600")
+	story := storyForTopic(topicID)
 	if brief == nil {
-		_ = json.NewEncoder(w).Encode(TopicBriefResponse{Available: false})
+		_ = json.NewEncoder(w).Encode(TopicBriefResponse{Available: false, Story: story})
 		return
 	}
 	var payload model.TopicBriefPayload
@@ -269,7 +273,7 @@ func handleTopicBrief(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "stored topic brief is invalid", http.StatusInternalServerError)
 		return
 	}
-	response := TopicBriefResponse{Available: true, GeneratedAt: &brief.GeneratedAt, WindowStart: &brief.WindowStart, WindowEnd: &brief.WindowEnd, EntryCount: brief.EntryCount, Payload: &payload}
+	response := TopicBriefResponse{Available: true, GeneratedAt: &brief.GeneratedAt, WindowStart: &brief.WindowStart, WindowEnd: &brief.WindowEnd, EntryCount: brief.EntryCount, Payload: &payload, Story: story}
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		slog.Error("pulse: encode topic brief failed", "topic_id", topicID, "error", err)
 	}
@@ -321,6 +325,7 @@ func main() {
 
 	slog.Info("pulse: initial cache refresh...")
 	refreshCache()
+	refreshStories()
 	layoutDir := os.Getenv("GOK_MAP_LAYOUT_DIR")
 	if layoutDir == "" {
 		layoutDir = filepath.Join("reports", "maps", "current", "layout")
@@ -363,6 +368,13 @@ func main() {
 		defer ticker.Stop()
 		for range ticker.C {
 			refreshCache()
+		}
+	}()
+	go func() {
+		ticker := time.NewTicker(storyRefreshInterval)
+		defer ticker.Stop()
+		for range ticker.C {
+			refreshStories()
 		}
 	}()
 

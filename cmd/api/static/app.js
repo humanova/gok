@@ -26,6 +26,7 @@ const PING_MIN_GAP_MS = IS_SOCIAL_IN_APP_BROWSER ? 125 : 0;
 const state = {
   mode: 'live',          // 'live' | 'scrub'
   topics: [],            // current topic list (ranked)
+  focusedStory: null,    // root topic id of the story highlighted from the strip
   pendingTimers: [],     // setTimeout IDs (for bulk cancel)
   seenTimestampCounts: {}, // topicId → timestamp → event count already scheduled
   pollTimer: null,
@@ -518,11 +519,14 @@ function updateTopicRowDetails(row, topic, playbackTs = currentPlaybackTs()) {
   const label = firstPopularLabel(topic.first_popular_at, playbackTs);
   status.textContent = label;
   status.classList.toggle('is-new', label === 'yeni');
+  applyStoryMark(row, topic);
+  row.querySelector('.topic-row-title').title = topic.story ? `${topic.title}\n${storyLabel(topic.story)}` : topic.title;
 }
 
 function buildTopicList(topics) {
   $topicList.innerHTML = '';
   topics.forEach(topic => $topicList.appendChild(createTopicRow(topic)));
+  renderStoryStrip(topics);
   applySelection();
 }
 
@@ -550,6 +554,70 @@ function updateTileDetails(tile, t, playbackTs = currentPlaybackTs()) {
     bar.classList.toggle('active', recentCount >= METER_THRESHOLDS[index]);
   });
   tile.classList.toggle('meter-overflow', recentCount > METER_THRESHOLDS.at(-1));
+  applyStoryMark(tile, t);
+}
+
+/** Topics of one story share a colour; the hue comes from the story's root topic id. */
+function storyHue(storyID) {
+  return Math.round((Number(storyID) * 137.508) % 360);
+}
+
+function storyLabel(story) {
+  return `hikaye: ${story.title} · ${story.size} başlık`;
+}
+
+/** "14 ekim 2026 halk tv baskını" → "halk tv baskını" */
+function shortStoryTitle(title) {
+  return title.replace(/^\d{1,2} \p{L}+ \d{4} /u, '');
+}
+
+function applyStoryMark(el, topic) {
+  const story = topic.story;
+  el.classList.toggle('in-story', Boolean(story));
+  el.dataset.story = story ? story.id : '';
+  if (story) el.style.setProperty('--story-hue', storyHue(story.id));
+  else el.style.removeProperty('--story-hue');
+  const rank = el.querySelector('.tile-rank');
+  if (rank) rank.title = story ? storyLabel(story) : '';
+}
+
+/** One chip per story on Radar, in rank order; a chip highlights its story's topics. */
+function renderStoryStrip(topics) {
+  const strip = $id('story-strip');
+  const stories = new Map();
+  topics.forEach(topic => {
+    if (topic.story && !stories.has(topic.story.id)) stories.set(topic.story.id, topic.story);
+  });
+  if (!stories.has(state.focusedStory)) state.focusedStory = null;
+
+  strip.replaceChildren(...[...stories.values()].map(story => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'story-chip';
+    chip.dataset.story = story.id;
+    chip.title = story.title;
+    chip.style.setProperty('--story-hue', storyHue(story.id));
+    const name = document.createElement('span');
+    name.textContent = shortStoryTitle(story.title);
+    const size = document.createElement('em');
+    size.textContent = `${story.size} başlık`;
+    chip.append(name, size);
+    chip.addEventListener('click', () => focusStory(state.focusedStory === story.id ? null : story.id));
+    return chip;
+  }));
+  strip.hidden = stories.size === 0;
+  document.body.classList.toggle('has-stories', stories.size > 0);
+  focusStory(state.focusedStory);
+}
+
+function focusStory(storyID) {
+  state.focusedStory = storyID;
+  document.body.classList.toggle('story-focus', storyID !== null);
+  document.querySelectorAll('.tile, .topic-row, .story-chip').forEach(el => {
+    const on = storyID !== null && el.dataset.story === String(storyID);
+    el.classList.toggle('in-focus', on);
+    if (el.classList.contains('story-chip')) el.setAttribute('aria-pressed', String(on));
+  });
 }
 
 function refreshActivityIndicators(playbackTs, force = false) {
@@ -640,7 +708,9 @@ function updateURLParam(name, value) {
 function initKeyboard() {
   document.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;
-    if (document.body.classList.contains('brief-open')) {
+    if (state.focusedStory !== null && !document.body.classList.contains('brief-open')) {
+      focusStory(null);
+    } else if (document.body.classList.contains('brief-open')) {
       const id = state.selectedTopic?.id;
       closeTopicBrief();
       const target = $id(document.body.classList.contains('list-view') ? `topic-row-${id}` : `tile-${id}`);
@@ -741,6 +811,7 @@ function renderTopicBrief(brief) {
     unavailable.className = 'brief-unavailable';
     unavailable.textContent = 'bu konunun özeti henüz hazır değil! dilersen başlığa gidip bakabilirsin.';
     content.appendChild(unavailable);
+    renderStory(content, brief?.story);
     return;
   }
 
@@ -753,7 +824,10 @@ function renderTopicBrief(brief) {
   // Majority first regardless of the order the LLM returned; sort is stable.
   const sides = [...(brief.payload.debate?.sides ?? [])].sort((a, b) =>
     (SUPPORT_ORDER[a.support] ?? SUPPORT_ORDER.balanced) - (SUPPORT_ORDER[b.support] ?? SUPPORT_ORDER.balanced));
-  if (sides.length === 0) return;
+  if (sides.length === 0) {
+    renderStory(content, brief.story);
+    return;
+  }
 
   const debateHeading = document.createElement('h3');
   debateHeading.textContent = 'Tartışma';
@@ -778,6 +852,97 @@ function renderTopicBrief(brief) {
     debate.appendChild(card);
   });
   content.append(debateHeading, debate);
+  renderStory(content, brief.story);
+}
+
+const STORY_LIST_HEAD = 3;
+const STORY_LIST_TAIL = 12;
+const STORY_TZ = 'Europe/Istanbul';
+
+/** The selected topic's story as a timeline: oldest first, replies indented under the topic they follow. */
+function renderStory(container, story) {
+  if (!story?.topics?.length) return;
+  const heading = document.createElement('h3');
+  heading.textContent = 'Hikaye';
+
+  const section = document.createElement('section');
+  section.className = 'brief-story';
+  section.style.setProperty('--story-hue', storyHue(story.id));
+
+  const name = document.createElement('p');
+  name.className = 'brief-story-name';
+  const size = document.createElement('em');
+  size.textContent = `· ${story.size} başlık`;
+  name.append(story.title, size);
+
+  const depth = {};
+  story.topics.forEach(topic => {
+    depth[topic.id] = topic.parent_id in depth ? depth[topic.parent_id] + 1 : 0;
+  });
+  let topics = story.topics;
+  let hidden = 0;
+  if (topics.length > STORY_LIST_HEAD + STORY_LIST_TAIL) {
+    hidden = topics.length - STORY_LIST_HEAD - STORY_LIST_TAIL;
+    topics = [...topics.slice(0, STORY_LIST_HEAD), null, ...topics.slice(-STORY_LIST_TAIL)];
+  }
+
+  const list = document.createElement('ol');
+  list.className = 'brief-story-topics';
+  const currentID = state.selectedTopic?.id;
+  let lastDay = '';
+  topics.forEach(topic => {
+    if (topic === null) {
+      const more = document.createElement('li');
+      more.className = 'brief-story-more';
+      more.textContent = `… ${hidden} başlık daha`;
+      list.appendChild(more);
+      return;
+    }
+    const date = new Date(topic.ready_at * 1000);
+    const day = date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', timeZone: STORY_TZ });
+    if (day !== lastDay) {
+      const dayItem = document.createElement('li');
+      dayItem.className = 'brief-story-day';
+      dayItem.textContent = day;
+      list.appendChild(dayItem);
+      lastDay = day;
+    }
+
+    const item = document.createElement('li');
+    item.style.setProperty('--depth', Math.min(depth[topic.id], 3));
+    const when = document.createElement('time');
+    when.dateTime = date.toISOString();
+    when.textContent = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: STORY_TZ });
+
+    const onRadar = state.topics.find(t => t.id === topic.id);
+    let label;
+    if (topic.id === currentID) {
+      label = document.createElement('span');
+      item.classList.add('is-current');
+    } else if (onRadar) {
+      label = document.createElement('button');
+      label.type = 'button';
+      label.addEventListener('click', () => openTopicBrief(onRadar));
+    } else {
+      label = document.createElement('a');
+      label.href = topicPopularURL(topic);
+      label.target = '_blank';
+      label.rel = 'noopener noreferrer';
+    }
+    label.className = 'brief-story-title';
+    label.textContent = topic.title;
+    item.append(when, label);
+    if (onRadar) {
+      const live = document.createElement('span');
+      live.className = 'brief-story-live';
+      live.textContent = 'radarda';
+      item.appendChild(live);
+    }
+    list.appendChild(item);
+  });
+
+  section.append(name, list);
+  container.append(heading, section);
 }
 
 function supportLabel(support) {
