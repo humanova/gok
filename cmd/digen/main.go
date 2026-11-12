@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"gok/internal/config"
-	"gok/internal/embedder"
 	"gok/internal/llm"
 	"gok/internal/model"
 	"gok/internal/rag"
@@ -47,18 +46,12 @@ func main() {
 
 	ctx := context.Background()
 
-	embedClient := embedder.NewClient(config.Config.EmbedderUrl)
 	llmClient, err := llm.NewClient(ctx, config.Config.GeminiApiKey, config.Config.GeminiModel)
 	if err != nil {
 		slog.Error("couldn't create LLM client", "error", err)
 		os.Exit(1)
 	}
 
-	runDigest := func() {
-		if _, err := rag.GenerateDigest(ctx, embedClient, llmClient); err != nil {
-			slog.Error("digest generation failed", "error", err)
-		}
-	}
 	storyModel, storyEmbeddingModel := config.Config.StoryModels()
 	storyJudge := llm.NewDecider(config.Config.GeminiApiKey, storyModel)
 	runTopicBriefs := func() {
@@ -91,8 +84,7 @@ func main() {
 	}
 
 	if *once {
-		slog.Info("running digest, topic briefs, agenda scores and story links once")
-		runDigest()
+		slog.Info("running topic briefs, agenda scores and story links once")
 		runTopicBriefs()
 		runAgenda()
 		runStories()
@@ -104,26 +96,16 @@ func main() {
 		briefInterval = 720
 	}
 
-	digestCron := gocron.NewScheduler(time.UTC)
-	digestInterval := config.Config.DigestIntervalMinutes
-	slog.Info("starting digest cron jobs", "digest_interval_minutes", digestInterval, "topic_brief_interval_minutes", briefInterval)
-	if digestInterval > 0 {
-		_, err = digestCron.Every(digestInterval).Minutes().Do(runDigest)
-		if err != nil {
-			slog.Error("couldn't create digest cron job", "error", err)
-			os.Exit(1)
-		}
-	} else {
-		slog.Info("digest generation disabled")
-	}
-	_, err = digestCron.Every(briefInterval).Minutes().Do(runTopicBriefs)
+	scheduler := gocron.NewScheduler(time.UTC)
+	slog.Info("starting topic brief job", "interval_minutes", briefInterval)
+	_, err = scheduler.Every(briefInterval).Minutes().Do(runTopicBriefs)
 	if err != nil {
 		slog.Error("couldn't create topic brief cron job", "error", err)
 		os.Exit(1)
 	}
 	if storyInterval := config.Config.StoryIntervalMinutes; storyInterval > 0 {
 		slog.Info("starting story link job", "interval_minutes", storyInterval, "model", storyModel, "embedding_model", storyEmbeddingModel)
-		_, err = digestCron.Every(storyInterval).Minutes().Do(runStories)
+		_, err = scheduler.Every(storyInterval).Minutes().Do(runStories)
 		if err != nil {
 			slog.Error("couldn't create story link cron job", "error", err)
 			os.Exit(1)
@@ -134,7 +116,7 @@ func main() {
 
 	if agendaInterval := config.Config.AgendaIntervalMinutes; agendaInterval > 0 {
 		slog.Info("starting agenda job", "interval_minutes", agendaInterval)
-		_, err = digestCron.Every(agendaInterval).Minutes().Do(runAgenda)
+		_, err = scheduler.Every(agendaInterval).Minutes().Do(runAgenda)
 		if err != nil {
 			slog.Error("couldn't create agenda cron job", "error", err)
 			os.Exit(1)
@@ -143,10 +125,10 @@ func main() {
 		slog.Info("agenda scores disabled")
 	}
 
-	digestCron.StartBlocking()
+	scheduler.StartBlocking()
 }
 
-// acquireProcessLock ensures only one digest scheduler can use Gemini at a
+// acquireProcessLock ensures only one digen scheduler can use Gemini at a
 // time, even when digen is launched manually as well as through run.sh.
 func acquireProcessLock() (*os.File, error) {
 	lock, err := os.OpenFile("/tmp/gok-digen.lock", os.O_CREATE|os.O_RDWR, 0o600)
