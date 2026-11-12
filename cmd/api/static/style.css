@@ -6,6 +6,7 @@
   --live-green: #17844e;
   --tile-radius: 10px;
   --topbar-h: 54px;
+  --strip-h: 0px;
   --bottombar-h: 74px;
 }
 
@@ -285,7 +286,7 @@ body.is-stale .dot {
   gap: 6px;
   /* Fit inside the available viewport area while staying square */
   width: min(
-    calc(100dvh - var(--topbar-h) - var(--bottombar-h) - 24px),
+    calc(100dvh - var(--topbar-h) - var(--strip-h) - var(--bottombar-h) - 24px),
     calc(100dvw - 24px)
   );
   aspect-ratio: 1 / 1;
@@ -300,7 +301,7 @@ body.is-stale .dot {
 #topic-list {
   display: none;
   width: min(760px, calc(100dvw - 24px));
-  height: calc(100dvh - var(--topbar-h) - var(--bottombar-h) - 24px);
+  height: calc(100dvh - var(--topbar-h) - var(--strip-h) - var(--bottombar-h) - 24px);
   overflow-y: auto;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -348,6 +349,17 @@ body.list-view #radar-wrap {
 .topic-row:focus-visible {
   background: #edf7ef;
   outline: none;
+}
+
+.topic-row.in-story .topic-row-title::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: hsl(var(--story-hue), 65%, 42%);
+  vertical-align: 1px;
 }
 
 .topic-row.is-selected {
@@ -570,6 +582,98 @@ body.list-view #radar-wrap {
   line-clamp: 3;
   pointer-events: none;
   user-select: none;
+}
+
+/* Topics of one story share a dot colour (--story-hue, set per story). */
+.tile.in-story .tile-rank::after {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: hsl(var(--story-hue), 65%, 42%);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
+  vertical-align: 0;
+}
+
+.tile.in-story .tile-rank {
+  pointer-events: auto;
+}
+
+/* ── Story strip ────────────────────────────────────────── */
+body.has-stories {
+  --strip-h: 40px;
+}
+
+#story-strip {
+  height: var(--strip-h);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+#story-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.story-chip {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.story-chip::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(var(--story-hue), 65%, 42%);
+}
+
+.story-chip em {
+  color: var(--text-dim);
+  font-style: normal;
+  font-weight: 600;
+}
+
+.story-chip:hover,
+.story-chip:focus-visible,
+.story-chip.in-focus {
+  border-color: hsl(var(--story-hue), 55%, 42%);
+  outline: none;
+}
+
+.story-chip.in-focus {
+  background: hsl(var(--story-hue), 60%, 94%);
+}
+
+body.story-focus .tile:not(.in-focus),
+body.story-focus .topic-row:not(.in-focus) {
+  opacity: 0.3;
+  filter: saturate(0.5);
+}
+
+body.story-focus .tile.in-focus {
+  outline: 2px solid hsl(var(--story-hue), 55%, 42%);
+  outline-offset: 1px;
 }
 
 /* ── Ping ─────────────────────────────────────────────────── */
@@ -799,7 +903,7 @@ body:not(.scrubber-hint-dismissed) #timeline-scrubber::after {
 #brief-panel {
   position: fixed;
   left: 8px;
-  top: calc(var(--topbar-h) + 8px);
+  top: calc(var(--topbar-h) + var(--strip-h) + 8px);
   bottom: calc(var(--bottombar-h) + 8px);
   z-index: 90;
   width: min(370px, calc(100vw - 28px));
@@ -979,11 +1083,143 @@ body.brief-open #brief-panel {
   padding-left: 8px;
 }
 
+.brief-story-name {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.brief-story-name::before {
+  content: '';
+  flex-shrink: 0;
+  align-self: center;
+  width: 8px;
+  height: 8px;
+  margin-right: 1px;
+  border-radius: 50%;
+  background: hsl(var(--story-hue), 65%, 42%);
+}
+
+.brief-story-name em {
+  color: var(--text-dim);
+  font-style: normal;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Timeline: a line on the left, a ring per topic, filled for the open topic. */
+.brief-story-topics {
+  margin-top: 6px;
+  list-style: none;
+}
+
+.brief-story-topics li {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0 3px 18px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.brief-story-topics li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3px;
+  width: 2px;
+  background: hsl(var(--story-hue), 45%, 82%);
+}
+
+.brief-story-topics li:first-child::before {
+  top: 12px;
+}
+
+.brief-story-topics li:last-child::before {
+  bottom: calc(100% - 12px);
+}
+
+.brief-story-topics li:not(.brief-story-day, .brief-story-more)::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+  border: 2px solid hsl(var(--story-hue), 60%, 42%);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.brief-story-topics li.is-current::after {
+  background: hsl(var(--story-hue), 60%, 42%);
+}
+
+.brief-story-topics time {
+  flex: 0 0 36px;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.brief-story-title {
+  min-width: 0;
+  margin-left: calc(var(--depth, 0) * 10px);
+  border: 0;
+  background: none;
+  color: #2f5f49;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  text-decoration: none;
+}
+
+.brief-story-title:hover,
+.brief-story-title:focus-visible {
+  color: var(--live-green);
+  outline: none;
+  text-decoration: underline;
+}
+
+.brief-story-topics li.is-current .brief-story-title {
+  color: var(--text);
+  cursor: default;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.brief-story-live {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--live-green);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.brief-story-day,
+.brief-story-more {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.brief-story-day {
+  padding-top: 8px;
+}
+
 /* ── Debug Panel ─────────────────────────────────────────── */
 #debug-panel {
   position: fixed;
   right: 8px;
-  top: calc(var(--topbar-h) + 8px);
+  top: calc(var(--topbar-h) + var(--strip-h) + 8px);
   bottom: calc(var(--bottombar-h) + 8px);
   width: min(320px, calc(100vw - 28px));
   background: rgba(255, 255, 255, 0.96);
@@ -1247,7 +1483,7 @@ body.events-open #debug-panel {
     grid-template-columns: repeat(4, 1fr);
     gap: 3px;
     width: min(
-      calc(100dvh - var(--topbar-h) - var(--bottombar-h) - 12px),
+      calc(100dvh - var(--topbar-h) - var(--strip-h) - var(--bottombar-h) - 12px),
       calc(100dvw - 12px)
     );
   }
@@ -1290,7 +1526,7 @@ body.events-open #debug-panel {
 
   #topic-list {
     width: calc(100dvw - 12px);
-    height: calc(100dvh - var(--topbar-h) - var(--bottombar-h) - 12px);
+    height: calc(100dvh - var(--topbar-h) - var(--strip-h) - var(--bottombar-h) - 12px);
   }
 
   body.list-view #topic-list {
@@ -1349,7 +1585,7 @@ body.events-open #debug-panel {
     left: max(6px, env(safe-area-inset-left));
     right: max(6px, env(safe-area-inset-right));
     width: auto;
-    top: calc(var(--topbar-h) + 6px);
+    top: calc(var(--topbar-h) + var(--strip-h) + 6px);
     bottom: calc(var(--bottombar-h) + 6px);
   }
 
