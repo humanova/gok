@@ -37,7 +37,7 @@ type Configuration struct {
 	TopicBriefIntervalMinutes int    // how often to regenerate topic radar briefs (minutes)
 	ApiPort                   int    // port for gok-api HTTP server
 	StoryIntervalMinutes      int    // how often to link new topics into story threads (minutes); 0 disables it
-	StoryModel                string // judge model for story links, default gemini-3.5-flash
+	StoryModel                string // judge model for story links, default gemini-3.5-flash-lite
 	StoryEmbeddingModel       string // embedding model for story candidates, default gemini-embedding-2
 }
 
@@ -45,7 +45,7 @@ type Configuration struct {
 func (c Configuration) StoryModels() (judge, embedding string) {
 	judge, embedding = c.StoryModel, c.StoryEmbeddingModel
 	if judge == "" {
-		judge = "gemini-3.5-flash"
+		judge = "gemini-3.5-flash-lite"
 	}
 	if embedding == "" {
 		embedding = "gemini-embedding-2"
