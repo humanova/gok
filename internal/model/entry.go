@@ -29,6 +29,20 @@ func InitDb() error {
 	return nil
 }
 
+// InitStoryDb connects without the startup DDL that InitDb runs on the large
+// tables and only creates the topic_stories table. Used by the stories command.
+func InitStoryDb() error {
+	db, err := openDb()
+	if err != nil {
+		return err
+	}
+	if err := db.AutoMigrate(&TopicStory{}); err != nil {
+		return err
+	}
+	database = db
+	return nil
+}
+
 // DB returns the underlying *gorm.DB for use by packages that need raw queries (e.g. rag).
 func DB() *gorm.DB {
 	return database

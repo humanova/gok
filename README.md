@@ -26,6 +26,10 @@ The API serves the Radar UI at `/`. It ranks topics by recent entry activity, sh
 AI-generated briefs give readers a concise explanation of a selected topic when Gemini is configured.
 
 
+### Story Threads
+
+Radar groups new topics that belong to the same event. When a new topic gets its third entry, `digen` embeds its title and first entries, takes the five most similar earlier new topics, and asks the Gemini Decisions API for each one whether the new topic belongs to its story. The most likely one becomes its parent if its probability is at least 0.5, and a story is the tree of these links. Radar lists the stories in a strip above the grid (a chip highlights its topics), marks their topics with a coloured dot, and shows the selected topic's story as a timeline in the topic panel.
+
 ### Topic Map
 
 Atlas is an offline snapshot of durable, recently active topics. It connects topics when enough of the same writers participate in both, forms communities from those links, assigns browseable regions, computes coordinates, validates the layout, and publishes the result atomically.
@@ -89,3 +93,10 @@ The `digen` worker creates both topic briefs and the periodic digest. Generate e
 ./digen --once
 ```
 
+Story threads run in `digen` every `StoryIntervalMinutes` (0 disables them) with `StoryModel` and `StoryEmbeddingModel`. To link topics from an earlier period, run the stories command; it decides topics in the order they got their third entry, as the live job does:
+
+```bash
+go build -o stories ./cmd/stories
+./stories -since 2026-08-01 -dry-run   # print the links without saving
+./stories -since 2026-08-01
+```
