@@ -17,7 +17,7 @@ func TestSnapshotMarksTopicsMissingFromPreviousWindowAsNew(t *testing.T) {
 	cache.firstPopularAt = map[uint64]int64{}
 	cache.mu.Unlock()
 
-	snapshot := buildSnapshot(now-liveWindowSecs, now)
+	snapshot := buildSnapshot(now-liveWindowSecs, now, nil)
 	byID := map[uint64]TopicMeta{}
 	for _, topic := range snapshot.Topics {
 		byID[topic.ID] = topic.TopicMeta

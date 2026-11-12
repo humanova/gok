@@ -27,6 +27,8 @@ const state = {
   mode: 'live',          // 'live' | 'scrub'
   topics: [],            // current topic list (ranked)
   focusedStory: null,    // root topic id of the story highlighted from the strip
+  agendaOnly: false,     // only topics about what is happening now (no football, no everyday chat)
+  storyHues: new Map(),  // story root id → hue, spread by strip order
   pendingTimers: [],     // setTimeout IDs (for bulk cancel)
   seenTimestampCounts: {}, // topicId → timestamp → event count already scheduled
   pollTimer: null,
@@ -364,7 +366,7 @@ function recentVisualEventCount(timestamps, playbackTs) {
 // ── API calls ────────────────────────────────────────────────────────────────
 async function fetchLive() {
   try {
-    const r = await fetch('api/pulse');
+    const r = await fetch(`api/pulse${state.agendaOnly ? '?gundem=1' : ''}`);
     if (!r.ok) throw new Error(r.status);
     return await r.json();
   } catch (e) {
@@ -375,7 +377,7 @@ async function fetchLive() {
 
 async function fetchRange(since, until) {
   try {
-    const url = `api/pulse/range?since=${Math.floor(since)}&until=${Math.floor(until)}`;
+    const url = `api/pulse/range?since=${Math.floor(since)}&until=${Math.floor(until)}${state.agendaOnly ? '&gundem=1' : ''}`;
     const r = await fetch(url);
     if (!r.ok) throw new Error(r.status);
     return await r.json();
@@ -557,9 +559,9 @@ function updateTileDetails(tile, t, playbackTs = currentPlaybackTs()) {
   applyStoryMark(tile, t);
 }
 
-/** Topics of one story share a colour; the hue comes from the story's root topic id. */
+/** Topics of one story share a colour; hues are spread by the story's place in the strip. */
 function storyHue(storyID) {
-  return Math.round((Number(storyID) * 137.508) % 360);
+  return state.storyHues.get(Number(storyID)) ?? Math.round((Number(storyID) * 137.508) % 360);
 }
 
 function storyLabel(story) {
@@ -583,10 +585,14 @@ function applyStoryMark(el, topic) {
 
 /** One chip per story on Radar, in rank order; a chip highlights its story's topics. */
 function renderStoryStrip(topics) {
-  const strip = $id('story-strip');
+  const strip = $id('story-chips');
   const stories = new Map();
   topics.forEach(topic => {
     if (topic.story && !stories.has(topic.story.id)) stories.set(topic.story.id, topic.story);
+  });
+  state.storyHues = new Map([...stories.keys()].map((id, index) => [id, Math.round((205 + index * 137.508) % 360)]));
+  document.querySelectorAll('[data-story]').forEach(el => {
+    if (el.dataset.story) el.style.setProperty('--story-hue', storyHue(el.dataset.story));
   });
   if (!stories.has(state.focusedStory)) state.focusedStory = null;
 
@@ -605,8 +611,6 @@ function renderStoryStrip(topics) {
     chip.addEventListener('click', () => focusStory(state.focusedStory === story.id ? null : story.id));
     return chip;
   }));
-  strip.hidden = stories.size === 0;
-  document.body.classList.toggle('has-stories', stories.size > 0);
   focusStory(state.focusedStory);
 }
 
@@ -855,51 +859,70 @@ function renderTopicBrief(brief) {
   renderStory(content, brief.story);
 }
 
-const STORY_LIST_HEAD = 3;
-const STORY_LIST_TAIL = 12;
+const STORY_HEAD = 2;      // topics always shown at the start of a long story
+const STORY_TAIL = 8;      // and at its end
 const STORY_TZ = 'Europe/Istanbul';
 
-/** The selected topic's story as a timeline: oldest first, replies indented under the topic they follow. */
-function renderStory(container, story) {
+function storyDate(ts, options) {
+  return new Date(ts * 1000).toLocaleDateString('tr-TR', { timeZone: STORY_TZ, ...options });
+}
+
+/** The selected topic's story as a timeline, oldest first. Long stories fold their middle. */
+function renderStory(container, story, expanded = false) {
   if (!story?.topics?.length) return;
+  const topics = story.topics;
+  const currentID = state.selectedTopic?.id;
+
   const heading = document.createElement('h3');
   heading.textContent = 'Hikaye';
-
   const section = document.createElement('section');
   section.className = 'brief-story';
   section.style.setProperty('--story-hue', storyHue(story.id));
 
-  const name = document.createElement('p');
-  name.className = 'brief-story-name';
-  const size = document.createElement('em');
-  size.textContent = `· ${story.size} başlık`;
-  name.append(story.title, size);
+  const first = storyDate(topics[0].ready_at, { day: 'numeric', month: 'short' });
+  const last = storyDate(topics.at(-1).ready_at, { day: 'numeric', month: 'short' });
+  const meta = document.createElement('p');
+  meta.className = 'brief-story-meta';
+  meta.title = story.title;
+  meta.textContent = `${story.size} başlık · ${first === last ? first : `${first} – ${last}`}`;
 
-  const depth = {};
-  story.topics.forEach(topic => {
-    depth[topic.id] = topic.parent_id in depth ? depth[topic.parent_id] + 1 : 0;
-  });
-  let topics = story.topics;
-  let hidden = 0;
-  if (topics.length > STORY_LIST_HEAD + STORY_LIST_TAIL) {
-    hidden = topics.length - STORY_LIST_HEAD - STORY_LIST_TAIL;
-    topics = [...topics.slice(0, STORY_LIST_HEAD), null, ...topics.slice(-STORY_LIST_TAIL)];
+  const shown = new Set(topics.map((_, i) => i));
+  if (!expanded && topics.length > STORY_HEAD + STORY_TAIL + 2) {
+    shown.clear();
+    const current = topics.findIndex(t => t.id === currentID);
+    topics.forEach((_, i) => {
+      if (i < STORY_HEAD || i >= topics.length - STORY_TAIL || Math.abs(i - current) <= 1) shown.add(i);
+    });
   }
 
   const list = document.createElement('ol');
   list.className = 'brief-story-topics';
-  const currentID = state.selectedTopic?.id;
   let lastDay = '';
-  topics.forEach(topic => {
-    if (topic === null) {
-      const more = document.createElement('li');
-      more.className = 'brief-story-more';
-      more.textContent = `… ${hidden} başlık daha`;
-      list.appendChild(more);
+  let folded = 0;
+  const flushFold = () => {
+    if (!folded) return;
+    const item = document.createElement('li');
+    item.className = 'brief-story-more';
+    const more = document.createElement('button');
+    more.type = 'button';
+    more.textContent = `${folded} başlık daha`;
+    more.addEventListener('click', () => {
+      heading.remove();
+      section.remove();
+      renderStory(container, story, true);
+    });
+    item.appendChild(more);
+    list.appendChild(item);
+    folded = 0;
+  };
+
+  topics.forEach((topic, index) => {
+    if (!shown.has(index)) {
+      folded++;
       return;
     }
-    const date = new Date(topic.ready_at * 1000);
-    const day = date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', timeZone: STORY_TZ });
+    flushFold();
+    const day = storyDate(topic.ready_at, { day: 'numeric', month: 'long', weekday: 'short' });
     if (day !== lastDay) {
       const dayItem = document.createElement('li');
       dayItem.className = 'brief-story-day';
@@ -909,15 +932,18 @@ function renderStory(container, story) {
     }
 
     const item = document.createElement('li');
-    item.style.setProperty('--depth', Math.min(depth[topic.id], 3));
+    item.className = 'brief-story-topic';
     const when = document.createElement('time');
-    when.dateTime = date.toISOString();
-    when.textContent = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: STORY_TZ });
+    when.dateTime = new Date(topic.ready_at * 1000).toISOString();
+    when.textContent = new Date(topic.ready_at * 1000).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: STORY_TZ });
 
     const onRadar = state.topics.find(t => t.id === topic.id);
     let label;
     if (topic.id === currentID) {
-      label = document.createElement('span');
+      label = document.createElement('a');
+      label.href = topicPopularURL(topic);
+      label.target = '_blank';
+      label.rel = 'noopener noreferrer';
       item.classList.add('is-current');
     } else if (onRadar) {
       label = document.createElement('button');
@@ -925,23 +951,24 @@ function renderStory(container, story) {
       label.addEventListener('click', () => openTopicBrief(onRadar));
     } else {
       label = document.createElement('a');
-      label.href = topicPopularURL(topic);
+      label.href = topic.url || `https://eksisozluk.com/?q=${encodeURIComponent(topic.title)}`;
       label.target = '_blank';
       label.rel = 'noopener noreferrer';
     }
     label.className = 'brief-story-title';
-    label.textContent = topic.title;
-    item.append(when, label);
+    label.textContent = shortStoryTitle(topic.title);
     if (onRadar) {
-      const live = document.createElement('span');
-      live.className = 'brief-story-live';
-      live.textContent = 'radarda';
-      item.appendChild(live);
+      item.classList.add('on-radar');
+      label.title = `${topic.title} · radarda`;
+    } else {
+      label.title = topic.title;
     }
+    item.append(when, label);
     list.appendChild(item);
   });
+  flushFold();
 
-  section.append(name, list);
+  section.append(meta, list);
   container.append(heading, section);
 }
 
@@ -1549,6 +1576,23 @@ function setView(view) {
   }
 }
 
+/** The gündem switch reloads the current view, live or replay, with only gündem topics. */
+function initAgendaToggle() {
+  const button = $id('agenda-toggle');
+  const apply = on => {
+    state.agendaOnly = on;
+    button.setAttribute('aria-pressed', String(on));
+    document.body.classList.toggle('agenda-only', on);
+  };
+  apply(new URL(window.location.href).searchParams.get('gundem') === '1');
+  button.addEventListener('click', () => {
+    apply(!state.agendaOnly);
+    updateURLParam('gundem', state.agendaOnly ? 1 : null);
+    if (state.mode === 'live') goLive();
+    else seekTo(currentPlaybackTs());
+  });
+}
+
 function initViewToggle() {
   let initialView = 'grid';
   try {
@@ -1577,6 +1621,7 @@ async function init() {
   $id('go-live').addEventListener('click', () => goLive(true));
 
   initScrubber();
+  initAgendaToggle();
   initViewToggle();
 
   // Wire up speed buttons.
