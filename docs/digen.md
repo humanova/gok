@@ -6,8 +6,6 @@
 <img src="digen.drawio.png" alt="how digen works"/>
 </div>
 
-The diagram is editable: open `digen.drawio.png` in [draw.io](https://app.diagrams.net).
-
 ## Settings
 
 | Setting | Live value | What it does |
